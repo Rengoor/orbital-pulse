@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 
+from backend.records.signing import sign
+
 _TIER_ORDER = {"GREEN": 0, "YELLOW": 1, "RED": 2, "GREY": 3}
 
 URGENT_TIERS = frozenset({"RED", "GREY"})
@@ -34,6 +36,20 @@ def summarize(record: dict) -> dict:
     }
 
 
+def build_anchor(record: dict, signing_key: str | None = None) -> dict:
+    """Compact signed chain anchor for a Record, sent automatically on downlink."""
+    anchor = {
+        "record_id": record["id"],
+        "astronaut_id": record["astronaut_id"],
+        "ts": record["ts"],
+        "prev_hash": record["prev_hash"],
+        "hash": record["hash"],
+    }
+    payload = json.dumps(anchor, separators=(",", ":"), sort_keys=True)
+    anchor["signature"] = sign(payload, signing_key)
+    return anchor
+
+
 def payload_bytes(obj) -> int:
     """Size of *obj* on the wire as compact JSON."""
     return len(json.dumps(obj, separators=(",", ":"), sort_keys=True).encode("utf-8"))
@@ -43,17 +59,27 @@ class DownlinkQueue:
     def __init__(self, long_delay_s: float = LONG_DELAY_S) -> None:
         self.long_delay_s = long_delay_s
         self._pending: list[tuple[int, dict]] = []  # (arrival order, summary)
+        self._anchors: list[dict] = []
         self._arrivals = 0
 
     def __len__(self) -> int:
         return len(self._pending)
 
-    def enqueue(self, record: dict) -> dict:
-        """Queue the summary of *record* and return it."""
+    def enqueue(self, record: dict, signing_key: str | None = None) -> dict:
+        """Queue the summary and automatic anchor of *record* and return the summary."""
         summary = summarize(record)
         self._pending.append((self._arrivals, summary))
+        self._anchors.append(build_anchor(record, signing_key=signing_key))
         self._arrivals += 1
         return summary
+
+    def anchors(self) -> list[dict]:
+        """All automatically produced chain anchors, oldest first."""
+        return [dict(a) for a in self._anchors]
+
+    def latest_anchor(self) -> dict | None:
+        """Most recently produced chain anchor, or None when no record has been queued."""
+        return dict(self._anchors[-1]) if self._anchors else None
 
     def pending(self) -> list[dict]:
         """Everything still waiting, in send order: worst tier first, then oldest."""

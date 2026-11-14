@@ -5,13 +5,13 @@ setup-%:
 	$*/.venv/bin/pip install -r $*/requirements.txt
 
 api:
-	uvicorn backend.api.main:app --reload
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} backend/.venv/bin/uvicorn backend.api.main:create_app --factory --host 127.0.0.1 --port 8000 --reload
 
 ui:
-	streamlit run frontend/app.py
+	backend/.venv/bin/python -m frontend.app
 
 reproduce:
-	python -m evidence.run_all --seed 42
+	backend/.venv/bin/python -m evidence.run_all --seed 42
 
 test:
-	pytest backend/tests data/tests evidence -q
+	backend/.venv/bin/pytest backend/tests data/tests evidence -q

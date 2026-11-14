@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · HelmetHUD</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/vitalis.css">
+<style>
+  .hw { padding: var(--space-6); display: grid; gap: var(--space-4); width: 1008px; box-sizing: border-box; }
+  .visor { position: relative; width: 960px; height: 540px; border-radius: 140px 140px 96px 96px; overflow: hidden; border: 6px solid var(--line-strong); box-shadow: var(--panel); color: var(--ink); }
+  .visor svg.scene { position: absolute; inset: 0; }
+  .visor .tint { position: absolute; inset: 0; pointer-events: none; }
+  .visor[data-light="sun"] .tint { background: rgba(120, 82, 20, .28); }
+
+  /* HUD layer: an emissive display, always rendered in the night palette (set on .visor) */
+  .h-plate { position: absolute; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 14px; }
+  .h-lbl { font: 600 13px/16px var(--font-sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); }
+  .h-num { font: 500 34px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+  .h-unit { font: 400 14px/1 var(--font-mono); color: var(--ink-muted); margin-left: 4px; }
+  .h-mono { font: 500 16px/22px var(--font-mono); color: var(--ink); }
+
+  .h-tl { left: 56px; top: 44px; display: grid; gap: 4px; }
+  .h-tr { right: 56px; top: 44px; display: grid; gap: 6px; justify-items: end; }
+  .h-state { display: flex; align-items: center; gap: 8px; font: 600 16px/20px var(--font-sans); letter-spacing: .1em; text-transform: uppercase; }
+  .h-state svg { width: 22px; height: 22px; }
+
+  .h-flag { left: calc(50% + 40px); top: 40px; transform: translateX(-50%); width: 392px; box-sizing: border-box; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: center; border-width: 2px; }
+  .h-flag svg { grid-row: 1 / 3; width: 40px; height: 40px; }
+  .h-flag .what { font: 600 18px/22px var(--font-sans); color: var(--ink); }
+  .h-flag .act { font: 500 19px/24px var(--font-sans); color: var(--ink); }
+  .h-flag .hint { grid-column: 2; font: 400 13px/16px var(--font-mono); color: var(--ink-muted); margin-top: 4px; }
+  .h-flag.pending { border-style: dashed; border-color: var(--line-strong); }
+  .h-flag.pending .what { color: var(--ink-muted); font-weight: 500; }
+  .h-ack { left: calc(50% + 40px); top: 40px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 14px; }
+  .h-ack svg { width: 20px; height: 20px; }
+
+  .h-row { left: 56px; right: 150px; bottom: 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; position: absolute; }
+  .h-vital { position: relative; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 14px; display: grid; gap: 6px; }
+  .h-vital .top { display: flex; align-items: center; justify-content: space-between; }
+  .h-vital svg { width: 20px; height: 20px; }
+  .h-vital.ok .h-num { color: var(--ink-muted); }
+  .t-YELLOW { color: var(--tier-yellow); border-color: var(--tier-yellow) !important; }
+  .t-RED { color: var(--tier-red); border-color: var(--tier-red) !important; }
+  .t-GREY { color: var(--tier-grey); border-color: var(--tier-grey) !important; }
+  .t-GREEN { color: var(--tier-green); }
+  .h-vital.t-YELLOW, .h-vital.t-RED, .h-vital.t-GREY { border-width: 2px; }
+  .h-fig { right: 56px; bottom: 40px; width: 72px; height: 104px; padding: 6px; display: grid; place-items: center; }
+  .h-fig .fig { fill: none; stroke: var(--holo); stroke-width: 1.5; }
+
+  .ctl { display: grid; grid-template-columns: 1fr auto; gap: var(--space-4); align-items: start; }
+  .ctl-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+  .note { margin: 0; font: 400 13px/18px var(--font-sans); color: var(--ink-muted); max-width: 640px; }
+  .note b { color: var(--ink); font-weight: 600; }
+</style>
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/vitalis.js"></script>
+<script src="../js/api.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+  // Checker thresholds for the suit channels. A flag commits only after 3 consecutive out-of-band readings.
+  var CH = [
+    { id: 'hr', label: 'Heart rate', unit: 'bpm', dp: 0, zone: 'chest', rule: function (v) { return v == null ? 'GREY' : v >= 160 ? 'RED' : v >= 125 ? 'YELLOW' : 'GREEN'; },
+      act: { YELLOW: 'Slow your pace. Rest 5 minutes.', RED: 'Stop work. Rest and call the CMO.', GREY: 'Heart rate sensor lost. Check harness at next stop.' } },
+    { id: 'temp', label: 'Core temp', unit: '°C', dp: 1, zone: 'core', rule: function (v) { return v == null ? 'GREY' : v >= 39 ? 'RED' : v >= 38.2 ? 'YELLOW' : 'GREEN'; },
+      act: { YELLOW: 'Running warm. Set cooling to max.', RED: 'Overheating. Stop and return to airlock.', GREY: 'Temperature sensor lost.' } },
+    { id: 'co2', label: 'Suit CO2', unit: 'mmHg', dp: 1, zone: 'helmet', rule: function (v) { return v == null ? 'GREY' : v >= 8 ? 'RED' : v >= 5 ? 'YELLOW' : 'GREEN'; },
+      act: { YELLOW: 'CO2 rising. Slow down, breathe easy.', RED: 'Open purge valve. Return to airlock.', GREY: 'CO2 sensor lost.' } },
+    { id: 'dose', label: 'Dose rate', unit: 'µSv/h', dp: 1, zone: 'all', rule: function (v) { return v == null ? 'GREY' : v >= 20 ? 'RED' : v >= 5 ? 'YELLOW' : 'GREEN'; },
+      act: { YELLOW: 'Dose rate elevated. Finish task, head in.', RED: 'Solar particle event. Return to habitat now.', GREY: 'Dosimeter lost.' } }
+  ];
+  var BASE = { hr: 94, temp: 37.1, co2: 2.6, dose: 0.6 };
+  var SCEN = [
+    { id: 'nominal', label: 'Nominal', target: {} },
+    { id: 'hr', label: 'Heart rate climbs', target: { hr: 138 } },
+    { id: 'temp', label: 'Running warm', target: { temp: 38.6 } },
+    { id: 'co2', label: 'Suit CO2 spike', target: { co2: 9.2 } },
+    { id: 'spe', label: 'Solar particle event', target: { dose: 34 } },
+    { id: 'drop', label: 'Sensor dropout', target: { hr: null } }
+  ];
+  var RANK = { GREEN: 0, GREY: 1, YELLOW: 2, RED: 3 };
+  var WORD = { GREEN: 'Nominal', YELLOW: 'Watch', RED: 'Act now', GREY: 'No data' };
+
+  function Fig(p) {
+    var dot = { chest: [36, 40], core: [36, 56], helmet: [36, 16] }[p.zone];
+    return h('svg', { viewBox: '0 0 72 104', width: 60, height: 88, 'aria-hidden': true },
+      h('circle', { className: 'fig', cx: 36, cy: 16, r: 11 }),
+      h('path', { className: 'fig', d: 'M22 30h28l4 40H18zM18 32l-8 30M54 32l8 30M24 70l-2 30M48 70l2 30' }),
+      p.zone === 'all' ? h('rect', { x: 4, y: 2, width: 64, height: 100, rx: 10, fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeDasharray: '4 3' }) : null,
+      dot ? h('circle', { cx: dot[0], cy: dot[1], r: 6, fill: 'currentColor', stroke: 'var(--void)', strokeWidth: 2 }) : null);
+  }
+
+  function Scene(p) {
+    var sun = p.light === 'sun';
+    return h('svg', { className: 'scene', viewBox: '0 0 960 540', preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': true },
+      h('rect', { width: 960, height: 540, fill: '#020305' }),
+      [[80, 60], [210, 120], [400, 40], [620, 90], [880, 150], [300, 200], [720, 30]].map(function (s, i) { return h('circle', { key: i, cx: s[0], cy: s[1], r: 1.2, fill: '#cfd6dd', opacity: sun ? .25 : .8 }); }),
+      sun ? h('circle', { cx: 840, cy: 70, r: 120, fill: '#fffdf2', opacity: .16 }) : null,
+      sun ? h('circle', { cx: 840, cy: 70, r: 34, fill: '#fffdf2', opacity: .9 }) : null,
+      h('path', { d: 'M0 300 Q140 270 300 292 T620 280 T960 300 V540 H0Z', fill: sun ? '#a8a49c' : '#26282b' }),
+      h('path', { d: 'M0 360 Q200 330 420 356 T960 350 V540 H0Z', fill: sun ? '#c9c5bc' : '#1b1c1f' }),
+      h('ellipse', { cx: 520, cy: 430, rx: 150, ry: 26, fill: sun ? '#8d8981' : '#121315' }),
+      h('ellipse', { cx: 180, cy: 470, rx: 60, ry: 14, fill: sun ? '#7c7870' : '#101113' }),
+      h('path', { d: 'M640 400l30-34 40 10 14 28z', fill: sun ? '#7a766e' : '#141517' }));
+  }
+
+  function App() {
+    var sc = React.useState('nominal'), lt = React.useState('sun'), tk = React.useState(0), ak = React.useState(null);
+    var apiState = React.useState({ online: false, lastRecId: null, lastAction: null });
+    var counts = React.useRef({}), committed = React.useRef({}), lastSentKey = React.useRef('');
+
+    React.useEffect(function () {
+      if (API) {
+        API.health().then(function () {
+          apiState[1](function (p) { return Object.assign({}, p, { online: true }); });
+        }).catch(function () {});
+      }
+    }, []);
+    React.useEffect(function () { var id = setInterval(function () { tk[1](function (t) { return t + 1; }); }, 1100); return function () { clearInterval(id); }; }, []);
+
+    var since = React.useRef({ id: 'nominal', at: 0 });
+    if (since.current.id !== sc[0]) since.current = { id: sc[0], at: tk[0] };
+    var s = SCEN.filter(function (x) { return x.id === sc[0]; })[0], k = Math.min(1, (tk[0] - since.current.at) / 5);
+    var jitter = Math.sin(tk[0] * 1.7);
+    var vals = {}, raw = {};
+    CH.forEach(function (c) {
+      var tgt = s.target.hasOwnProperty(c.id) ? s.target[c.id] : BASE[c.id];
+      var v = tgt === null ? (k >= .2 ? null : BASE[c.id]) : BASE[c.id] + (tgt - BASE[c.id]) * k + jitter * (c.id === 'hr' ? 1.5 : c.id === 'dose' ? .05 : .03);
+      vals[c.id] = v; raw[c.id] = c.rule(v);
+    });
+    // Checker persistence: evaluate once per tick
+    var last = React.useRef(-1);
+    if (last.current !== tk[0]) {
+      last.current = tk[0];
+      CH.forEach(function (c) {
+        var r = raw[c.id], prev = committed.current[c.id] || 'GREEN';
+        if (r === prev) { counts.current[c.id] = 0; return; }
+        counts.current[c.id] = (counts.current[c.id] || 0) + 1;
+        if (counts.current[c.id] >= 3) { committed.current[c.id] = r; counts.current[c.id] = 0; }
+      });
+    }
+    var tier = {}; CH.forEach(function (c) { tier[c.id] = committed.current[c.id] || 'GREEN'; });
+    var worst = CH.slice().sort(function (a, b) { return RANK[tier[b.id]] - RANK[tier[a.id]]; })[0];
+    var wt = tier[worst.id];
+    var pend = CH.filter(function (c) { return raw[c.id] !== tier[c.id] && RANK[raw[c.id]] > RANK[tier[c.id]] && counts.current[c.id] > 0; })[0];
+    var flagKey = wt !== 'GREEN' ? worst.id + wt : null;
+    var acked = flagKey && ak[0] === flagKey;
+
+    // When a new committed state is reached and backend is live, log the signed check-in record
+    var commitSignature = sc[0] + ':' + wt + ':' + worst.id;
+    React.useEffect(function () {
+      if (!API || !apiState[0].online || lastSentKey.current === commitSignature) return;
+      lastSentKey.current = commitSignature;
+      var tsIso = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+      var readings = [
+        { id: 'eva-hr', astronaut_id: 'eva_02', ts: tsIso, channel: 'heart_rate', value: vals.hr == null ? 94 : Math.round(vals.hr), unit: 'bpm', source: 'simulated', quality: vals.hr == null ? 'fault' : 'ok' },
+        { id: 'eva-temp', astronaut_id: 'eva_02', ts: tsIso, channel: 'temperature', value: Number((vals.temp || 37.1).toFixed(1)), unit: 'C', source: 'simulated', quality: 'ok' },
+        { id: 'eva-co2', astronaut_id: 'eva_02', ts: tsIso, channel: 'co2_ppm', value: Math.round((vals.co2 || 2.6) * 850), unit: 'ppm', source: 'simulated', quality: 'ok' },
+        { id: 'eva-dose', astronaut_id: 'eva_02', ts: tsIso, channel: 'dose_rate_usv_h', value: vals.dose >= 20 ? 220 : Number((vals.dose || 0.6).toFixed(1)), unit: 'uSv/h', source: 'nasa_radlab', quality: 'ok' }
+      ];
+      API.checkin('eva_02', readings).then(function (res) {
+        apiState[1]({ online: true, lastRecId: res.record_id, lastAction: res.verdict.action });
+      }).catch(function () {});
+    }, [commitSignature, apiState[0].online]);
+
+    var elapsed = 2 * 3600 + 47 * 60 + tk[0], left = 5 * 3600 + 12 * 60 - tk[0];
+    function hm(x) { return Math.floor(x / 3600) + ':' + String(Math.floor(x / 60) % 60).padStart(2, '0'); }
+
+    var flag = null;
+    if (flagKey && !acked) {
+      flag = h('div', { className: 'h-plate h-flag t-' + wt, role: 'alert' },
+        h(I, { name: 'tier-' + wt }),
+        h('div', { className: 'what' }, worst.label + ' ' + (vals[worst.id] == null ? '--' : vals[worst.id].toFixed(worst.dp)) + ' ' + worst.unit + ' · ' + WORD[wt]),
+        h('div', { className: 'act' }, worst.act[wt]),
+        h('div', { className: 'hint' }, 'Say "acknowledge" or press DCM button 2'));
+    } else if (flagKey && acked) {
+      flag = h('div', { className: 'h-plate h-ack t-' + wt }, h(I, { name: 'tier-' + wt }), h('span', { className: 'h-mono' }, 'ACK · ' + worst.act[wt]));
+    } else if (pend) {
+      flag = h('div', { className: 'h-plate h-flag pending' },
+        h(I, { name: 'clock' }),
+        h('div', { className: 'what' }, 'Checking ' + pend.label.toLowerCase() + ' · ' + counts.current[pend.id] + '/3 readings'),
+        h('div', { className: 'hint', style: { marginTop: 0 } }, 'No action yet. Flags need 3 readings in a row.'));
+    }
+
+    var checkerLabel = apiState[0].online
+      ? ('Link 1.3 s · Checker LIVE' + (apiState[0].lastRecId ? ' · #' + apiState[0].lastRecId.slice(0, 6) : ''))
+      : 'Link 1.3 s · Checker local';
+
+    return h('div', { className: 'hw' },
+      h('div', { className: 'visor', 'data-theme': 'night', 'data-light': lt[0], role: 'img', 'aria-label': 'Helmet display simulation' },
+        h(Scene, { light: lt[0] }), h('div', { className: 'tint' }),
+        h('div', { className: 'h-plate h-tl' },
+          h('span', { className: 'h-lbl' }, 'EVA 02 · ' + hm(elapsed) + ' elapsed'),
+          h('span', { className: 'h-mono' }, 'O2 ', h('b', null, hm(left)), ' left'),
+          h('span', { className: 'h-lbl' }, checkerLabel)),
+        h('div', { className: 'h-plate h-tr' },
+          h('span', { className: 'h-state t-' + wt }, h(I, { name: 'tier-' + wt }), WORD[wt])),
+        flag,
+        h('div', { className: 'h-row' }, CH.map(function (c) {
+          var t = tier[c.id], v = vals[c.id];
+          return h('div', { key: c.id, className: 'h-vital ' + (t === 'GREEN' ? 'ok' : 't-' + t) },
+            h('div', { className: 'top' }, h('span', { className: 'h-lbl' }, c.label), t === 'GREEN' ? null : h(I, { name: 'tier-' + t })),
+            h('div', null, h('span', { className: 'h-num' }, v == null ? '--' : v.toFixed(c.dp)), h('span', { className: 'h-unit' }, c.unit)));
+        })),
+        h('div', { className: 'h-plate h-fig t-' + wt }, h(Fig, { zone: wt === 'GREEN' ? null : worst.zone }))),
+      h('div', { className: 'ctl' },
+        h('div', { style: { display: 'grid', gap: 'var(--space-3)' } },
+          h('span', { className: 'vt-lbl' }, 'Simulate'),
+          h('div', { className: 'ctl-row' }, SCEN.map(function (x) {
+            return h(V.Button, { key: x.id, size: 'sm', variant: x.id === sc[0] ? 'primary' : 'secondary', onClick: function () { sc[1](x.id); ak[1](null); } }, x.label);
+          })),
+          h('p', { className: 'note' }, h('b', null, 'Design rules: '), 'only the wearer’s own data; nothing moves; nominal values sit dim; a flag needs 3 consecutive readings and always carries one action; the centre of the view stays clear; text is 13px or larger for near-vision shift.')),
+        h('div', { style: { display: 'grid', gap: 'var(--space-3)', justifyItems: 'end' } },
+          h(V.SegmentedControl, { ariaLabel: 'Lighting', value: lt[0], onChange: lt[1], options: [{ value: 'sun', label: 'Sunlit', icon: 'sun' }, { value: 'shade', label: 'Shadow', icon: 'cube' }] }),
+          h(V.Button, { variant: 'secondary', icon: 'check', disabled: !flagKey || acked, onClick: function () { ak[1](flagKey); } }, 'Acknowledge'))));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

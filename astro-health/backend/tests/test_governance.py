@@ -1,8 +1,7 @@
 """Governance-layer tests: one section per point of the governance audit.
 
 Point 2 (a confirmed data fault invalidates a reading instead of lowering
-severity) is deliberately not covered here: it reverses an existing Checker
-rule and is handled separately.
+severity) is covered in its own section below and in test_checker.py.
 
 Owner: person A and person B
 """
@@ -18,7 +17,7 @@ import httpx
 import jsonschema
 import pytest
 import yaml
-from hypothesis import assume, given
+from hypothesis import given
 from hypothesis import strategies as st
 
 from backend import cli
@@ -231,6 +230,71 @@ def test_checker_skips_the_requirements_gate_only_when_no_report_is_given():
 
 
 # ---------------------------------------------------------------------------
+# 2. A confirmed data fault invalidates a reading; it does not lower severity
+# ---------------------------------------------------------------------------
+
+def _confirmed(pid, tier, reading_ids):
+    return _proposal(pid, tier, data_fault=True, reading_ids=reading_ids)
+
+
+def test_confirmed_fault_never_turns_grey_into_red():
+    """The old one-step-down rule made GREY into RED out of nothing."""
+    proposals = [_confirmed("a_statistical", "GREY", ["r1"]), _confirmed("b_limits", "GREY", ["r1"])]
+    assert check(proposals, [_reading(quality="fault")], POLICY_PATH)["tier"] == "GREY"
+
+
+def test_dropping_the_only_reading_leaves_too_little_evidence_so_grey_not_green():
+    """Fault correction is not medical recovery: nothing left to assess is not an all-clear."""
+    readings = [_reading("r1", value=150.0, quality="fault")]
+    proposals = [_confirmed("a_statistical", "RED", ["r1"]), _confirmed("b_limits", "RED", ["r1"])]
+    integrity = input_gate.evaluate(readings, NOW, REQUIREMENTS)
+
+    verdict = check(proposals, readings, POLICY_PATH, integrity=integrity, reevaluate=lambda remaining: [])
+    assert verdict["tier"] == "GREY"
+    assert "0 valid reading(s)" in verdict["reasons"][0]
+    issue = verdict["decision_trace"]["data_quality"]["issues"][0]
+    assert issue["status"] == "confirmed_fault" and "confirmed_data_fault" in issue["issues"]
+    # The caller's report is not modified.
+    assert integrity["readings"][0]["status"] == "fault"
+
+
+def test_confirmed_fault_is_dropped_and_the_rest_is_reassessed():
+    readings = [_reading("bad", value=150.0, quality="fault"), _reading("good", channel="sleep_hours", value=5.0)]
+    proposals = [_confirmed("a_statistical", "RED", ["bad"]), _confirmed("b_limits", "RED", ["bad"])]
+    integrity = input_gate.evaluate(readings, NOW, REQUIREMENTS)
+    seen = []
+
+    def reevaluate(remaining):
+        seen.append([r["id"] for r in remaining])
+        return [_proposal("a_statistical", "GREEN"), _proposal("b_limits", "YELLOW")]
+
+    verdict = check(proposals, readings, POLICY_PATH, integrity=integrity, reevaluate=reevaluate)
+    assert seen and all(ids == ["good"] for ids in seen)      # only the surviving reading was reassessed
+    assert verdict["tier"] == "YELLOW"                        # what the remaining evidence supports
+    changed = [g for g in verdict["decision_trace"]["gates"] if g["changed"]]
+    assert (changed[0]["gate"], changed[0]["tier_in"], changed[0]["tier_out"]) == ("data_fault", "RED", "YELLOW")
+
+
+def test_one_pipeline_alone_cannot_invalidate_a_reading():
+    readings = [_reading("r1", value=150.0, quality="fault"), _reading("ok", channel="sleep_hours", value=7.0)]
+    proposals = [_confirmed("a_statistical", "GREEN", ["r1"]), _proposal("b_limits", "RED")]
+    integrity = input_gate.evaluate(readings, NOW, REQUIREMENTS)
+    verdict = check(proposals, readings, POLICY_PATH, integrity=integrity)
+    assert verdict["tier"] == "RED"
+    assert integrity["readings"][0]["status"] == "fault"
+
+
+def test_contradiction_uses_the_policy_tolerance_band():
+    tolerances = POLICY["contradiction_tolerances"]
+    close = [_reading("a", value=72.0), _reading("b", value=74.0)]      # heart_rate band is 3.0
+    apart = [_reading("a", value=72.0), _reading("b", value=80.0)]
+    assert [e["status"] for e in input_gate.evaluate(close, NOW, REQUIREMENTS, tolerances)["readings"]] == ["valid", "valid"]
+    assert [e["status"] for e in input_gate.evaluate(apart, NOW, REQUIREMENTS, tolerances)["readings"]] == ["invalid", "invalid"]
+    assert _decide(close)["verdict"]["tier"] == "GREEN"
+    assert _decide(apart)["verdict"]["tier"] == "GREY"
+
+
+# ---------------------------------------------------------------------------
 # 3. Pipeline availability policy
 # ---------------------------------------------------------------------------
 
@@ -367,9 +431,6 @@ _tiers = st.sampled_from(["GREEN", "YELLOW", "RED", "GREY"])
 
 @given(a=_tiers, b=_tiers, a_fault=st.booleans(), b_fault=st.booleans())
 def test_known_severity_is_never_grey_and_never_understates_a_verified_verdict(a, b, a_fault, b_fault):
-    # Excluded: every pipeline claiming a data fault. That path still steps the
-    # tier down (GREY becomes RED), which is audit point 2 and is not settled yet.
-    assume(not (a_fault and b_fault))
     verdict = check(
         [_proposal("a_statistical", a, a_fault), _proposal("b_limits", b, b_fault)], [], POLICY_PATH
     )
@@ -592,18 +653,21 @@ def test_every_record_names_its_signing_key(monkeypatch):
     assert _decide([_reading()])["execution_manifest"]["signing"]["demo_key"] is True
 
 
-def test_startup_warns_when_running_on_the_demo_key(monkeypatch, caplog):
-    for var in ("SIGNING_KEY", "RECORDS_PATH"):
-        monkeypatch.delenv(var, raising=False)
-    with caplog.at_level("WARNING"):
+@pytest.mark.parametrize("key", [None, "", "demo-only-change-me"])
+def test_api_refuses_to_start_without_a_real_signing_key(monkeypatch, key):
+    monkeypatch.delenv("RECORDS_PATH", raising=False)
+    if key is None:
+        monkeypatch.delenv("SIGNING_KEY", raising=False)
+    else:
+        monkeypatch.setenv("SIGNING_KEY", key)
+    with pytest.raises(RuntimeError, match="SIGNING_KEY"):
         create_app()
-    assert any("DEMO key" in message for message in caplog.messages)
 
-    caplog.clear()
+
+def test_api_starts_with_a_real_signing_key(monkeypatch):
+    monkeypatch.delenv("RECORDS_PATH", raising=False)
     monkeypatch.setenv("SIGNING_KEY", "a-real-secret")
-    with caplog.at_level("WARNING"):
-        create_app()
-    assert not any("DEMO key" in message for message in caplog.messages)
+    assert create_app().state.ctx.signing_key == "a-real-secret"
 
 
 @pytest.mark.parametrize("prev_hash", ["", "abc", "genesis", "G" * 64, "a" * 63, "a" * 65, "A" * 64])
@@ -772,8 +836,9 @@ def test_every_row_of_the_real_table_declares_its_basis():
 
 @pytest.fixture
 def api(monkeypatch):
-    for var in ("RECORDS_PATH", "BASELINES_PATH", "LLM_ENABLED", "SIGNING_KEY"):
+    for var in ("RECORDS_PATH", "BASELINES_PATH", "LLM_ENABLED"):
         monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("SIGNING_KEY", "governance-test-key")
     app = create_app()
 
     def call(method, url, **kwargs):
@@ -812,7 +877,7 @@ def test_trust_summary_for_a_disputed_red(api):
     assert trust["data"]["simulated_inputs"] == ["heart_rate"]
     assert trust["rules"]["triggered"] == ["heart_rate.red_high"]
     assert trust["rules"]["limits_are_official"] is False
-    assert trust["record"] == {"recorded": True, "chain_intact": True, "signed_with_demo_key": True}
+    assert trust["record"] == {"recorded": True, "chain_intact": True, "signed_with_demo_key": False}
     assert trust["human_review"]["status"] == "pending"
     # Meant for the astronaut: plain statements, no hashes.
     assert "b_limits proposed RED" in trust["explanation"]

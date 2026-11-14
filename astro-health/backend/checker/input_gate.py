@@ -21,6 +21,8 @@ from __future__ import annotations
 import math
 from datetime import datetime, timezone
 
+from backend.checker.gates import detect_contradictions
+
 USABLE_STATUSES = ("valid", "fault")
 
 _REAL_DATA_SOURCES = ("nasa_osdr", "nasa_radlab", "nasa_donki")
@@ -37,7 +39,12 @@ def _parse_ts(ts) -> datetime | None:
         return None
 
 
-def evaluate(readings: list[dict], now: datetime, requirements: dict | None = None) -> dict:
+def evaluate(
+    readings: list[dict],
+    now: datetime,
+    requirements: dict | None = None,
+    tolerances: dict[str, float] | None = None,
+) -> dict:
     """Return an integrity report for *readings* at decision time *now*.
 
     Pure: no clock, no I/O, inputs untouched. The report lists every reading
@@ -50,10 +57,9 @@ def evaluate(readings: list[dict], now: datetime, requirements: dict | None = No
     max_future = requirements.get("max_future_skew_s")
     now_utc = _to_utc(now)
 
-    # Readings that share a channel and a timestamp but not a value contradict each other.
-    values_at: dict[tuple, set] = {}
-    for r in readings:
-        values_at.setdefault((r.get("channel"), r.get("ts")), set()).add(r.get("value"))
+    # Readings on the same channel and timestamp that differ by more than the
+    # policy tolerance for that channel contradict each other.
+    contradicting = detect_contradictions(readings, tolerances=tolerances)
 
     seen_ids: set = set()
     entries: list[dict] = []
@@ -87,7 +93,7 @@ def evaluate(readings: list[dict], now: datetime, requirements: dict | None = No
             elif max_age is not None and age_s > float(max_age):
                 stale = True
 
-        if len(values_at[(channel, r.get("ts"))]) > 1:
+        if r.get("id") in contradicting:
             issues.append("contradicts_another_reading_at_the_same_time")
 
         if r.get("source") in _REAL_DATA_SOURCES and not r.get("provenance"):

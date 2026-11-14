@@ -94,9 +94,20 @@ class Api:
 @pytest.fixture
 def api(monkeypatch):
     # Fresh app per test: empty in-memory store, LLM off, nothing written to disk.
+    monkeypatch.setenv("SIGNING_KEY", "test-api-signing-key")
     for var in ("RECORDS_PATH", "BASELINES_PATH", "LLM_ENABLED"):
         monkeypatch.delenv(var, raising=False)
     return Api(create_app())
+
+
+def test_startup_blocks_unset_or_demo_signing_key(monkeypatch):
+    monkeypatch.delenv("SIGNING_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="SIGNING_KEY"):
+        create_app()
+
+    monkeypatch.setenv("SIGNING_KEY", "demo-only-change-me")
+    with pytest.raises(RuntimeError, match="SIGNING_KEY"):
+        create_app()
 
 
 # ---------------------------------------------------------------------------
@@ -110,7 +121,7 @@ def test_health_endpoint(api):
     assert body["ok"] is True
     # The key in use is identified, and the demo key is called out as such.
     assert body["signing_key"]["key_id"].startswith("k-")
-    assert body["signing_key"]["demo_key"] is True
+    assert body["signing_key"]["demo_key"] is False  # the API refuses to start on the demo key
 
 
 def test_all_seven_routes_are_registered(api):
@@ -128,6 +139,8 @@ def test_all_seven_routes_are_registered(api):
         ("POST", "/earth/replay"),
         ("POST", "/earth/review"),
         ("POST", "/earth/rulechange"),
+        ("GET", "/earth/downlink"),
+        ("POST", "/earth/downlink/release"),
         ("GET", "/records/{record_id}/card"),
         ("GET", "/health"),
     ]:
@@ -491,6 +504,34 @@ def test_rulechange_no_op_override_changes_nothing(api):
 
 def test_rulechange_requires_an_override(api):
     assert api.post("/earth/rulechange", json={}).status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# GET /earth/downlink, POST /earth/downlink/release
+# ---------------------------------------------------------------------------
+
+def test_checkin_automatically_queues_downlink_summary_and_anchor(api):
+    r1 = api.checkin("crew_1", [_reading("g1")])["record_id"]
+    r2 = api.checkin("crew_1", _STORM_READINGS)["record_id"]
+
+    resp = api.get("/earth/downlink")
+    assert resp.status_code == 200
+    body = resp.json()
+    # Urgent (RED) is ordered before routine (GREEN) in pending queue
+    assert [s["record_id"] for s in body["pending"]] == [r2, r1]
+    assert [a["record_id"] for a in body["anchors"]] == [r1, r2]
+    assert body["anchors"][0]["prev_hash"] == GENESIS
+    assert body["anchors"][1]["prev_hash"] == body["anchors"][0]["hash"]
+
+    # Release under long delay: RED goes now, GREEN is held until flush
+    rel = api.post("/earth/downlink/release", json={"one_way_delay_s": 500.0}).json()
+    assert [s["record_id"] for s in rel["sent"]] == [r2]
+    assert rel["pending_count"] == 1
+    assert rel["latest_anchor"]["record_id"] == r2
+
+    flushed = api.post("/earth/downlink/release", json={"one_way_delay_s": 500.0, "flush": True}).json()
+    assert [s["record_id"] for s in flushed["sent"]] == [r1]
+    assert flushed["pending_count"] == 0
 
 
 # ---------------------------------------------------------------------------

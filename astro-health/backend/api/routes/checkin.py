@@ -65,7 +65,13 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
     now = now.astimezone(timezone.utc).replace(tzinfo=None) if now.tzinfo else now
 
     def build(prev_hash: str) -> dict:
-        common = dict(now=now, prev_hash=prev_hash, astronaut_id=body.astronaut_id, clock_source=clock_source)
+        common = dict(
+            now=now,
+            prev_hash=prev_hash,
+            astronaut_id=body.astronaut_id,
+            clock_source=clock_source,
+            signing_key=state.signing_key,
+        )
         try:
             return decide(readings=readings, baselines=state.baselines, rules=state.rules, **common)
         except Exception as exc:  # noqa: BLE001 - last line of defence
@@ -81,6 +87,8 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
     # Log first, display second: the signed Record is in the store before the
     # verdict leaves this function.
     record = state.store.append_with(build)
+    # Automatically enqueue the downlink summary and chain anchor on every check-in.
+    state.queue.enqueue(record, signing_key=state.signing_key)
 
     # Verdict summary only, never the full Record: keeps the downlink payload small.
     return {"record_id": record["id"], "verdict": record["verdict"]}

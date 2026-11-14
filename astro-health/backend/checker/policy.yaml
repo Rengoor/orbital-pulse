@@ -1,7 +1,17 @@
 # Checker policy (action whitelist, tier rules). Versioned; its hash goes into every record.
 version: "0.2.0"
 
-# Whitelisted actions, weakest first. This order is also what "stronger action" means.
+# Action whitelist in ascending order of clinical urgency (least to most severe).
+# When an action is not whitelisted, the Checker escalates along this order.
+action_order:
+  - NO_ACTION
+  - RECHECK_IN_1H
+  - REST_AND_HYDRATE
+  - USE_PROTOCOL_CARD
+  - ALERT_CMO
+  - CONTACT_GROUND_URGENT
+
+# Whitelisted actions.
 actions:
   - NO_ACTION
   - RECHECK_IN_1H
@@ -48,3 +58,19 @@ data_requirements:
     sleep_hours: {unit: h}
     co2_ppm: {unit: ppm}
     dose_rate_usv_h: {unit: uSv/h}
+
+# Maximum tolerated difference between two readings on the same channel and
+# timestamp. Readings further apart than this contradict each other: the input
+# gate rejects both and the verdict is GREY.
+contradiction_tolerances:
+  bp_systolic: 5.0
+  bp_diastolic: 5.0
+  heart_rate: 3.0
+  glucose: 5.0
+  temperature: 0.2
+  sleep_hours: 0.25
+  mood: 0.5
+  co2_ppm: 50.0
+  exercise_minutes: 2.0
+  dose_rate_usv_h: 1.0
+  blood_analyte: 0.1
