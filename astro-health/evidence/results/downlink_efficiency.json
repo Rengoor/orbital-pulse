@@ -1,0 +1,57 @@
+{
+  "seed": 42,
+  "records": 10,
+  "links": [
+    {
+      "location": "leo",
+      "one_way_delay_s": 0.0,
+      "sent_immediately": 10,
+      "held_for_digest": 0,
+      "summary_and_anchor_bytes": 5942,
+      "full_record_bytes": 44248,
+      "bytes_ratio": 0.134
+    },
+    {
+      "location": "moon",
+      "one_way_delay_s": 1.28,
+      "sent_immediately": 10,
+      "held_for_digest": 0,
+      "summary_and_anchor_bytes": 5942,
+      "full_record_bytes": 44248,
+      "bytes_ratio": 0.134
+    },
+    {
+      "location": "mars_near",
+      "one_way_delay_s": 182.13,
+      "sent_immediately": 3,
+      "held_for_digest": 7,
+      "summary_and_anchor_bytes": 5942,
+      "full_record_bytes": 44248,
+      "bytes_ratio": 0.134
+    },
+    {
+      "location": "mars_far",
+      "one_way_delay_s": 1337.59,
+      "sent_immediately": 3,
+      "held_for_digest": 7,
+      "summary_and_anchor_bytes": 5942,
+      "full_record_bytes": 44248,
+      "bytes_ratio": 0.134
+    }
+  ],
+  "distances_km": {
+    "leo": 400.0,
+    "moon": 384400.0,
+    "mars_near": 54600000.0,
+    "mars_far": 401000000.0
+  },
+  "checkin_timing": {
+    "events": 10,
+    "median_s": 0.0063,
+    "max_s": 0.0065
+  },
+  "alerts_per_scenario_day": {
+    "storm_day": 3,
+    "normal_day": 0
+  }
+}

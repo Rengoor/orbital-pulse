@@ -1,6 +1,58 @@
 {
   "id": "normal_day",
-  "description": "Green day, everything logged.",
-  "status": "todo",
-  "events": []
+  "description": "Quiet day: every reading stays near its typical value and inside every limit; every verdict should be GREEN.",
+  "status": "draft",
+  "note": "Draft events written for the evidence runners (ablation false-alarm baseline). Every value is simulated and hand-chosen to sit inside the project-defined limits; no NASA data. Same shape as storm_day: one crew member, five check-ins across one day.",
+  "events": [
+    {
+      "ts": "2026-11-15T06:00:00Z",
+      "readings": [
+        {"id": "normal-01-heart_rate", "astronaut_id": "crew_1", "ts": "2026-11-15T06:00:00Z", "channel": "heart_rate", "value": 64.0, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-01-temperature", "astronaut_id": "crew_1", "ts": "2026-11-15T06:00:00Z", "channel": "temperature", "value": 36.6, "unit": "C", "source": "simulated", "quality": "ok"},
+        {"id": "normal-01-dose_rate_usv_h", "astronaut_id": "crew_1", "ts": "2026-11-15T06:00:00Z", "channel": "dose_rate_usv_h", "value": 11.5, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-01-sleep_hours", "astronaut_id": "crew_1", "ts": "2026-11-15T06:00:00Z", "channel": "sleep_hours", "value": 7.4, "unit": "h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-01-mood", "astronaut_id": "crew_1", "ts": "2026-11-15T06:00:00Z", "channel": "mood", "value": 7.0, "unit": "score_1_10", "source": "simulated", "quality": "ok"}
+      ]
+    },
+    {
+      "ts": "2026-11-15T10:00:00Z",
+      "readings": [
+        {"id": "normal-02-heart_rate", "astronaut_id": "crew_1", "ts": "2026-11-15T10:00:00Z", "channel": "heart_rate", "value": 71.0, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-02-temperature", "astronaut_id": "crew_1", "ts": "2026-11-15T10:00:00Z", "channel": "temperature", "value": 36.8, "unit": "C", "source": "simulated", "quality": "ok"},
+        {"id": "normal-02-dose_rate_usv_h", "astronaut_id": "crew_1", "ts": "2026-11-15T10:00:00Z", "channel": "dose_rate_usv_h", "value": 12.2, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-02-co2_ppm", "astronaut_id": "crew_1", "ts": "2026-11-15T10:00:00Z", "channel": "co2_ppm", "value": 2350.0, "unit": "ppm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-02-mood", "astronaut_id": "crew_1", "ts": "2026-11-15T10:00:00Z", "channel": "mood", "value": 7.0, "unit": "score_1_10", "source": "simulated", "quality": "ok"}
+      ]
+    },
+    {
+      "ts": "2026-11-15T14:00:00Z",
+      "readings": [
+        {"id": "normal-03-heart_rate", "astronaut_id": "crew_1", "ts": "2026-11-15T14:00:00Z", "channel": "heart_rate", "value": 76.0, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-03-temperature", "astronaut_id": "crew_1", "ts": "2026-11-15T14:00:00Z", "channel": "temperature", "value": 36.9, "unit": "C", "source": "simulated", "quality": "ok"},
+        {"id": "normal-03-dose_rate_usv_h", "astronaut_id": "crew_1", "ts": "2026-11-15T14:00:00Z", "channel": "dose_rate_usv_h", "value": 11.9, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-03-exercise_minutes", "astronaut_id": "crew_1", "ts": "2026-11-15T14:00:00Z", "channel": "exercise_minutes", "value": 48.0, "unit": "min", "source": "simulated", "quality": "ok"},
+        {"id": "normal-03-mood", "astronaut_id": "crew_1", "ts": "2026-11-15T14:00:00Z", "channel": "mood", "value": 7.5, "unit": "score_1_10", "source": "simulated", "quality": "ok"}
+      ]
+    },
+    {
+      "ts": "2026-11-15T18:00:00Z",
+      "readings": [
+        {"id": "normal-04-heart_rate", "astronaut_id": "crew_1", "ts": "2026-11-15T18:00:00Z", "channel": "heart_rate", "value": 69.0, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-04-temperature", "astronaut_id": "crew_1", "ts": "2026-11-15T18:00:00Z", "channel": "temperature", "value": 36.7, "unit": "C", "source": "simulated", "quality": "ok"},
+        {"id": "normal-04-dose_rate_usv_h", "astronaut_id": "crew_1", "ts": "2026-11-15T18:00:00Z", "channel": "dose_rate_usv_h", "value": 12.5, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-04-co2_ppm", "astronaut_id": "crew_1", "ts": "2026-11-15T18:00:00Z", "channel": "co2_ppm", "value": 2500.0, "unit": "ppm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-04-mood", "astronaut_id": "crew_1", "ts": "2026-11-15T18:00:00Z", "channel": "mood", "value": 7.0, "unit": "score_1_10", "source": "simulated", "quality": "ok"}
+      ]
+    },
+    {
+      "ts": "2026-11-15T22:00:00Z",
+      "readings": [
+        {"id": "normal-05-heart_rate", "astronaut_id": "crew_1", "ts": "2026-11-15T22:00:00Z", "channel": "heart_rate", "value": 62.0, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "normal-05-temperature", "astronaut_id": "crew_1", "ts": "2026-11-15T22:00:00Z", "channel": "temperature", "value": 36.5, "unit": "C", "source": "simulated", "quality": "ok"},
+        {"id": "normal-05-dose_rate_usv_h", "astronaut_id": "crew_1", "ts": "2026-11-15T22:00:00Z", "channel": "dose_rate_usv_h", "value": 11.8, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-05-sleep_hours", "astronaut_id": "crew_1", "ts": "2026-11-15T22:00:00Z", "channel": "sleep_hours", "value": 7.2, "unit": "h", "source": "simulated", "quality": "ok"},
+        {"id": "normal-05-mood", "astronaut_id": "crew_1", "ts": "2026-11-15T22:00:00Z", "channel": "mood", "value": 7.0, "unit": "score_1_10", "source": "simulated", "quality": "ok"}
+      ]
+    }
+  ]
 }

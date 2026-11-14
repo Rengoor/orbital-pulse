@@ -1,0 +1,566 @@
+{
+  "seed": 42,
+  "attack_count": 10,
+  "factors": [
+    {
+      "factor": 0.8,
+      "unsafe_approvals": 0,
+      "attacks": [
+        {
+          "id": "stale_data",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "stuck_sensor",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "implausible_jump",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "pipeline_disagreement",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "missing_baseline",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "radiation_spike_normal_vitals",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "unit_mismatch",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "contradictory_sensors",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "fake_nasa_provenance",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "empty_checkin",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        }
+      ],
+      "storm_tiers": [
+        {
+          "ts": "2026-11-14T06:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T10:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T14:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T18:00:00Z",
+          "tier": "RED"
+        },
+        {
+          "ts": "2026-11-14T22:00:00Z",
+          "tier": "RED"
+        }
+      ],
+      "storm_first_non_green_event": 1,
+      "normal_false_alarms": 5
+    },
+    {
+      "factor": 0.9,
+      "unsafe_approvals": 0,
+      "attacks": [
+        {
+          "id": "stale_data",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "stuck_sensor",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "implausible_jump",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "pipeline_disagreement",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "missing_baseline",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "radiation_spike_normal_vitals",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "unit_mismatch",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "contradictory_sensors",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "fake_nasa_provenance",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "empty_checkin",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        }
+      ],
+      "storm_tiers": [
+        {
+          "ts": "2026-11-14T06:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T10:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T14:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T18:00:00Z",
+          "tier": "RED"
+        },
+        {
+          "ts": "2026-11-14T22:00:00Z",
+          "tier": "YELLOW"
+        }
+      ],
+      "storm_first_non_green_event": 2,
+      "normal_false_alarms": 5
+    },
+    {
+      "factor": 1.0,
+      "unsafe_approvals": 0,
+      "attacks": [
+        {
+          "id": "stale_data",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "stuck_sensor",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "implausible_jump",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "pipeline_disagreement",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "missing_baseline",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "radiation_spike_normal_vitals",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "unit_mismatch",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "contradictory_sensors",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "fake_nasa_provenance",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "empty_checkin",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        }
+      ],
+      "storm_tiers": [
+        {
+          "ts": "2026-11-14T06:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T10:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T14:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T18:00:00Z",
+          "tier": "RED"
+        },
+        {
+          "ts": "2026-11-14T22:00:00Z",
+          "tier": "YELLOW"
+        }
+      ],
+      "storm_first_non_green_event": 2,
+      "normal_false_alarms": 0
+    },
+    {
+      "factor": 1.1,
+      "unsafe_approvals": 0,
+      "attacks": [
+        {
+          "id": "stale_data",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "stuck_sensor",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "implausible_jump",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "pipeline_disagreement",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "missing_baseline",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "radiation_spike_normal_vitals",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "unit_mismatch",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "contradictory_sensors",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "fake_nasa_provenance",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "empty_checkin",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        }
+      ],
+      "storm_tiers": [
+        {
+          "ts": "2026-11-14T06:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T10:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T14:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T18:00:00Z",
+          "tier": "RED"
+        },
+        {
+          "ts": "2026-11-14T22:00:00Z",
+          "tier": "YELLOW"
+        }
+      ],
+      "storm_first_non_green_event": 2,
+      "normal_false_alarms": 5
+    },
+    {
+      "factor": 1.2,
+      "unsafe_approvals": 2,
+      "attacks": [
+        {
+          "id": "stale_data",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "stuck_sensor",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "implausible_jump",
+          "observed": "RED",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "pipeline_disagreement",
+          "observed": "YELLOW",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": true
+        },
+        {
+          "id": "missing_baseline",
+          "observed": "YELLOW",
+          "allowed": [
+            "RED",
+            "GREY"
+          ],
+          "unsafe": true
+        },
+        {
+          "id": "radiation_spike_normal_vitals",
+          "observed": "RED",
+          "allowed": [
+            "RED"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "unit_mismatch",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "contradictory_sensors",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "fake_nasa_provenance",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        },
+        {
+          "id": "empty_checkin",
+          "observed": "GREY",
+          "allowed": [
+            "GREY"
+          ],
+          "unsafe": false
+        }
+      ],
+      "storm_tiers": [
+        {
+          "ts": "2026-11-14T06:00:00Z",
+          "tier": "GREEN"
+        },
+        {
+          "ts": "2026-11-14T10:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T14:00:00Z",
+          "tier": "YELLOW"
+        },
+        {
+          "ts": "2026-11-14T18:00:00Z",
+          "tier": "RED"
+        },
+        {
+          "ts": "2026-11-14T22:00:00Z",
+          "tier": "RED"
+        }
+      ],
+      "storm_first_non_green_event": 1,
+      "normal_false_alarms": 5
+    }
+  ]
+}

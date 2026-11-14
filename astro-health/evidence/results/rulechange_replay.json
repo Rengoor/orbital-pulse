@@ -1,0 +1,374 @@
+{
+  "seed": 42,
+  "records": 10,
+  "proposals": {
+    "tighten_dose": {
+      "changes": {
+        "dose_rate_usv_h": {
+          "yellow_high": 40,
+          "red_high": 160
+        }
+      },
+      "total": 10,
+      "changed": 2,
+      "unsafe": 0,
+      "rows": [
+        {
+          "record_id": "8bb01868-2851-5161-ae5e-01c1fb81d7b6",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "YELLOW",
+          "old_action": "NO_ACTION",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": true,
+          "unsafe": false
+        },
+        {
+          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T14:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "YELLOW",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T18:00:00Z",
+          "old_tier": "RED",
+          "new_tier": "RED",
+          "old_action": "ALERT_CMO",
+          "new_action": "ALERT_CMO",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T22:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "RED",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "ALERT_CMO",
+          "changed": true,
+          "unsafe": false
+        },
+        {
+          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T14:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T18:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T22:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        }
+      ]
+    },
+    "loosen_dose": {
+      "changes": {
+        "dose_rate_usv_h": {
+          "yellow_high": 80,
+          "red_high": 320
+        }
+      },
+      "total": 10,
+      "changed": 1,
+      "unsafe": 1,
+      "rows": [
+        {
+          "record_id": "8bb01868-2851-5161-ae5e-01c1fb81d7b6",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T14:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "YELLOW",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T18:00:00Z",
+          "old_tier": "RED",
+          "new_tier": "YELLOW",
+          "old_action": "ALERT_CMO",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": true,
+          "unsafe": true
+        },
+        {
+          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T22:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "YELLOW",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T14:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T18:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T22:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        }
+      ]
+    },
+    "tighten_sleep": {
+      "changes": {
+        "sleep_hours": {
+          "yellow_low": 6.5
+        }
+      },
+      "total": 10,
+      "changed": 0,
+      "unsafe": 0,
+      "rows": [
+        {
+          "record_id": "8bb01868-2851-5161-ae5e-01c1fb81d7b6",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T14:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "YELLOW",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T18:00:00Z",
+          "old_tier": "RED",
+          "new_tier": "RED",
+          "old_action": "ALERT_CMO",
+          "new_action": "ALERT_CMO",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-14T22:00:00Z",
+          "old_tier": "YELLOW",
+          "new_tier": "YELLOW",
+          "old_action": "REST_AND_HYDRATE",
+          "new_action": "REST_AND_HYDRATE",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T06:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T10:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T14:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T18:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        },
+        {
+          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "astronaut_id": "crew_1",
+          "ts": "2026-11-15T22:00:00Z",
+          "old_tier": "GREEN",
+          "new_tier": "GREEN",
+          "old_action": "NO_ACTION",
+          "new_action": "NO_ACTION",
+          "changed": false,
+          "unsafe": false
+        }
+      ]
+    }
+  }
+}
