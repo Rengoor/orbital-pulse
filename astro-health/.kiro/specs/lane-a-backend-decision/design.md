@@ -1,5 +1,15 @@
 # Design Document: Lane A — Backend Decision
 
+> **Status note, 2026-11-14.** This design predates most of the governance
+> work and is kept as the original Lane A spec. Since it was written the
+> implementation added: the input integrity gate and GREY data requirements
+> in `checker/policy.yaml`; chain checkpoints (anchors) and the truncation
+> check; the downlink queue (now persistent through the record store);
+> signed simulated reviews and signed crew acknowledgements, each in its own
+> chain; the Earth rule-change time machine; the red-team suite and evidence
+> runners; and the three live views served at `/ui/`. Where this document
+> and the code disagree, the code and its tests are current.
+
 ## Overview
 
 AstroHealth's backend is the decision core of the NASA Space Apps 2026 health-monitoring system. It ingests physiological and environmental readings from an astronaut, runs them through two or more independent analytical pipelines, adjudicates those pipelines' proposals through a small trusted Checker, and writes a tamper-evident signed Record before displaying any verdict to the crew or ground.

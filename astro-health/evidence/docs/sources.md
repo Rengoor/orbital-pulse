@@ -1,6 +1,7 @@
 # Sources
 
 - NASA Space Apps judging guidance and Project Submission Guide (spaceappschallenge.org; check the 2026 version)
+- NASA-STD-3001 Volume 2 Revision F (Human Factors, Habitability, and Environmental Health) — display, alert and annunciation requirements cited per rule in `frontend/hud/README.md`: https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/
 - Inspiration4 data access through OSDR: https://www.nature.com/articles/s41526-024-00393-5
 - RadLab and Artemis I telemetry: https://science.data.nasa.gov/features-events/data-software-highlights-may-2026 and https://www.nasa.gov/reference/osdr-environmental-data/
 - DONKI: https://ccmc.gsfc.nasa.gov/tools/DONKI (free key at https://api.nasa.gov)

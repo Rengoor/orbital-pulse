@@ -1,0 +1,35 @@
+name: ci
+on: [push, pull_request]
+
+# The project lives under astro-health/; this file must sit at the repository
+# root (.github/) or GitHub never runs it, which is where it used to sit.
+defaults:
+  run:
+    working-directory: astro-health
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      SIGNING_KEY: ci-signing-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # evidence/requirements.txt pulls in backend and data requirements too.
+      - run: pip install -r evidence/requirements.txt
+      - run: pytest backend/tests data/tests evidence/tests -q
+
+  redteam:
+    runs-on: ubuntu-latest
+    env:
+      SIGNING_KEY: ci-signing-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r evidence/requirements.txt
+      # Exit code is 1 if any attack gets an unsafe approval.
+      - run: python -m evidence.redteam.run_redteam --no-write

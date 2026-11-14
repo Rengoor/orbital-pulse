@@ -1,0 +1,5 @@
+# Repository owner reviews everything by default. The earlier per-lane rules
+# used placeholder handles (@person-a ... @person-d), which GitHub ignores;
+# restore per-path rules here with the team's real GitHub handles when the
+# lane owners want review routing back.
+* @Rengoor

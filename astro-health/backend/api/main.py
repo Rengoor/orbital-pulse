@@ -37,13 +37,9 @@ def create_app() -> FastAPI:
 
     # Loaded once, at startup: rules, baselines, policy whitelist, record store.
     # (Schema validators are compiled when backend.orchestrator is imported.)
+    # AppState.load() refuses an unset or demo SIGNING_KEY, so past this point
+    # the key is a real secret.
     app.state.ctx = AppState.load()
-    if is_demo_key():
-        logger.warning(
-            "Signing with the built-in DEMO key (%s). Records are tamper-evident only against "
-            "someone who does not know it. Set SIGNING_KEY for anything but a demonstration.",
-            key_id(),
-        )
 
     app.include_router(checkin_router, prefix="/checkin")
     app.include_router(status_router, prefix="/status")

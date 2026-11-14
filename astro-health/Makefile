@@ -1,17 +1,31 @@
-.PHONY: api ui reproduce test
+# Convenience targets. Works with GNU make on macOS/Linux, and on Windows
+# wherever make is available (Git Bash, MSYS2): the venv's binary directory is
+# Scripts/ there instead of bin/. Without make, the README's plain commands do
+# the same things.
+.PHONY: api ui reproduce test redteam
+
+VENV := backend/.venv
+ifeq ($(OS),Windows_NT)
+BIN := $(VENV)/Scripts
+else
+BIN := $(VENV)/bin
+endif
 
 setup-%:
 	python -m venv $*/.venv
-	$*/.venv/bin/pip install -r $*/requirements.txt
+	$*/.venv/$(notdir $(BIN))/pip install -r $*/requirements.txt
 
 api:
-	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} backend/.venv/bin/uvicorn backend.api.main:create_app --factory --host 127.0.0.1 --port 8000 --reload
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/uvicorn backend.api.main:create_app --factory --host 127.0.0.1 --port 8000 --reload
 
 ui:
-	backend/.venv/bin/python -m frontend.app
+	$(BIN)/python -m frontend.app
 
 reproduce:
-	backend/.venv/bin/python -m evidence.run_all --seed 42
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/python -m evidence.run_all --seed 42
 
 test:
-	backend/.venv/bin/pytest backend/tests data/tests evidence -q
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/pytest backend/tests data/tests evidence/tests -q
+
+redteam:
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/python -m evidence.redteam.run_redteam
