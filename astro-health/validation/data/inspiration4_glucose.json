@@ -1,0 +1,161 @@
+{
+  "source": "NASA OSDR, SpaceX Inspiration4",
+  "dataset_id": "OSD-575",
+  "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575",
+  "fetched_at": "2026-11-14T23:15:28Z",
+  "timepoints": "L-n = n days before launch, R+n = n days after return",
+  "subjects": {
+    "C001": {
+      "panel": "CMP",
+      "dataset_id": "OSD-575",
+      "unit": "mg/dL",
+      "range_min": 65.0,
+      "range_max": 99.0,
+      "range_basis": "laboratory reference range as published in the dataset",
+      "draws": [
+        {
+          "timepoint": "L-92",
+          "value": 83.0
+        },
+        {
+          "timepoint": "L-44",
+          "value": 80.0
+        },
+        {
+          "timepoint": "L-3",
+          "value": 69.0
+        },
+        {
+          "timepoint": "R+1",
+          "value": 90.0
+        },
+        {
+          "timepoint": "R+45",
+          "value": 84.0
+        },
+        {
+          "timepoint": "R+82",
+          "value": 91.0
+        },
+        {
+          "timepoint": "R+194",
+          "value": 87.0
+        }
+      ]
+    },
+    "C002": {
+      "panel": "CMP",
+      "dataset_id": "OSD-575",
+      "unit": "mg/dL",
+      "range_min": 65.0,
+      "range_max": 99.0,
+      "range_basis": "laboratory reference range as published in the dataset",
+      "draws": [
+        {
+          "timepoint": "L-92",
+          "value": 69.0
+        },
+        {
+          "timepoint": "L-44",
+          "value": 72.0
+        },
+        {
+          "timepoint": "L-3",
+          "value": 78.0
+        },
+        {
+          "timepoint": "R+1",
+          "value": 83.0
+        },
+        {
+          "timepoint": "R+45",
+          "value": 44.0
+        },
+        {
+          "timepoint": "R+82",
+          "value": 77.0
+        },
+        {
+          "timepoint": "R+194",
+          "value": 84.0
+        }
+      ]
+    },
+    "C003": {
+      "panel": "CMP",
+      "dataset_id": "OSD-575",
+      "unit": "mg/dL",
+      "range_min": 65.0,
+      "range_max": 99.0,
+      "range_basis": "laboratory reference range as published in the dataset",
+      "draws": [
+        {
+          "timepoint": "L-92",
+          "value": 77.0
+        },
+        {
+          "timepoint": "L-44",
+          "value": 62.0
+        },
+        {
+          "timepoint": "L-3",
+          "value": 75.0
+        },
+        {
+          "timepoint": "R+1",
+          "value": 103.0
+        },
+        {
+          "timepoint": "R+45",
+          "value": 36.0
+        },
+        {
+          "timepoint": "R+82",
+          "value": 80.0
+        },
+        {
+          "timepoint": "R+194",
+          "value": 73.0
+        }
+      ]
+    },
+    "C004": {
+      "panel": "CMP",
+      "dataset_id": "OSD-575",
+      "unit": "mg/dL",
+      "range_min": 65.0,
+      "range_max": 99.0,
+      "range_basis": "laboratory reference range as published in the dataset",
+      "draws": [
+        {
+          "timepoint": "L-92",
+          "value": 100.0
+        },
+        {
+          "timepoint": "L-44",
+          "value": 83.0
+        },
+        {
+          "timepoint": "L-3",
+          "value": 56.0
+        },
+        {
+          "timepoint": "R+1",
+          "value": 97.0
+        },
+        {
+          "timepoint": "R+45",
+          "value": 43.0
+        },
+        {
+          "timepoint": "R+82",
+          "value": 80.0
+        },
+        {
+          "timepoint": "R+194",
+          "value": 84.0
+        }
+      ]
+    }
+  }
+}

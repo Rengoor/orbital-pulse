@@ -2,7 +2,7 @@
 # wherever make is available (Git Bash, MSYS2): the venv's binary directory is
 # Scripts/ there instead of bin/. Without make, the README's plain commands do
 # the same things.
-.PHONY: api ui reproduce test redteam
+.PHONY: api demo reproduce test redteam validate
 
 VENV := backend/.venv
 ifeq ($(OS),Windows_NT)
@@ -18,14 +18,17 @@ setup-%:
 api:
 	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/uvicorn backend.api.main:create_app --factory --host 127.0.0.1 --port 8000 --reload
 
-ui:
-	$(BIN)/python -m frontend.app
+demo:
+	$(BIN)/python run_demo.py
 
 reproduce:
 	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/python -m evidence.run_all --seed 42
 
 test:
-	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/pytest backend/tests data/tests evidence/tests -q
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/pytest backend/tests data/tests evidence/tests validation/tests -q
 
 redteam:
 	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/python -m evidence.redteam.run_redteam
+
+validate:
+	SIGNING_KEY=$${SIGNING_KEY:-local-dev-signing-key} $(BIN)/python -m validation.run

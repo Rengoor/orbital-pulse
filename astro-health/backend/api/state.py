@@ -16,6 +16,7 @@ from fastapi import Request
 from backend.downlink.queue import DownlinkQueue, PersistentDownlinkQueue
 from backend.orchestrator import load_rules
 from backend.pipelines.a_statistical.baseline import compute_baseline
+from backend.records.handoff import link_for, load_autonomy_policy
 from backend.records.signing import require_signing_key
 from backend.records.store import RecordStore
 
@@ -56,6 +57,10 @@ class AppState:
     signing_key: str = ""
     store: RecordStore = field(default_factory=RecordStore)
     queue: DownlinkQueue = field(default_factory=DownlinkQueue)
+    # Delay-aware autonomy: the autonomy policy and the current link to Earth.
+    autonomy_policy: dict = field(default_factory=dict)
+    autonomy_hash: str = ""
+    link: dict = field(default_factory=lambda: link_for("moon"))
 
     @classmethod
     def load(cls) -> "AppState":
@@ -68,7 +73,16 @@ class AppState:
         if not isinstance(policy, dict) or not policy.get("actions"):
             raise RuntimeError(f"{rules['policy_path']} has no 'actions' whitelist")
         store = RecordStore(os.environ.get("RECORDS_PATH") or None)
+        autonomy_policy, autonomy_hash = load_autonomy_policy()
+        # LINK_PRESET (leo, moon, mars_near, mars_far) or LINK_ONE_WAY_S picks the
+        # starting link; POST /link changes it while running.
+        custom = os.environ.get("LINK_ONE_WAY_S")
+        link = (link_for(one_way_delay_s=float(custom)) if custom
+                else link_for(os.environ.get("LINK_PRESET") or autonomy_policy.get("default_link", "moon")))
         return cls(
+            autonomy_policy=autonomy_policy,
+            autonomy_hash=autonomy_hash,
+            link=link,
             rules=rules,
             baselines=load_all_baselines(),
             policy_actions=list(policy["actions"]),

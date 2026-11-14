@@ -9,7 +9,6 @@ import httpx
 import pytest
 
 from backend.api.main import create_app
-from frontend import api_client, mock_mode
 
 _FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
@@ -39,10 +38,8 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
 
     for path in (
         "/ui/index.html",
-        "/ui/pages/helmet-hud.html",
         "/ui/hud/index.html",
-        "/ui/tablet/index.html",
-        "/ui/tablet/crew-console.html",
+        "/ui/tablet/monitor.html",
         "/ui/earth/index.html",
         "/ui/js/vitalis.js",
         "/ui/js/api.js",
@@ -58,7 +55,7 @@ def test_three_views_each_have_their_own_directory():
     for view in ("hud", "tablet", "earth"):
         assert (_FRONTEND_DIR / view / "README.md").is_file(), f"missing {view}/"
     start = (_FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
-    for link in ("hud/index.html", "tablet/index.html", "earth/index.html"):
+    for link in ("hud/index.html", "tablet/monitor.html", "earth/index.html"):
         assert (_FRONTEND_DIR / link).is_file()
         assert f'href="{link}"' in start
 
@@ -151,18 +148,12 @@ def test_earth_base_review_log(client):
     assert client("GET", "/earth/reviews", params={"record_id": "other"}).json()["reviews"] == []
 
 
-def test_retired_tablet_pages_hold_no_demo_data():
-    """The retired tablet pages and the API client must not ship scripted crew.
+def test_api_js_ships_no_demo_data():
+    """api.js must not bring back the helpers that faked data.
 
-    The old StationTablet and crew console rendered hard-coded crew as if live and
-    api.js labelled simulated values as NASA data with fabricated provenance
-    (buildReadingsForCrew / syncCrewWithBackend). This pins their removal.
+    An earlier version labelled simulated values as NASA data with fabricated
+    provenance (buildReadingsForCrew / syncCrewWithBackend). This pins their removal.
     """
-    for name in ("index.html", "crew-console.html"):
-        page = (_FRONTEND_DIR / "tablet" / name).read_text(encoding="utf-8")
-        for forbidden in ("DEFAULT_CREW", "nasa_osdr", "nasa_radlab", "Advisory", "<script"):
-            assert forbidden not in page, f"{name} still contains {forbidden}"
-
     api_js = (_FRONTEND_DIR / "js" / "api.js").read_text(encoding="utf-8")
     for forbidden in (
         "buildReadingsForCrew",   # labelled simulated readings as nasa_* with made-up provenance
@@ -255,17 +246,3 @@ def test_vitalis_crew_checkins_produce_expected_tiers_and_cards(client):
     assert len(dl_resp.json()["pending"]) == 4
     assert len(dl_resp.json()["anchors"]) == 4
 
-
-def test_frontend_python_api_client_local_only_and_mock_mode(monkeypatch):
-    monkeypatch.setenv("MOCK_MODE", "1")
-    status = api_client.get_status("ml")
-    assert "tier" in status
-    assert api_client.list_records()[0]["id"] == mock_mode.sample_record()["id"]
-
-    monkeypatch.setenv("MOCK_MODE", "0")
-    monkeypatch.setenv("API_URL", "https://external.example.com:8000")
-    with pytest.raises(ValueError, match="loopback"):
-        api_client.base_url()
-
-    monkeypatch.setenv("API_URL", "http://127.0.0.1:8000")
-    assert api_client.base_url() == "http://127.0.0.1:8000"

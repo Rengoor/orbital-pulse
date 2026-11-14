@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "handoff.schema.json",
+  "title": "Handoff",
+  "description": "v0.1: whether ground could answer a verdict in time for its action (delay-aware autonomy). Never changes the verdict. New schema added 2026-11; additive changes only from here.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "astronaut_id",
+    "mode",
+    "tier",
+    "actions",
+    "action_deadline_s",
+    "link",
+    "ground_turnaround_s",
+    "earth_answer_s",
+    "verdict_reaches_earth_at",
+    "earliest_ground_answer_at",
+    "policy_hash",
+    "ts"
+  ],
+  "properties": {
+    "record_id": {"type": "string"},
+    "astronaut_id": {"type": "string"},
+    "mode": {"enum": ["GROUND_IN_LOOP", "ONBOARD_AUTHORITY", "ROUTINE"]},
+    "tier": {"enum": ["GREEN", "YELLOW", "RED", "GREY"]},
+    "actions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "action_deadline_s": {"type": ["number", "null"], "description": "Tightest deadline among the verdict's actions; null when none has one."},
+    "link": {
+      "type": "object",
+      "required": ["label", "one_way_delay_s"],
+      "properties": {
+        "preset": {"type": ["string", "null"]},
+        "label": {"type": "string"},
+        "one_way_delay_s": {"type": "number", "minimum": 0}
+      }
+    },
+    "ground_turnaround_s": {"type": "number", "minimum": 0},
+    "earth_answer_s": {"type": "number", "minimum": 0, "description": "Round-trip light time plus ground turnaround."},
+    "verdict_reaches_earth_at": {"type": "string"},
+    "earliest_ground_answer_at": {"type": "string"},
+    "policy_version": {"type": "string"},
+    "policy_hash": {"type": "string"},
+    "ts": {"type": "string"},
+    "prev_hash": {"type": "string"},
+    "hash": {"type": "string"},
+    "signature": {"type": "string"}
+  }
+}

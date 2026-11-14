@@ -26,6 +26,29 @@ The HUD is at http://127.0.0.1:8000/ui/hud/index.html. The page accepts these qu
 Browsers block sound until the page is clicked. Press **Enable audio cues** once.
 Until then, the HUD shows "Audio cues off".
 
+## Delay-aware autonomy (who can decide in time)
+
+Every verdict gets a signed **handoff** from the backend (`backend/records/handoff.py`,
+policy in `backend/checker/autonomy.yaml`). It compares how soon the verdict's action must
+start with how soon Earth could answer: round-trip light time at the current distance plus
+an assumed ground turnaround.
+
+| Handoff | What the HUD shows |
+|---|---|
+| `GROUND_IN_LOOP` | "Earth can answer in ~2 min." (dim) |
+| `ONBOARD_AUTHORITY` | A marker: "Earth answers in ~8 min: too late for this action. Act on the onboard verdict." |
+| `ROUTINE` | Nothing (no time pressure) |
+
+The top-left plate shows the distance ("Earth: Mars (closest), 3 min one way"). The latest
+ground review (simulated, from the Earth view) shows as "Ground review on its way, arrives
+hh:mm:ss UTC" until the light delay has passed. It then shows "Ground (simulated) agreed
+with / disagreed with / asked for follow-up on your hh:mm verdict".
+
+* **The handoff never changes a tier or an action.** Delay changes who can take part in a decision, not the decision.
+* The distance is a demo setting. Use **Demo controls → Earth delay**, the Earth view's **Earth delay** selector, `POST /link`, or `run_demo.py --link mars_near`.
+* Deadlines and turnaround are project-defined placeholders, not NASA values.
+* `python -m evidence.autonomy` writes `evidence/results/autonomy.md`: which decisions the crew owns alone at each distance.
+
 ## Camera view and health sidebar
 
 The HUD is camera-first. Your laptop camera fills the screen as the view through the

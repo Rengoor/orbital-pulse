@@ -1,7 +1,8 @@
 """SQLite append-only store. Log first, display second.
 
-Two chains live here: decision Records, and ground Reviews in a chain of their
-own (a review never rewrites the Record it is about). The class only ever
+Several chains live here: decision Records, plus ground Reviews, acknowledgements
+and delay-aware handoffs, each in a chain of its own (none of them ever rewrites
+the Record it is about). The class only ever
 inserts; there is no update or delete. That is a convention, not a defence:
 whoever can open the database file can edit it, which is exactly what the hash
 chain and signatures exist to reveal.
@@ -36,6 +37,13 @@ CREATE TABLE IF NOT EXISTS acks (
     record_id TEXT NOT NULL,
     body      TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS handoffs (
+    seq       INTEGER PRIMARY KEY AUTOINCREMENT,
+    record_id TEXT NOT NULL,
+    astronaut_id TEXT NOT NULL,
+    body      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS handoffs_by_astronaut ON handoffs (astronaut_id, seq);
 CREATE TABLE IF NOT EXISTS downlink_pending (
     arrival   INTEGER PRIMARY KEY,
     record_id TEXT NOT NULL,
@@ -187,6 +195,50 @@ class RecordStore:
                 return False, position
             prev_hash = ack["hash"]
         return True, None
+
+    # -- handoffs (delay-aware autonomy) -----------------------------------------
+
+    def add_handoff(self, handoff: dict, signing_key: str | None = None) -> dict:
+        """Seal *handoff* into the handoff chain and store it."""
+        with self._lock:
+            sealed = seal(handoff, self._head_hash("handoffs"), signing_key=signing_key)
+            with self._conn:
+                self._conn.execute(
+                    "INSERT INTO handoffs (record_id, astronaut_id, body) VALUES (?, ?, ?)",
+                    (sealed["record_id"], sealed["astronaut_id"], json.dumps(sealed, sort_keys=True)),
+                )
+            return sealed
+
+    def handoffs(self, record_id: str | None = None) -> list[dict]:
+        """Handoffs, oldest first, optionally for one Record."""
+        if record_id is None:
+            return self._rows("SELECT body FROM handoffs ORDER BY seq")
+        return self._rows("SELECT body FROM handoffs WHERE record_id = ? ORDER BY seq", (record_id,))
+
+    def latest_handoff(self, astronaut_id: str) -> dict | None:
+        rows = self._rows(
+            "SELECT body FROM handoffs WHERE astronaut_id = ? ORDER BY seq DESC LIMIT 1", (astronaut_id,)
+        )
+        return rows[0] if rows else None
+
+    def verify_handoffs(self) -> tuple[bool, int | None]:
+        """(valid, position of the first broken handoff) for the handoff chain."""
+        prev_hash = GENESIS
+        for position, entry in enumerate(self.handoffs()):
+            if entry.get("prev_hash") != prev_hash or not verify_entry(entry):
+                return False, position
+            prev_hash = entry["hash"]
+        return True, None
+
+    def latest_review_for(self, astronaut_id: str) -> tuple[dict, dict] | None:
+        """(review, record) for the most recent review of any of this astronaut's records."""
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT rv.body, rc.body FROM reviews rv JOIN records rc ON rc.id = rv.record_id "
+                "WHERE rc.astronaut_id = ? ORDER BY rv.seq DESC LIMIT 1",
+                (astronaut_id,),
+            ).fetchone()
+        return (json.loads(row[0]), json.loads(row[1])) if row else None
 
     # -- downlink queue persistence -------------------------------------------
 

@@ -153,7 +153,8 @@ def test_all_seven_routes_are_registered(api):
 
 def test_checkin_returns_200_with_no_readings(api):
     data = api.checkin("crew_1", [])
-    assert set(data) == {"record_id", "verdict"}
+    # autonomy: the delay-aware handoff summary (additive field, never part of the verdict).
+    assert set(data) == {"record_id", "verdict", "autonomy"}
     assert isinstance(data["record_id"], str)
     jsonschema.validate(data["verdict"], _VERDICT_SCHEMA)
 
@@ -257,6 +258,7 @@ def test_status_returns_latest_verdict_for_that_astronaut_only(api):
     assert set(body) == {
         "tier", "action", "additional_actions", "known_severity",
         "disagreement_status", "reasons", "record_id", "ts",
+        "autonomy", "ground_review",  # delay-aware handoff and latest ground review
     }  # no raw readings
     assert body["disagreement_status"] == "DISAGREEMENT"  # A said GREEN, B said RED
     assert body["record_id"] == latest["record_id"]

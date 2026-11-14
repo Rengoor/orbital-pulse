@@ -136,7 +136,7 @@
         : h('div', { className: 'log-wrap' },
             h('table', { className: 'log' },
               h('thead', null, h('tr', null,
-                ['Time (UTC)', 'Crew', 'Tier', 'Authorized action', 'Assessments', 'Record'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+                ['Time (UTC)', 'Crew', 'Tier', 'Authorized action', 'Assessments', 'Who decided', 'Record'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
               h('tbody', null, rows.map(function (r) {
                 var v = r.verdict, sel = r.id === p.selected;
                 function pick() { p.onSelect(r.id); }
@@ -147,8 +147,27 @@
                   h('td', null, actionText(v.action),
                     (v.additional_actions || []).map(function (a) { return h('div', { key: a, className: 'muted' }, '+ ' + actionText(a)); })),
                   h('td', null, h(StatusChip, { verdict: v })),
+                  h('td', null, h(ModeChip, { mode: (p.modes || {})[r.id] })),
                   h('td', { className: 'mono muted' }, short(r.id, 8)));
               })))));
+  }
+
+  /* ---------- Delay-aware autonomy ---------- */
+  var MODE = {
+    GROUND_IN_LOOP: { chip: 'Ground in loop', text: 'Earth could answer before this action had to start.' },
+    ONBOARD_AUTHORITY: { chip: 'Onboard alone', text: 'Earth could not answer in time: the crew acted on the onboard verdict alone. Ground confirms or corrects afterwards.' },
+    ROUTINE: { chip: 'Routine', text: 'No time pressure: ground reviews this in the normal course.' }
+  };
+  function dur(s) {
+    if (s == null) return '--';
+    if (s < 60) return (s < 10 ? s.toFixed(1) : Math.round(s)) + ' s';
+    if (s < 3600) return Math.round(s / 60) + ' min';
+    return (s / 3600).toFixed(1) + ' h';
+  }
+  function ModeChip(p) {
+    var m = MODE[p.mode];
+    if (!m) return h('span', { className: 'chip' }, '--');
+    return h('span', { className: 'chip' + (p.mode === 'ONBOARD_AUTHORITY' ? ' split' : '') }, m.chip);
   }
 
   /* ---------- Selected decision ---------- */
@@ -169,6 +188,19 @@
             ? h('p', { style: { marginTop: 'var(--space-2)' } }, 'Also required, from the worst severity still known (' + v.known_severity + '): ' + v.additional_actions.map(actionText).join(', ') + '.')
             : null,
           h('p', { style: { marginTop: 'var(--space-2)' } }, t.explanation || (v.reasons || []).join(' ') || 'No explanation was recorded.')),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Who could decide in time'),
+          p.handoff
+            ? h('div', null,
+                h('div', { className: 'det-head' }, h(ModeChip, { mode: p.handoff.mode }),
+                  h('span', { className: 'muted' }, p.handoff.link.label + ' · ' + dur(p.handoff.link.one_way_delay_s) + ' one way')),
+                h('p', { style: { marginTop: 'var(--space-2)' } }, (MODE[p.handoff.mode] || {}).text),
+                h('p', { className: 'muted', style: { marginTop: 'var(--space-2)' } },
+                  'Earth\u2019s answer needs ' + dur(p.handoff.earth_answer_s) + ' (round trip ' + dur(2 * p.handoff.link.one_way_delay_s) + ' + turnaround ' + dur(p.handoff.ground_turnaround_s) + '). ' +
+                  (p.handoff.action_deadline_s == null ? 'The action has no deadline.' : 'The action had to start within ' + dur(p.handoff.action_deadline_s) + '.') +
+                  ' Verdict reached Earth ' + clock(p.handoff.verdict_reaches_earth_at) + ' UTC; earliest ground answer ' + clock(p.handoff.earliest_ground_answer_at) + ' UTC.'),
+                h('p', { className: 'muted', style: { fontSize: 12 } }, 'Signed in the handoff log. Deadlines are project-defined placeholders (autonomy.yaml). It never changes the decision.'))
+            : h('p', { className: 'muted' }, 'No handoff was logged for this decision.')),
 
         h('div', null, h('h3', { className: 'vt-lbl' }, 'Assessments'),
           h('ul', { className: 'lst' },
@@ -396,6 +428,7 @@
     var checkpoint = React.useState(loadCheckpoint()), checkResult = React.useState(null);
     var delay = React.useState('1.3'), received = React.useState([]);
     var nasa = React.useState({}), checks = React.useState(null), panels = React.useState(null), loadedRef = React.useRef(false);
+    var handoffs = React.useState(null);
 
     // Reference data changes rarely: load it once the link is up.
     function loadReference() {
@@ -409,14 +442,14 @@
     }
 
     function refresh() {
-      return Promise.all([API.health(), API.records(null, 1000), API.downlink(), API.reviews()]).then(function (res) {
+      return Promise.all([API.health(), API.records(null, 1000), API.downlink(), API.reviews(), API.earthHandoffs()]).then(function (res) {
         link[1]({ state: 'online', key: res[0].signing_key || null });
-        records[1](res[1]); downlink[1](res[2]); reviews[1](res[3]);
+        records[1](res[1]); downlink[1](res[2]); reviews[1](res[3]); handoffs[1](res[4]);
         loadReference();
       }).catch(function () {
         // No link: show nothing rather than stale or sample data.
         link[1](function (p) { return { state: 'offline', key: p.key }; });
-        records[1]([]); downlink[1](null); reviews[1](null); chain[1](null);
+        records[1]([]); downlink[1](null); reviews[1](null); chain[1](null); handoffs[1](null);
       });
     }
     React.useEffect(function () {
@@ -460,6 +493,10 @@
     }
 
     var online = link[0].state === 'online', key = link[0].key;
+    var modes = {}, handoffOf = {};
+    ((handoffs[0] || {}).handoffs || []).forEach(function (x) { modes[x.record_id] = x.mode; handoffOf[x.record_id] = x; });
+    var earth = (handoffs[0] || {}).link, alone = ((handoffs[0] || {}).counts || {}).ONBOARD_AUTHORITY || 0;
+    function setEarthLink(preset) { API.setLink(preset).then(refresh).catch(function () {}); }
     var urgent = records[0].filter(function (r) { return r.verdict.tier === 'RED' || r.verdict.tier === 'GREY'; }).length;
 
     return h('div', { className: 'eb' },
@@ -468,6 +505,14 @@
           h('span', { className: 'eb-sub' }, 'Every decision the vehicle has recorded, and the tools to check it')),
         h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Link'),
           h('span', { className: 'v ' + (online ? 'ok' : link[0].state === 'offline' ? 'bad' : 'muted') }, online ? 'Connected' : link[0].state === 'offline' ? 'No link' : 'Connecting')),
+        h('div', { className: 'eb-stat' }, h('label', { className: 'vt-lbl', htmlFor: 'f-link' }, 'Earth delay'),
+          online && earth
+            ? h('select', { id: 'f-link', value: earth.preset || '', onChange: function (e) { if (e.target.value) setEarthLink(e.target.value); } },
+                earth.preset ? null : h('option', { value: '' }, earth.label),
+                [['leo', 'Low Earth orbit'], ['moon', 'Moon'], ['mars_near', 'Mars (closest)'], ['mars_far', 'Mars (farthest)']].map(function (o) { return h('option', { key: o[0], value: o[0] }, o[1]); }))
+            : h('span', { className: 'v muted' }, '--'),
+          online && earth ? h('span', { className: 'v' }, dur(earth.one_way_delay_s) + ' one way') : null),
+        h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Decided onboard alone'), h('span', { className: 'v ' + (alone ? 'warn' : '') }, online && handoffs[0] ? String(alone) : '--')),
         h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Urgent on record'), h('span', { className: 'v ' + (urgent ? 'warn' : '') }, online ? String(urgent) : '--')),
         h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Signing key'),
           h('span', { className: 'v ' + (key && key.demo_key ? 'bad' : '') }, key ? key.key_id + (key.demo_key ? ' · DEMO' : '') : '--'))),
@@ -479,9 +524,9 @@
             h('span', null, h('b', null, 'Read-only oversight. '), 'This console shows what the Checker decided and recorded. Verifying, replaying and reviewing never alter a decision.')),
 
       h('div', { className: 'eb-main' },
-        h(DecisionLog, { records: records[0], selected: selected[0], crew: crew[0], tier: tier[0], onCrew: crew[1], onTier: tier[1],
+        h(DecisionLog, { modes: modes, records: records[0], selected: selected[0], crew: crew[0], tier: tier[0], onCrew: crew[1], onTier: tier[1],
           onSelect: function (id) { selected[1](id); result[1](null); } }),
-        h(Detail, { key: current ? current.id : 'none', record: current, result: result[0], onVerify: verify, onReplay: replay, onReview: review })),
+        h(Detail, { key: current ? current.id : 'none', record: current, handoff: current ? handoffOf[current.id] : null, result: result[0], onVerify: verify, onReplay: replay, onReview: review })),
 
       h('div', { className: 'eb-row' },
         h(ChainPanel, { records: records[0], chain: chain[0], checkpoint: checkpoint[0], checkResult: checkResult[0],

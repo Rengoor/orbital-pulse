@@ -10,7 +10,9 @@ What it does:
 Ctrl+C stops everything.
 
 Options: --port N, --no-sim (backend and pages only), --storm (simulator storm
-mode), --no-browser, --interval S (simulator seconds between rounds).
+mode), --no-browser, --interval S (simulator seconds between rounds),
+--link leo|moon|mars_near|mars_far (starting distance from Earth; the HUD's
+demo controls and the Earth view can change it while running).
 SIGNING_KEY is taken from the environment; without it a local development key
 is used and the backend says so in its log.
 """
@@ -65,6 +67,8 @@ def main() -> int:
     ap.add_argument("--storm", action="store_true", help="simulator storm mode (dose rate climbs)")
     ap.add_argument("--interval", type=float, default=10.0, help="simulator seconds between rounds")
     ap.add_argument("--no-browser", action="store_true", help="do not open the pages")
+    ap.add_argument("--link", choices=["leo", "moon", "mars_near", "mars_far"], default=None,
+                    help="starting distance from Earth (default: moon)")
     args = ap.parse_args()
     sys.stdout.reconfigure(line_buffering=True)   # show progress even when piped to a file
 
@@ -78,6 +82,8 @@ def main() -> int:
         env["SIGNING_KEY"] = "local-dev-signing-key"
         print("SIGNING_KEY not set; using the local development key (records are for this demo only).")
 
+    if args.link:
+        env["LINK_PRESET"] = args.link
     procs: list[subprocess.Popen] = []
 
     def stop_all(*_: object) -> None:

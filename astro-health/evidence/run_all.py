@@ -3,7 +3,7 @@
     python -m evidence.run_all [--seed 42]
 
 Writes evidence/results/{ablation,sensitivity,rulechange_replay,
-downlink_efficiency}.{md,json} and redteam.{md,json}, then prints one
+downlink_efficiency,autonomy}.{md,json} and redteam.{md,json}, then prints one
 summary line per runner. Exit code 0 only when the red team reports zero
 unsafe approvals.
 
@@ -20,7 +20,7 @@ import argparse
 import json
 import sys
 
-from evidence import ablation, downlink_efficiency, rulechange_replay, sensitivity
+from evidence import ablation, autonomy, downlink_efficiency, rulechange_replay, sensitivity
 from evidence._harness import RESULTS, write_results
 from evidence.redteam import run_redteam
 
@@ -36,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
         ("sensitivity", sensitivity),
         ("rulechange_replay", rulechange_replay),
         ("downlink_efficiency", downlink_efficiency),
+        ("autonomy", autonomy),
     ):
         data = module.run(seed=args.seed)
         write_results(name, module.to_markdown(data), data)

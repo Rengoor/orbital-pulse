@@ -80,6 +80,16 @@ def list_acks(record_id: str, state: AppState = Depends(get_state)) -> dict:
     }
 
 
+@router.get("/{record_id}/handoff")
+def get_handoff(record_id: str, state: AppState = Depends(get_state)) -> dict:
+    """The delay-aware handoff logged for one Record, with the handoff chain's integrity."""
+    if state.store.get(record_id) is None:
+        raise HTTPException(status_code=404, detail=f"no record {record_id!r}")
+    valid, broken_at = state.store.verify_handoffs()
+    entries = state.store.handoffs(record_id)
+    return {"handoff": entries[-1] if entries else None, "chain": {"valid": valid, "broken_at": broken_at}}
+
+
 @router.get("/{record_id}/trust")
 def get_trust(record_id: str, state: AppState = Depends(get_state)) -> dict:
     """Data for the "Why should I trust this decision?" panel."""

@@ -8,3 +8,5 @@ __pycache__/
 .streamlit/secrets.toml
 data/nasa/raw/*
 !data/nasa/raw/.gitkeep
+.hypothesis/
+.pytest_cache/

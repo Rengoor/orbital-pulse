@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from backend.api.state import AppState, get_state
 from backend.orchestrator import _READING_VALIDATOR, decide
 from backend.orchestrator import decide as _failsafe
+from backend.records.handoff import assess
 
 logger = logging.getLogger(__name__)
 
@@ -90,5 +91,18 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
     # Automatically enqueue the downlink summary and chain anchor on every check-in.
     state.queue.enqueue(record, signing_key=state.signing_key)
 
+    # Delay-aware autonomy: can Earth answer in time for this action at the
+    # current link? Logged in its own signed chain, after the Record. It never
+    # changes the verdict, so a failure here is reported but never blocks one.
+    try:
+        handoff = state.store.add_handoff(
+            assess(record, state.link, state.autonomy_policy, state.autonomy_hash),
+            signing_key=state.signing_key,
+        )
+        autonomy = {k: handoff[k] for k in ("mode", "earth_answer_s", "action_deadline_s", "link")}
+    except Exception:  # noqa: BLE001 - the verdict stands without it
+        logger.exception("could not record the handoff for %s", record["id"])
+        autonomy = None
+
     # Verdict summary only, never the full Record: keeps the downlink payload small.
-    return {"record_id": record["id"], "verdict": record["verdict"]}
+    return {"record_id": record["id"], "verdict": record["verdict"], "autonomy": autonomy}

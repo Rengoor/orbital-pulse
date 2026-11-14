@@ -1,0 +1,463 @@
+{
+  "radiation": {
+    "source": "NASA OSDR RadLab, ALTEA on the ISS, dose_equivalent_rate (uSv/h)",
+    "window": {
+      "start": "2010-11-01T00:00Z",
+      "end": "2010-11-08T00:00Z"
+    },
+    "samples": 9220,
+    "donki_sep_events": 0,
+    "verdicts": {
+      "GREEN": 6341,
+      "YELLOW": 2775,
+      "RED": 104,
+      "GREY": 0
+    },
+    "alarms": 2879,
+    "false_alarm_share": 0.3123,
+    "by_abs_latitude": {
+      "0-20": {
+        "GREEN": 2486,
+        "YELLOW": 123,
+        "RED": 0,
+        "GREY": 0
+      },
+      "20-35": {
+        "GREEN": 1776,
+        "YELLOW": 343,
+        "RED": 0,
+        "GREY": 0
+      },
+      "35-45": {
+        "GREEN": 1067,
+        "YELLOW": 679,
+        "RED": 18,
+        "GREY": 0
+      },
+      "45-60": {
+        "GREEN": 1012,
+        "YELLOW": 1630,
+        "RED": 86,
+        "GREY": 0
+      }
+    },
+    "dose_uSv_h": {
+      "median": 25.2,
+      "p95": 140.22,
+      "max": 354.04
+    },
+    "example_alarms": [
+      {
+        "ts": "2010-11-01T00:00:00Z",
+        "value": 56.6,
+        "lat": -40.84791,
+        "lon": 167.534145,
+        "tier": "YELLOW",
+        "rules": [
+          "dose_rate_usv_h.yellow_high"
+        ]
+      },
+      {
+        "ts": "2010-11-01T00:01:00Z",
+        "value": 60.0,
+        "lat": -38.518766,
+        "lon": 171.371997,
+        "tier": "YELLOW",
+        "rules": [
+          "dose_rate_usv_h.yellow_high"
+        ]
+      },
+      {
+        "ts": "2010-11-01T00:02:00Z",
+        "value": 84.9,
+        "lat": -36.054868,
+        "lon": 174.94841,
+        "tier": "YELLOW",
+        "rules": [
+          "dose_rate_usv_h.yellow_high"
+        ]
+      },
+      {
+        "ts": "2010-11-01T00:03:00Z",
+        "value": 67.2,
+        "lat": -33.475044,
+        "lon": 178.289136,
+        "tier": "YELLOW",
+        "rules": [
+          "dose_rate_usv_h.yellow_high"
+        ]
+      },
+      {
+        "ts": "2010-11-01T00:17:00Z",
+        "value": 51.3,
+        "lat": 8.25951,
+        "lon": -147.35714,
+        "tier": "YELLOW",
+        "rules": [
+          "dose_rate_usv_h.yellow_high"
+        ]
+      }
+    ]
+  },
+  "glucose": {
+    "source": "NASA OSDR OSD-575 (SpaceX Inspiration4, CMP), GLUCOSE mg/dL",
+    "draws": 28,
+    "agreement": {
+      "agree": 24,
+      "system_flagged_in_range": 2,
+      "system_missed_out_of_range": 2
+    },
+    "rows": [
+      {
+        "crew": "C001",
+        "timepoint": "L-92",
+        "value": 83.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C001",
+        "timepoint": "L-44",
+        "value": 80.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C001",
+        "timepoint": "L-3",
+        "value": 69.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "YELLOW",
+        "rules": [
+          "glucose.yellow_low"
+        ]
+      },
+      {
+        "crew": "C001",
+        "timepoint": "R+1",
+        "value": 90.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C001",
+        "timepoint": "R+45",
+        "value": 84.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C001",
+        "timepoint": "R+82",
+        "value": 91.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C001",
+        "timepoint": "R+194",
+        "value": 87.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C002",
+        "timepoint": "L-92",
+        "value": 69.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "YELLOW",
+        "rules": [
+          "glucose.yellow_low"
+        ]
+      },
+      {
+        "crew": "C002",
+        "timepoint": "L-44",
+        "value": 72.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C002",
+        "timepoint": "L-3",
+        "value": 78.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C002",
+        "timepoint": "R+1",
+        "value": 83.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C002",
+        "timepoint": "R+45",
+        "value": 44.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "RED",
+        "rules": [
+          "glucose.red_low"
+        ]
+      },
+      {
+        "crew": "C002",
+        "timepoint": "R+82",
+        "value": 77.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C002",
+        "timepoint": "R+194",
+        "value": 84.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C003",
+        "timepoint": "L-92",
+        "value": 77.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C003",
+        "timepoint": "L-44",
+        "value": 62.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "YELLOW",
+        "rules": [
+          "glucose.yellow_low"
+        ]
+      },
+      {
+        "crew": "C003",
+        "timepoint": "L-3",
+        "value": 75.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C003",
+        "timepoint": "R+1",
+        "value": 103.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C003",
+        "timepoint": "R+45",
+        "value": 36.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "RED",
+        "rules": [
+          "glucose.red_low"
+        ]
+      },
+      {
+        "crew": "C003",
+        "timepoint": "R+82",
+        "value": 80.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C003",
+        "timepoint": "R+194",
+        "value": 73.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C004",
+        "timepoint": "L-92",
+        "value": 100.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C004",
+        "timepoint": "L-44",
+        "value": 83.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C004",
+        "timepoint": "L-3",
+        "value": 56.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "YELLOW",
+        "rules": [
+          "glucose.yellow_low"
+        ]
+      },
+      {
+        "crew": "C004",
+        "timepoint": "R+1",
+        "value": 97.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C004",
+        "timepoint": "R+45",
+        "value": 43.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": false,
+        "tier": "RED",
+        "rules": [
+          "glucose.red_low"
+        ]
+      },
+      {
+        "crew": "C004",
+        "timepoint": "R+82",
+        "value": 80.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      },
+      {
+        "crew": "C004",
+        "timepoint": "R+194",
+        "value": 84.0,
+        "lab_range": [
+          65.0,
+          99.0
+        ],
+        "lab_in_range": true,
+        "tier": "GREEN",
+        "rules": []
+      }
+    ]
+  }
+}

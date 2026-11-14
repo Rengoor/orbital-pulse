@@ -19,7 +19,7 @@ jobs:
           python-version: "3.11"
       # evidence/requirements.txt pulls in backend and data requirements too.
       - run: pip install -r evidence/requirements.txt
-      - run: pytest backend/tests data/tests evidence/tests -q
+      - run: pytest backend/tests data/tests evidence/tests validation/tests -q
 
   redteam:
     runs-on: ubuntu-latest

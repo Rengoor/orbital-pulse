@@ -123,6 +123,14 @@
         note: note || ''
       });
     },
+    handoff: function (recordId) {
+      return request('GET', '/records/' + encodeURIComponent(recordId) + '/handoff');
+    },
+    link: function () { return request('GET', '/link'); },
+    earthHandoffs: function () { return request('GET', '/earth/handoffs'); },
+    setLink: function (preset, oneWayDelayS, label) {
+      return request('POST', '/link', { preset: preset || null, one_way_delay_s: oneWayDelayS == null ? null : oneWayDelayS, label: label || null });
+    },
     acks: function (recordId) {
       return request('GET', '/records/' + encodeURIComponent(recordId) + '/acks');
     },

@@ -80,6 +80,11 @@
   .mark svg { width: 16px; height: 16px; flex: none; }
   .mark.fail { border: 2px solid var(--tier-red); }
   .mark.fail svg { color: var(--tier-red); }
+  .marks.col { flex-direction: column; align-items: flex-start; }
+  .mark { white-space: normal; }
+  /* Onboard authority: Earth cannot answer in time (delay-aware autonomy). */
+  .mark.onboard { border: 2px solid var(--holo); align-items: flex-start; }
+  .mark.onboard svg { color: var(--holo); margin-top: 3px; }
 
   .vital { position: relative; white-space: nowrap; box-sizing: border-box; display: grid; gap: 4px; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 12px; }
   .vital .top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
@@ -227,6 +232,12 @@
     if (!isFinite(s) || s < 0) return null;
     return 'MET ' + Math.floor(s / 86400) + '/' + pad(Math.floor(s / 3600) % 24) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
   }
+  function dur(sec) {
+    if (sec == null || !isFinite(sec)) return '--';
+    if (sec < 60) return (sec < 10 ? sec.toFixed(1) : Math.round(sec)) + ' s';
+    if (sec < 3600) return Math.round(sec / 60) + ' min';
+    return (sec / 3600).toFixed(1) + ' h';
+  }
   function age(ms, now) {
     var s = Math.max(0, Math.round((now - ms) / 1000));
     return s < 60 ? s + ' s old' : s < 3600 ? Math.floor(s / 60) + ' min old' : Math.floor(s / 3600) + ' h old';
@@ -350,6 +361,7 @@
       h('div', { className: 'tier' }, h(I, { name: 'tier-' + tier, className: 'c-' + tier, strokeWidth: 2.2 }), V.TIERS[tier].word),
       h(ActionLine, { code: s.action }),
       (s.additional_actions || []).map(function (a) { return h(ActionLine, { key: a, code: a, also: true }); }),
+      h(AutonomyLines, { autonomy: s.autonomy, ground: s.ground_review }),
       (failsafe || (s.disagreement_status && s.disagreement_status !== 'AGREEMENT')) ? h('div', { className: 'marks' },
         failsafe ? h('span', { className: 'mark fail' }, h(I, { name: 'tier-RED' }), 'Decision system failed') : null,
         s.disagreement_status && s.disagreement_status !== 'AGREEMENT' ? h('span', { className: 'mark' }, h(I, { name: 'tier-YELLOW' }), SPLIT[s.disagreement_status] || s.disagreement_status) : null) : null,
@@ -364,6 +376,27 @@
           : h(V.Button, { size: 'sm', variant: 'secondary', icon: 'check', className: 'ack-btn', 'aria-label': 'Acknowledge this alert',
               disabled: p.ack.sending, onClick: p.ack.onAck }, p.ack.sending ? 'Acknowledging' : 'Acknowledge'),
       p.ack && p.ack.err ? h('div', { className: 'txt' }, 'Not acknowledged: ' + p.ack.err) : null);
+  }
+
+  /* Delay-aware autonomy, from the backend's signed handoff (GET /status -> autonomy):
+     can Earth answer before this action has to start? And the latest ground review,
+     which only shows as received once the light delay has passed. */
+  var REVIEW_WORD = { AGREE: 'agreed with', DISAGREE: 'disagreed with', FOLLOW_UP: 'asked for follow-up on' };
+  function AutonomyLines(p) {
+    var a = p.autonomy, g = p.ground, out = [];
+    if (a && a.mode === 'ONBOARD_AUTHORITY') {
+      out.push(h('div', { key: 'a', className: 'mark onboard' }, h(I, { name: 'antenna' }),
+        'Earth answers in ~' + dur(a.earth_answer_s) + ': too late for this action. Act on the onboard verdict.'));
+    } else if (a && a.mode === 'GROUND_IN_LOOP') {
+      out.push(h('div', { key: 'a', className: 'txt dim' }, 'Earth can answer in ~' + dur(a.earth_answer_s) + '.'));
+    }
+    if (g) {
+      out.push(g.arrived
+        ? h('div', { key: 'g', className: 'mark' + (g.outcome === 'DISAGREE' ? ' fail' : '') }, h(I, { name: g.outcome === 'AGREE' ? 'check' : 'antenna' }),
+            'Ground (simulated) ' + (REVIEW_WORD[g.outcome] || g.outcome) + ' your ' + utc(parseTs(g.record_ts)).slice(4, 9) + ' verdict')
+        : h('div', { key: 'g', className: 'txt dim' }, 'Ground review on its way, arrives ' + utc(parseTs(g.arrives_at)).slice(4) + ' UTC'));
+    }
+    return out.length ? h('div', { className: 'marks col' }, out) : null;
   }
 
   function Vital(p) {
@@ -603,7 +636,9 @@
           h('span', { className: 'mono' }, utc(now)),
           h('span', { className: 'lbl' }, WEARER),
           state.link === 'down' ? h('span', { className: 'lbl bad' }, h(I, { name: 'antenna' }), 'NO LINK') :
-            state.link === 'up' ? h('span', { className: 'txt' }, 'Link up') : h('span', { className: 'txt' }, 'Connecting'),
+            state.link === 'up' ? h('span', { className: 'txt' }, 'Habitat link up') : h('span', { className: 'txt' }, 'Connecting'),
+          state.link === 'up' && state.status && state.status.autonomy
+            ? h('span', { className: 'txt' }, 'Earth: ' + state.status.autonomy.link.label + ', ' + dur(state.status.autonomy.link.one_way_delay_s) + ' one way') : null,
           audioOn[0] ? null : h('span', { className: 'txt' }, 'Audio cues off'),
           layout[0] !== 'normal' ? h('span', { className: 'txt' }, LAYOUT_WORD[layout[0]] + ' view') : null,
           gest[0].on ? h('span', { className: 'txt' }, gest[0].hand ? 'Gestures: hand seen' : 'Gestures on') :
@@ -636,6 +671,14 @@
             var l = LAYOUT_OF[c];
             return h(V.Button, { key: c, size: 'sm', variant: layout[0] === l ? 'primary' : 'secondary', onClick: function () { layout[1](l); } }, LAYOUT_WORD[l]);
           })),
+          h('span', { className: 'vt-lbl' }, 'Earth delay (applies to new verdicts)'),
+          h('div', { className: 'ctl-row' },
+            [['leo', null, 'Low Earth orbit'], ['moon', null, 'Moon'], ['mars_near', null, 'Mars closest'], ['mars_far', null, 'Mars farthest'], [null, 30, 'Demo: 30 s']].map(function (o) {
+              var cur = state.status && state.status.autonomy ? state.status.autonomy.link : null;
+              var on = cur && (o[0] ? cur.preset === o[0] : cur.preset == null && cur.one_way_delay_s === o[1]);
+              return h(V.Button, { key: o[2], size: 'sm', variant: on ? 'primary' : 'secondary',
+                onClick: function () { API.setLink(o[0], o[1], o[0] ? null : 'Demo Mars (30 s)').catch(function (e) { simErr[1](e.message); }); } }, o[2]);
+            })),
           h('span', { className: 'vt-lbl' }, 'Scenario simulator (posts simulated readings for ' + WEARER + ')'),
           h('div', { className: 'ctl-row' },
             SCENARIOS.map(function (x) {

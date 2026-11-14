@@ -1,0 +1,33 @@
+# Delay-aware autonomy policy. Versioned; its hash goes into every handoff record.
+#
+# For each authorized action: how soon it must start, in seconds after the
+# verdict. When Earth's answer (round-trip light time plus ground turnaround)
+# cannot arrive within that time, the crew acts on the onboard verdict alone:
+# the handoff mode is ONBOARD_AUTHORITY. Otherwise ground is in the loop.
+#
+# PLACEHOLDER: every value here is project-defined, not taken from a NASA
+# document. They encode an ordering of urgency that matches policy.yaml's
+# action_order; the absolute numbers need operational review.
+#
+# A handoff never changes a verdict, a tier or an action. It only states who
+# can take part in the decision in time.
+version: "0.1.0"
+
+# Assumed time for a flight surgeon on the ground to read a downlinked verdict
+# and send an answer, excluding light travel time.
+ground_turnaround_s: 120
+
+# Seconds within which each action must start. null = no time pressure
+# (the decision is routine and ground reviews it in the normal course).
+action_deadline_s:
+  NO_ACTION: null
+  RECHECK_IN_1H: 3600
+  REST_AND_HYDRATE: 1800
+  USE_PROTOCOL_CARD: 600
+  ALERT_CMO: 300
+  CONTACT_GROUND_URGENT: 300
+
+# Named link presets for the demo and the evidence runner (see
+# backend/downlink/delay.py for the distances).
+link_presets: [leo, moon, mars_near, mars_far]
+default_link: moon

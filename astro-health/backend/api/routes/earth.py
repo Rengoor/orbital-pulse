@@ -106,6 +106,23 @@ def review(body: ReviewRequest, state: AppState = Depends(get_state)) -> dict:
     )
 
 
+@router.get("/handoffs")
+def handoffs(state: AppState = Depends(get_state)) -> dict:
+    """Every delay-aware handoff, oldest first: which decisions the crew had to own
+    alone because Earth could not answer in time. Never changes a decision."""
+    entries = state.store.handoffs()
+    valid, broken_at = state.store.verify_handoffs()
+    counts = {m: 0 for m in ("GROUND_IN_LOOP", "ONBOARD_AUTHORITY", "ROUTINE")}
+    for e in entries:
+        counts[e["mode"]] = counts.get(e["mode"], 0) + 1
+    return {
+        "handoffs": entries,
+        "counts": counts,
+        "link": state.link,
+        "chain": {"valid": valid, "broken_at": broken_at},
+    }
+
+
 @router.get("/reviews")
 def reviews(record_id: str | None = None, state: AppState = Depends(get_state)) -> dict:
     """The review log, oldest first, with whether the review chain is intact."""
