@@ -1,0 +1,29 @@
+{
+  "id": "fake_nasa_provenance",
+  "title": "Unverifiable provenance",
+  "area": "data",
+  "description": "A reading claims to be real NASA RadLab data but carries no dataset reference.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm"
+      },
+      {
+        "id": "dose",
+        "channel": "dose_rate_usv_h",
+        "value": 0.4,
+        "unit": "uSv/h",
+        "source": "nasa_radlab"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
+}

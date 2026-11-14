@@ -1,0 +1,41 @@
+{
+  "id": "llm_invents_evidence",
+  "title": "LLM invents evidence",
+  "area": "llm",
+  "description": "The model cites a reading that was never taken and a figure that is not in the data.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm"
+      }
+    ],
+    "llm_output": {
+      "pipeline_id": "d_llm",
+      "tier": "GREEN",
+      "reasons": [
+        "Oxygen saturation of 98.5 confirms the crew member is stable."
+      ],
+      "data_fault": false,
+      "reading_ids": [
+        "hr",
+        "spo2-7"
+      ]
+    }
+  },
+  "expect": {
+    "tiers": [
+      "GREEN"
+    ],
+    "pipeline_status": {
+      "d_llm": "no_output"
+    },
+    "forbid": [
+      "98.5",
+      "saturation"
+    ]
+  }
+}

@@ -1,6 +1,26 @@
 {
   "id": "pipeline_disagreement",
-  "description": "pipeline disagreement",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Pipelines disagree",
+  "area": "governance",
+  "description": "The statistical pipeline sees nothing unusual while the limits pipeline sees a red-level heart rate.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 150,
+        "unit": "bpm"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "RED"
+    ],
+    "verdict": {
+      "disagreement_status": "DISAGREEMENT",
+      "action": "ALERT_CMO"
+    }
+  }
 }

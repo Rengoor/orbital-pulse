@@ -1,0 +1,5969 @@
+{
+  "source": "NASA OSDR, SpaceX Inspiration4",
+  "fetched_at": "2026-11-14T20:37:17Z",
+  "datasets": [
+    {
+      "dataset_id": "OSD-569",
+      "panel": "CBC",
+      "file": "LSDS-7_Complete_Blood_Count_CBC.upload_SUBMITTED.csv",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-569",
+      "rows": 553
+    },
+    {
+      "dataset_id": "OSD-575",
+      "panel": "CMP",
+      "file": "LSDS-8_Comprehensive_Metabolic_Panel_CMP.upload_SUBMITTED.csv",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575",
+      "rows": 531
+    }
+  ],
+  "timepoints": "L-n = n days before launch, R+n = n days after return",
+  "subjects": {
+    "C001": {
+      "sex": "M",
+      "analytes": {
+        "WHITE BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 3.8,
+          "range_max": 10.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 5.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 5.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 5.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.9
+            }
+          ]
+        },
+        "RED BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Million/uL",
+          "range_min": 4.2,
+          "range_max": 5.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.58
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.85
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.69
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.84
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.63
+            },
+            {
+              "timepoint": "R+82",
+              "value": 5.02
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.66
+            }
+          ]
+        },
+        "HEMOGLOBIN": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 13.2,
+          "range_max": 17.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 14.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 14.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 14.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 14.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 14.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 15.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 14.1
+            }
+          ]
+        },
+        "HEMATOCRIT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.5,
+          "range_max": 50.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 42.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 45.1
+            },
+            {
+              "timepoint": "L-3",
+              "value": 44.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 43.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 43.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 46.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 41.8
+            }
+          ]
+        },
+        "MCV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 80.0,
+          "range_max": 100.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 92.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 93.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 94.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 90.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 93.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 91.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 89.7
+            }
+          ]
+        },
+        "MCH": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "pg",
+          "range_min": 27.0,
+          "range_max": 33.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 30.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 30.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 31.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 30.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 30.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 31.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 30.3
+            }
+          ]
+        },
+        "MCHC": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 32.0,
+          "range_max": 36.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 33.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 33.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 33.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 33.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 33.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 34.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 33.7
+            }
+          ]
+        },
+        "RDW": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 11.0,
+          "range_max": 15.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 13.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 12.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 12.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 12.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 12.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 12.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 12.8
+            }
+          ]
+        },
+        "PLATELET COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 140.0,
+          "range_max": 400.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 241.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 237.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 258.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 227.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 228.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 257.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 214.0
+            }
+          ]
+        },
+        "MPV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 7.5,
+          "range_max": 12.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 10.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 10.8
+            },
+            {
+              "timepoint": "R+45",
+              "value": 10.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 10.5
+            }
+          ]
+        },
+        "ABSOLUTE NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 1500.0,
+          "range_max": 7800.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2349.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2998.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3570.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2685.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2200.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1994.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2391.0
+            }
+          ]
+        },
+        "ABSOLUTE LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 850.0,
+          "range_max": 3900.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2241.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1859.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2667.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1640.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2146.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2171.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1847.0
+            }
+          ]
+        },
+        "ABSOLUTE MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 200.0,
+          "range_max": 950.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 481.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 391.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 553.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 455.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 368.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 485.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 392.0
+            }
+          ]
+        },
+        "ABSOLUTE EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 15.0,
+          "range_max": 500.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 259.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 204.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 161.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 170.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 127.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 181.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 221.0
+            }
+          ]
+        },
+        "ABSOLUTE BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 0.0,
+          "range_max": 200.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 70.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 50.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 49.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 50.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 59.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 69.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 49.0
+            }
+          ]
+        },
+        "NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.0,
+          "range_max": 80.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 43.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 54.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 51.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 53.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 44.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 40.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 48.8
+            }
+          ]
+        },
+        "LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 15.0,
+          "range_max": 49.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 41.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 33.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 38.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 32.8
+            },
+            {
+              "timepoint": "R+45",
+              "value": 43.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 44.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 37.7
+            }
+          ]
+        },
+        "MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 13.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 8.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 7.1
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 9.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 8.0
+            }
+          ]
+        },
+        "EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 8.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.5
+            }
+          ]
+        },
+        "BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 2.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.0
+            }
+          ]
+        },
+        "GLUCOSE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 65.0,
+          "range_max": 99.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 83.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 80.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 69.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 90.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 84.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 91.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 87.0
+            }
+          ]
+        },
+        "UREA NITROGEN (BUN)": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 7.0,
+          "range_max": 25.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 25.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 19.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 20.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 18.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 15.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 22.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 28.0
+            }
+          ]
+        },
+        "CREATININE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.6,
+          "range_max": 1.35,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.24
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.1
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.37
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.12
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.11
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.25
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.29
+            }
+          ]
+        },
+        "eGFR NON-AFR. AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 73.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 85.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 65.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 83.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 84.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 73.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 69.0
+            }
+          ]
+        },
+        "eGFR AFRICAN AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 85.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 98.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 75.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 96.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 97.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 84.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 80.0
+            }
+          ]
+        },
+        "BUN/CREATININE RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 6.0,
+          "range_max": 22.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": null
+            },
+            {
+              "timepoint": "L-44",
+              "value": null
+            },
+            {
+              "timepoint": "L-3",
+              "value": 15.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": null
+            },
+            {
+              "timepoint": "R+45",
+              "value": null
+            },
+            {
+              "timepoint": "R+82",
+              "value": null
+            },
+            {
+              "timepoint": "R+194",
+              "value": 22.0
+            }
+          ]
+        },
+        "SODIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 135.0,
+          "range_max": 146.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 141.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 139.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 142.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 138.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 138.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 140.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 137.0
+            }
+          ]
+        },
+        "POTASSIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 3.5,
+          "range_max": 5.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.3
+            }
+          ]
+        },
+        "CHLORIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 98.0,
+          "range_max": 110.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 104.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 101.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 102.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 102.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 100.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 101.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 102.0
+            }
+          ]
+        },
+        "CARBON DIOXIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 20.0,
+          "range_max": 32.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 23.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 26.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 26.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 28.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 27.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 23.0
+            }
+          ]
+        },
+        "CALCIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 8.6,
+          "range_max": 10.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 9.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 9.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 9.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 9.4
+            }
+          ]
+        },
+        "PROTEIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 6.1,
+          "range_max": 8.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 7.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 7.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.4
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 7.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 7.0
+            }
+          ]
+        },
+        "ALBUMIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 3.6,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 5.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 5.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 5.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.6
+            }
+          ]
+        },
+        "GLOBULIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 1.9,
+          "range_max": 3.7,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2.4
+            }
+          ]
+        },
+        "ALBUMIN/GLOBULIN RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 1.0,
+          "range_max": 2.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.1
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.9
+            }
+          ]
+        },
+        "BILIRUBIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.2,
+          "range_max": 1.2,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": null
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.8
+            }
+          ]
+        },
+        "ALKALINE PHOSPHATASE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 36.0,
+          "range_max": 130.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 51.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 46.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 45.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 52.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 46.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 49.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 50.0
+            }
+          ]
+        },
+        "AST": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 10.0,
+          "range_max": 40.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 15.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 18.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 15.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 16.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 13.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 16.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 12.0
+            }
+          ]
+        },
+        "ALT": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 9.0,
+          "range_max": 46.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 15.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 16.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 13.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 11.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 15.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 15.0
+            }
+          ]
+        }
+      }
+    },
+    "C002": {
+      "sex": "F",
+      "analytes": {
+        "WHITE BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 3.8,
+          "range_max": 10.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 6.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 5.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 5.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 6.4
+            },
+            {
+              "timepoint": "R+82",
+              "value": 5.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 6.4
+            }
+          ]
+        },
+        "RED BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Million/uL",
+          "range_min": 3.8,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.36
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.93
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3.72
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.02
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.02
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3.84
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.11
+            }
+          ]
+        },
+        "HEMOGLOBIN": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 11.7,
+          "range_max": 15.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 13.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 12.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 11.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 12.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 12.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 11.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 12.7
+            }
+          ]
+        },
+        "HEMATOCRIT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 35.0,
+          "range_max": 45.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 40.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 37.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 35.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 36.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 37.1
+            },
+            {
+              "timepoint": "R+82",
+              "value": 34.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 38.3
+            }
+          ]
+        },
+        "MCV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 80.0,
+          "range_max": 100.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 93.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 96.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 96.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 90.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 92.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 90.4
+            }
+          ]
+        },
+        "MCH": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "pg",
+          "range_min": 27.0,
+          "range_max": 33.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 30.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 32.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 30.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 30.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 30.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 29.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 30.9
+            }
+          ]
+        },
+        "RDW": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 11.0,
+          "range_max": 15.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 12.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 12.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 12.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 11.8
+            },
+            {
+              "timepoint": "R+45",
+              "value": 12.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 11.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 12.1
+            }
+          ]
+        },
+        "PLATELET COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 140.0,
+          "range_max": 400.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 241.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 229.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 241.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 252.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 252.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 245.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 243.0
+            }
+          ]
+        },
+        "MPV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 7.5,
+          "range_max": 12.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 10.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 10.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": 11.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 10.8
+            }
+          ]
+        },
+        "ABSOLUTE NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 1500.0,
+          "range_max": 7800.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 3705.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2873.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3701.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3328.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2765.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3132.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 3123.0
+            }
+          ]
+        },
+        "ABSOLUTE LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 850.0,
+          "range_max": 3900.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2119.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1982.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2873.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1540.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2874.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1701.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2573.0
+            }
+          ]
+        },
+        "ABSOLUTE MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 200.0,
+          "range_max": 950.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 364.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 302.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 446.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 435.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 499.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 345.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 518.0
+            }
+          ]
+        },
+        "ABSOLUTE EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 15.0,
+          "range_max": 500.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 280.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 211.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 151.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 160.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 211.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 90.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 166.0
+            }
+          ]
+        },
+        "ABSOLUTE BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 0.0,
+          "range_max": 200.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 33.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 32.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 29.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 39.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 51.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 32.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 19.0
+            }
+          ]
+        },
+        "NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.0,
+          "range_max": 80.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 57.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 53.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 51.4
+            },
+            {
+              "timepoint": "R+1",
+              "value": 60.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 43.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 59.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 48.8
+            }
+          ]
+        },
+        "LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 15.0,
+          "range_max": 49.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 32.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 36.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 39.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 28.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 44.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 32.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 40.2
+            }
+          ]
+        },
+        "MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 13.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 5.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 5.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 6.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 6.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 8.1
+            }
+          ]
+        },
+        "EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 8.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 3.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2.6
+            }
+          ]
+        },
+        "BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 2.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.4
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.3
+            }
+          ]
+        },
+        "MCHC": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 32.0,
+          "range_max": 36.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "R+45",
+              "value": 32.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 33.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 33.2
+            }
+          ]
+        },
+        "GLUCOSE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 65.0,
+          "range_max": 99.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 69.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 72.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 78.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 83.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 44.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 77.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 84.0
+            }
+          ]
+        },
+        "UREA NITROGEN (BUN)": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 7.0,
+          "range_max": 25.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 14.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 16.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 17.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 20.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 16.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 18.0
+            }
+          ]
+        },
+        "CREATININE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.5,
+          "range_max": 1.05,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.83
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.88
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.96
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.95
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.02
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.82
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.02
+            }
+          ]
+        },
+        "eGFR NON-AFR. AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 82.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 76.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 68.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 69.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 64.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 83.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 63.0
+            }
+          ]
+        },
+        "eGFR AFRICAN AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 95.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 88.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 79.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 80.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 74.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 96.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 73.0
+            }
+          ]
+        },
+        "BUN/CREATININE RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 6.0,
+          "range_max": 22.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": null
+            },
+            {
+              "timepoint": "L-44",
+              "value": null
+            },
+            {
+              "timepoint": "L-3",
+              "value": null
+            },
+            {
+              "timepoint": "R+1",
+              "value": null
+            },
+            {
+              "timepoint": "R+45",
+              "value": null
+            },
+            {
+              "timepoint": "R+194",
+              "value": null
+            }
+          ]
+        },
+        "SODIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 135.0,
+          "range_max": 146.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 142.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 141.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 143.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 137.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 140.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 141.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 138.0
+            }
+          ]
+        },
+        "POTASSIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 3.5,
+          "range_max": 5.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 3.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.1
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.4
+            }
+          ]
+        },
+        "CHLORIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 98.0,
+          "range_max": 110.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 103.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 103.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 106.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 103.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 104.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 105.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 104.0
+            }
+          ]
+        },
+        "CARBON DIOXIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 20.0,
+          "range_max": 32.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 23.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 26.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 22.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 21.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 25.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 20.0
+            }
+          ]
+        },
+        "CALCIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 8.6,
+          "range_max": 10.4,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 10.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 9.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 9.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": 9.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 9.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 9.5
+            }
+          ]
+        },
+        "PROTEIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 6.1,
+          "range_max": 8.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 7.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 7.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 6.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 7.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 7.3
+            }
+          ]
+        },
+        "ALBUMIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 3.6,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.3
+            }
+          ]
+        },
+        "GLOBULIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 1.9,
+          "range_max": 3.7,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 3.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 3.0
+            }
+          ]
+        },
+        "ALBUMIN/GLOBULIN RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 1.0,
+          "range_max": 2.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.4
+            }
+          ]
+        },
+        "BILIRUBIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.2,
+          "range_max": 1.2,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.3
+            }
+          ]
+        },
+        "ALKALINE PHOSPHATASE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 37.0,
+          "range_max": 153.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 73.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 78.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 68.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 71.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 65.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 65.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 66.0
+            }
+          ]
+        },
+        "AST": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 10.0,
+          "range_max": 35.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 19.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 31.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 40.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 17.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 21.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 24.0
+            }
+          ]
+        },
+        "ALT": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 6.0,
+          "range_max": 29.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 16.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 24.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 16.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 14.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 17.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 17.0
+            }
+          ]
+        }
+      }
+    },
+    "C003": {
+      "sex": "F",
+      "analytes": {
+        "WHITE BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 3.8,
+          "range_max": 10.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 9.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 9.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 9.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 8.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 7.4
+            }
+          ]
+        },
+        "RED BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Million/uL",
+          "range_min": 4.2,
+          "range_max": 5.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.46
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.62
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 5.09
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.89
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.64
+            }
+          ]
+        },
+        "HEMOGLOBIN": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 13.2,
+          "range_max": 17.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 13.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 14.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 13.3
+            },
+            {
+              "timepoint": "R+45",
+              "value": 14.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 14.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 13.3
+            }
+          ]
+        },
+        "HEMATOCRIT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.5,
+          "range_max": 50.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 40.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 42.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 41.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 44.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 44.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 40.4
+            }
+          ]
+        },
+        "MCV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 80.0,
+          "range_max": 100.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 91.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 92.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 92.4
+            },
+            {
+              "timepoint": "R+1",
+              "value": 88.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 87.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 91.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 87.1
+            }
+          ]
+        },
+        "MCHC": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 32.0,
+          "range_max": 36.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 29.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 33.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 32.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 32.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 33.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 32.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 32.9
+            }
+          ]
+        },
+        "RDW": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 11.0,
+          "range_max": 15.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 32.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 13.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 12.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 12.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 12.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 12.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 13.1
+            }
+          ]
+        },
+        "PLATELET COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 140.0,
+          "range_max": 400.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 12.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 345.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 367.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 359.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 396.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 345.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 185.0
+            }
+          ]
+        },
+        "MPV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 7.5,
+          "range_max": 12.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 330.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 10.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 10.4
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 10.2
+            }
+          ]
+        },
+        "ABSOLUTE NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 1500.0,
+          "range_max": 7800.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 10.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 6408.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 5792.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4088.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4618.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4576.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4151.0
+            }
+          ]
+        },
+        "ABSOLUTE LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 850.0,
+          "range_max": 3900.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 6826.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2083.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3156.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2086.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2379.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3247.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2220.0
+            }
+          ]
+        },
+        "ABSOLUTE MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 200.0,
+          "range_max": 950.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1997.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 632.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 715.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 658.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 624.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 730.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 762.0
+            }
+          ]
+        },
+        "ABSOLUTE EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 15.0,
+          "range_max": 500.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 614.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 130.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 88.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 140.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 117.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 176.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 207.0
+            }
+          ]
+        },
+        "ABSOLUTE BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 0.0,
+          "range_max": 200.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 125.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 47.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 49.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 28.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 62.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 70.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 59.0
+            }
+          ]
+        },
+        "NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.0,
+          "range_max": 80.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 71.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 68.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 59.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 58.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 59.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 52.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 56.1
+            }
+          ]
+        },
+        "LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 15.0,
+          "range_max": 49.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 20.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 22.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 32.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 29.8
+            },
+            {
+              "timepoint": "R+45",
+              "value": 30.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 36.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 30.0
+            }
+          ]
+        },
+        "MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 13.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 6.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 6.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 8.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 8.3
+            },
+            {
+              "timepoint": "R+194",
+              "value": 10.3
+            }
+          ]
+        },
+        "EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 8.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2.8
+            }
+          ]
+        },
+        "BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 2.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.8
+            }
+          ]
+        },
+        "MCH": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "pg",
+          "range_min": 27.0,
+          "range_max": 33.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-44",
+              "value": 31.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 29.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 28.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 28.7
+            },
+            {
+              "timepoint": "R+82",
+              "value": 29.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 28.7
+            }
+          ]
+        },
+        "RED BLOOD CELL COUNT (FEMALE)": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Million/uL",
+          "range_min": 3.8,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "R+1",
+              "value": 4.67
+            }
+          ]
+        },
+        "HEMOGLOBIN (FEMALE)": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 11.7,
+          "range_max": 15.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "R+1",
+              "value": 13.5
+            }
+          ]
+        },
+        "HEMATOCRIT (FEMALE)": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 35.0,
+          "range_max": 45.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "R+1",
+              "value": 41.4
+            }
+          ]
+        },
+        "GLUCOSE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 65.0,
+          "range_max": 99.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 77.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 62.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 75.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 103.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 36.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 80.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 73.0
+            }
+          ]
+        },
+        "UREA NITROGEN (BUN)": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 7.0,
+          "range_max": 25.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 17.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 19.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 26.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 21.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 28.0
+            }
+          ]
+        },
+        "CREATININE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.6,
+          "range_max": 1.35,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.03
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.08
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.89
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.94
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.89
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.1
+            }
+          ]
+        },
+        "eGFR NON-AFR. AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 76.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 73.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 69.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 88.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 82.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 87.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 67.0
+            }
+          ]
+        },
+        "eGFR AFRICAN AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 88.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 85.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 80.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 102.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 95.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 101.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 78.0
+            }
+          ]
+        },
+        "BUN/CREATININE RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 6.0,
+          "range_max": 22.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": null
+            },
+            {
+              "timepoint": "L-44",
+              "value": null
+            },
+            {
+              "timepoint": "L-3",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": null
+            },
+            {
+              "timepoint": "R+45",
+              "value": null
+            },
+            {
+              "timepoint": "R+82",
+              "value": null
+            },
+            {
+              "timepoint": "R+194",
+              "value": 25.0
+            }
+          ]
+        },
+        "SODIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 135.0,
+          "range_max": 146.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 139.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 139.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 138.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 137.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 136.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 138.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 137.0
+            }
+          ]
+        },
+        "POTASSIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 3.5,
+          "range_max": 5.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 3.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.4
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 3.8
+            }
+          ]
+        },
+        "CHLORIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 98.0,
+          "range_max": 110.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 102.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 99.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 101.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 103.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 97.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 102.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 101.0
+            }
+          ]
+        },
+        "CARBON DIOXIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 20.0,
+          "range_max": 32.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 20.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 21.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 20.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 22.0
+            }
+          ]
+        },
+        "CALCIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 8.6,
+          "range_max": 10.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 9.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 9.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 9.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 9.6
+            }
+          ]
+        },
+        "PROTEIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 6.1,
+          "range_max": 8.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 7.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 8.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 6.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.4
+            },
+            {
+              "timepoint": "R+82",
+              "value": 7.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 7.3
+            }
+          ]
+        },
+        "ALBUMIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 3.6,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.4
+            }
+          ]
+        },
+        "GLOBULIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 1.9,
+          "range_max": 3.7,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2.7
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2.9
+            }
+          ]
+        },
+        "ALBUMIN/GLOBULIN RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 1.0,
+          "range_max": 2.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.5
+            }
+          ]
+        },
+        "BILIRUBIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.2,
+          "range_max": 1.2,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.3
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.7
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.3
+            }
+          ]
+        },
+        "ALKALINE PHOSPHATASE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 36.0,
+          "range_max": 130.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 33.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 41.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 31.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 41.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 51.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 50.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 43.0
+            }
+          ]
+        },
+        "AST": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 10.0,
+          "range_max": 40.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 15.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 17.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 13.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 18.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 15.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 15.0
+            }
+          ]
+        },
+        "ALT": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 9.0,
+          "range_max": 46.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 12.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 13.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 13.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 17.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 12.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 10.0
+            }
+          ]
+        }
+      }
+    },
+    "C004": {
+      "sex": "M",
+      "analytes": {
+        "WHITE BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 3.8,
+          "range_max": 10.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 7.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 6.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 8.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 6.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 7.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 8.3
+            }
+          ]
+        },
+        "RED BLOOD CELL COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Million/uL",
+          "range_min": 4.2,
+          "range_max": 5.8,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 5.48
+            },
+            {
+              "timepoint": "L-44",
+              "value": 5.57
+            },
+            {
+              "timepoint": "L-3",
+              "value": 5.4
+            },
+            {
+              "timepoint": "R+1",
+              "value": 5.55
+            },
+            {
+              "timepoint": "R+45",
+              "value": 5.54
+            },
+            {
+              "timepoint": "R+82",
+              "value": 5.45
+            },
+            {
+              "timepoint": "R+194",
+              "value": 5.58
+            }
+          ]
+        },
+        "HEMOGLOBIN": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 13.2,
+          "range_max": 17.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 17.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 16.6
+            },
+            {
+              "timepoint": "L-3",
+              "value": 16.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 16.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 16.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 16.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 16.5
+            }
+          ]
+        },
+        "HEMATOCRIT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.5,
+          "range_max": 50.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 49.1
+            },
+            {
+              "timepoint": "L-44",
+              "value": 50.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 49.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 48.3
+            },
+            {
+              "timepoint": "R+45",
+              "value": 49.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 47.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 48.0
+            }
+          ]
+        },
+        "MCV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 80.0,
+          "range_max": 100.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 89.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 89.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 90.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 87.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 88.4
+            },
+            {
+              "timepoint": "R+82",
+              "value": 87.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 86.0
+            }
+          ]
+        },
+        "MCHC": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "g/dL",
+          "range_min": 32.0,
+          "range_max": 36.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 34.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 33.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 34.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 34.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": 34.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 34.5
+            },
+            {
+              "timepoint": "R+194",
+              "value": 34.4
+            }
+          ]
+        },
+        "RDW": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 11.0,
+          "range_max": 15.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 12.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 12.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 13.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 13.2
+            },
+            {
+              "timepoint": "R+45",
+              "value": 12.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 12.9
+            },
+            {
+              "timepoint": "R+194",
+              "value": 13.1
+            }
+          ]
+        },
+        "PLATELET COUNT": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "Thousand/uL",
+          "range_min": 140.0,
+          "range_max": 400.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 239.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 227.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 295.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 240.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 281.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 198.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 256.0
+            }
+          ]
+        },
+        "MPV": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "fL",
+          "range_min": 7.5,
+          "range_max": 12.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 9.5
+            },
+            {
+              "timepoint": "L-44",
+              "value": 9.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 10.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 9.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 9.8
+            }
+          ]
+        },
+        "ABSOLUTE NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 1500.0,
+          "range_max": 7800.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4766.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 3699.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 6318.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4528.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 3618.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4361.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4200.0
+            }
+          ]
+        },
+        "ABSOLUTE LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 850.0,
+          "range_max": 3900.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1786.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1613.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2947.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2155.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1938.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2307.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2639.0
+            }
+          ]
+        },
+        "ABSOLUTE MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 200.0,
+          "range_max": 950.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 870.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 832.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 965.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1029.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 898.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 916.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 988.0
+            }
+          ]
+        },
+        "ABSOLUTE EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 15.0,
+          "range_max": 500.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 200.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 173.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 276.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 300.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 258.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 269.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 374.0
+            }
+          ]
+        },
+        "ABSOLUTE BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "cells/uL",
+          "range_min": 0.0,
+          "range_max": 200.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 77.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 83.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 95.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 89.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 88.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 47.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 100.0
+            }
+          ]
+        },
+        "NEUTROPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 38.0,
+          "range_max": 80.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 61.9
+            },
+            {
+              "timepoint": "L-44",
+              "value": 57.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 59.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 55.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 53.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 55.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 50.6
+            }
+          ]
+        },
+        "LYMPHOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 15.0,
+          "range_max": 49.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 23.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 25.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 27.8
+            },
+            {
+              "timepoint": "R+1",
+              "value": 26.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 28.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 29.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 31.8
+            }
+          ]
+        },
+        "MONOCYTES": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 13.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 11.3
+            },
+            {
+              "timepoint": "L-44",
+              "value": 13.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 9.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 12.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 13.2
+            },
+            {
+              "timepoint": "R+82",
+              "value": 11.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 11.9
+            }
+          ]
+        },
+        "EOSINOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 8.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 3.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 3.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 3.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.5
+            }
+          ]
+        },
+        "BASOPHILS": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "%",
+          "range_min": 0.0,
+          "range_max": 2.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.9
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.1
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 0.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.2
+            }
+          ]
+        },
+        "MCH": {
+          "panel": "CBC",
+          "dataset_id": "OSD-569",
+          "unit": "pg",
+          "range_min": 27.0,
+          "range_max": 33.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-44",
+              "value": 29.8
+            },
+            {
+              "timepoint": "L-3",
+              "value": 31.1
+            },
+            {
+              "timepoint": "R+1",
+              "value": 29.7
+            },
+            {
+              "timepoint": "R+45",
+              "value": 30.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 30.1
+            },
+            {
+              "timepoint": "R+194",
+              "value": 29.6
+            }
+          ]
+        },
+        "GLUCOSE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 65.0,
+          "range_max": 99.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 100.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 83.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 56.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 97.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 43.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 80.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 84.0
+            }
+          ]
+        },
+        "UREA NITROGEN (BUN)": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 7.0,
+          "range_max": 25.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 22.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 19.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 19.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 26.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 21.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 16.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 27.0
+            }
+          ]
+        },
+        "CREATININE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.6,
+          "range_max": 1.35,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.14
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.08
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.13
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.15
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.08
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.11
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.31
+            }
+          ]
+        },
+        "eGFR NON-AFR. AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 79.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 85.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 80.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 78.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 84.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 81.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 67.0
+            }
+          ]
+        },
+        "eGFR AFRICAN AMERICAN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mL/min/1.73m2",
+          "range_min": 60.0,
+          "range_max": null,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 92.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 98.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 92.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 90.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 98.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 94.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 77.0
+            }
+          ]
+        },
+        "BUN/CREATININE RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 6.0,
+          "range_max": 22.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": null
+            },
+            {
+              "timepoint": "L-44",
+              "value": null
+            },
+            {
+              "timepoint": "L-3",
+              "value": null
+            },
+            {
+              "timepoint": "R+1",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": null
+            },
+            {
+              "timepoint": "R+82",
+              "value": null
+            },
+            {
+              "timepoint": "R+194",
+              "value": 21.0
+            }
+          ]
+        },
+        "SODIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 135.0,
+          "range_max": 146.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 138.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 140.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 141.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 140.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 139.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 140.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 141.0
+            }
+          ]
+        },
+        "POTASSIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 3.5,
+          "range_max": 5.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.2
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.2
+            },
+            {
+              "timepoint": "L-3",
+              "value": 3.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 5.9
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.2
+            },
+            {
+              "timepoint": "R+194",
+              "value": 3.8
+            }
+          ]
+        },
+        "CHLORIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 98.0,
+          "range_max": 110.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 102.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 103.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 103.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 105.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 102.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 103.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 105.0
+            }
+          ]
+        },
+        "CARBON DIOXIDE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mmol/L",
+          "range_min": 20.0,
+          "range_max": 32.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 23.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 24.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 24.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 19.0
+            }
+          ]
+        },
+        "CALCIUM": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 8.6,
+          "range_max": 10.3,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 10.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 10.1
+            },
+            {
+              "timepoint": "L-3",
+              "value": 10.2
+            },
+            {
+              "timepoint": "R+1",
+              "value": 9.8
+            },
+            {
+              "timepoint": "R+45",
+              "value": 9.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 10.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 9.8
+            }
+          ]
+        },
+        "PROTEIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 6.1,
+          "range_max": 8.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 7.4
+            },
+            {
+              "timepoint": "L-44",
+              "value": 7.3
+            },
+            {
+              "timepoint": "L-3",
+              "value": 7.3
+            },
+            {
+              "timepoint": "R+1",
+              "value": 7.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 7.3
+            },
+            {
+              "timepoint": "R+82",
+              "value": 7.4
+            },
+            {
+              "timepoint": "R+194",
+              "value": 7.2
+            }
+          ]
+        },
+        "ALBUMIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 3.6,
+          "range_max": 5.1,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 4.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 4.4
+            },
+            {
+              "timepoint": "L-3",
+              "value": 4.6
+            },
+            {
+              "timepoint": "R+1",
+              "value": 4.5
+            },
+            {
+              "timepoint": "R+45",
+              "value": 4.5
+            },
+            {
+              "timepoint": "R+82",
+              "value": 4.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 4.3
+            }
+          ]
+        },
+        "GLOBULIN": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "g/dL",
+          "range_min": 1.9,
+          "range_max": 3.7,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 2.8
+            },
+            {
+              "timepoint": "L-44",
+              "value": 2.9
+            },
+            {
+              "timepoint": "L-3",
+              "value": 2.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 2.9
+            },
+            {
+              "timepoint": "R+45",
+              "value": 2.8
+            },
+            {
+              "timepoint": "R+82",
+              "value": 2.8
+            },
+            {
+              "timepoint": "R+194",
+              "value": 2.9
+            }
+          ]
+        },
+        "ALBUMIN/GLOBULIN RATIO": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "(calc)",
+          "range_min": 1.0,
+          "range_max": 2.5,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 1.6
+            },
+            {
+              "timepoint": "L-44",
+              "value": 1.5
+            },
+            {
+              "timepoint": "L-3",
+              "value": 1.7
+            },
+            {
+              "timepoint": "R+1",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+45",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.6
+            },
+            {
+              "timepoint": "R+194",
+              "value": 1.5
+            }
+          ]
+        },
+        "BILIRUBIN; TOTAL": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "mg/dL",
+          "range_min": 0.2,
+          "range_max": 1.2,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 0.7
+            },
+            {
+              "timepoint": "L-44",
+              "value": 0.7
+            },
+            {
+              "timepoint": "L-3",
+              "value": 0.5
+            },
+            {
+              "timepoint": "R+1",
+              "value": 0.4
+            },
+            {
+              "timepoint": "R+45",
+              "value": 0.7
+            },
+            {
+              "timepoint": "R+82",
+              "value": 1.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 0.5
+            }
+          ]
+        },
+        "ALKALINE PHOSPHATASE": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 36.0,
+          "range_max": 130.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 58.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 56.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 55.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 62.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 60.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 54.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 57.0
+            }
+          ]
+        },
+        "AST": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 10.0,
+          "range_max": 40.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 36.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 44.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 39.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 48.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 33.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 25.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 38.0
+            }
+          ]
+        },
+        "ALT": {
+          "panel": "CMP",
+          "dataset_id": "OSD-575",
+          "unit": "U/L",
+          "range_min": 9.0,
+          "range_max": 46.0,
+          "range_basis": "laboratory reference range as published in the dataset",
+          "draws": [
+            {
+              "timepoint": "L-92",
+              "value": 37.0
+            },
+            {
+              "timepoint": "L-44",
+              "value": 35.0
+            },
+            {
+              "timepoint": "L-3",
+              "value": 37.0
+            },
+            {
+              "timepoint": "R+1",
+              "value": 40.0
+            },
+            {
+              "timepoint": "R+45",
+              "value": 32.0
+            },
+            {
+              "timepoint": "R+82",
+              "value": 23.0
+            },
+            {
+              "timepoint": "R+194",
+              "value": 43.0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,39 @@
 {
   "id": "tampered_record",
-  "description": "tampered record",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Tampered record",
+  "area": "records",
+  "description": "A stored RED verdict is edited to GREEN in the database and its hash recomputed.",
+  "attack": {
+    "kind": "tamper",
+    "readings": [
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 72,
+          "unit": "bpm"
+        }
+      ],
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 150,
+          "unit": "bpm"
+        }
+      ],
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 74,
+          "unit": "bpm"
+        }
+      ]
+    ],
+    "edit_index": 1
+  },
+  "expect": {
+    "chain_valid": false
+  }
 }

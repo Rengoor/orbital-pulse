@@ -1,6 +1,34 @@
 {
   "id": "radiation_spike_normal_vitals",
-  "description": "radiation spike normal vitals",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Radiation spike, normal vitals",
+  "area": "data",
+  "description": "Dose rate jumps far past its limit while every vital sign stays normal.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm"
+      },
+      {
+        "id": "temp",
+        "channel": "temperature",
+        "value": 36.8,
+        "unit": "C"
+      },
+      {
+        "id": "dose",
+        "channel": "dose_rate_usv_h",
+        "value": 260.0,
+        "unit": "uSv/h"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "RED"
+    ]
+  }
 }

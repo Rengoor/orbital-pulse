@@ -1,0 +1,15 @@
+{
+  "id": "empty_checkin",
+  "title": "Empty check-in",
+  "area": "data",
+  "description": "A check-in arrives with no readings at all.",
+  "attack": {
+    "kind": "checkin",
+    "readings": []
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
+}

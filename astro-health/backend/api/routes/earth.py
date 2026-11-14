@@ -5,7 +5,9 @@ Thin handlers: each one looks up its inputs and delegates to backend/earth/.
 Owner: person A
 """
 
+import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -111,6 +113,30 @@ def reviews(record_id: str | None = None, state: AppState = Depends(get_state)) 
     return {
         "reviews": state.store.reviews(record_id),
         "chain": {"valid": valid, "broken_at": broken_at},
+    }
+
+
+_REDTEAM_RESULTS = Path(__file__).resolve().parents[3] / "evidence" / "results" / "redteam.json"
+
+
+@router.get("/governance-checks")
+def governance_checks() -> dict:
+    """Results of the last red-team run: each attack and whether it was blocked.
+
+    Produced by ``python -m evidence.redteam.run_redteam``. This route only
+    reports the saved results; it does not run the attacks.
+    """
+    if not _REDTEAM_RESULTS.is_file():
+        raise HTTPException(
+            status_code=404,
+            detail="no red-team results yet. Run: python -m evidence.redteam.run_redteam",
+        )
+    results = json.loads(_REDTEAM_RESULTS.read_text(encoding="utf-8"))
+    return {
+        "total": len(results),
+        "blocked": sum(r["blocked"] for r in results),
+        "unsafe_approvals": sum(not r["blocked"] for r in results),
+        "results": results,
     }
 
 

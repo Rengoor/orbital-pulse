@@ -1,6 +1,86 @@
 {
   "id": "stuck_sensor",
-  "description": "stuck sensor",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Stuck sensor",
+  "area": "data",
+  "description": "A heart-rate sensor freezes and keeps reporting the same healthy value.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr0",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 600
+      },
+      {
+        "id": "hr1",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 540
+      },
+      {
+        "id": "hr2",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 480
+      },
+      {
+        "id": "hr3",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 420
+      },
+      {
+        "id": "hr4",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 360
+      },
+      {
+        "id": "hr5",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 300
+      },
+      {
+        "id": "hr6",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 240
+      },
+      {
+        "id": "hr7",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 180
+      },
+      {
+        "id": "hr8",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 120
+      },
+      {
+        "id": "hr9",
+        "channel": "heart_rate",
+        "value": 71,
+        "unit": "bpm",
+        "age_s": 60
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
 }

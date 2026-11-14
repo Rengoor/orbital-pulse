@@ -1,0 +1,28 @@
+{
+  "id": "unit_mismatch",
+  "title": "Wrong unit",
+  "area": "data",
+  "description": "Body temperature arrives in Fahrenheit while the limits are in Celsius.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm"
+      },
+      {
+        "id": "temp",
+        "channel": "temperature",
+        "value": 98.6,
+        "unit": "F"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
+}

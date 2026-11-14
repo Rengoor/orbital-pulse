@@ -339,6 +339,16 @@
     reviews: function () {
       return request('GET', '/earth/reviews');
     },
+    governanceChecks: function () {
+      return request('GET', '/earth/governance-checks');
+    },
+    nasaSources: function () { return request('GET', '/nasa/sources'); },
+    spaceWeather: function () { return request('GET', '/nasa/space-weather'); },
+    radiation: function (hourly) { return request('GET', '/nasa/radiation' + (hourly === false ? '?hourly=false' : '')); },
+    bloodPanels: function (subject) {
+      return request('GET', '/nasa/blood-panels' + (subject ? '?subject=' + encodeURIComponent(subject) : ''));
+    },
+    baselines: function () { return request('GET', '/nasa/baselines'); },
     anchor: function () {
       return request('GET', '/earth/anchor');
     },
