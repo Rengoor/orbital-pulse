@@ -6,7 +6,16 @@ reduces it to hourly statistics per instrument. The default window is the May
 2024 solar storm, when instruments on the ISS, in lunar orbit, in deep space
 and on the surface of Mars were all recording.
 
-UNIT CAVEAT: the API returns ``absorbed_dose_rate`` as a bare number. Values
+UNIT: the RadLab Data API documentation
+(https://visualization.osdr.nasa.gov/radlab/gui/data-api, checked 2026-11-14)
+states ``absorbed_dose_rate`` is in uGy/hour, which matches the magnitudes
+seen here. The API also offers a separate ``dose_equivalent_rate`` field in
+uSv/hour where available; fetching that field directly is the sanctioned
+route if radiation is ever to reach the decision pipelines. Never convert
+absorbed dose to dose equivalent with an assumed quality factor.
+
+Original caveat (kept for the record): the API returns the value as a bare
+number. Values
 are consistent with micrograys per hour (quiet ISS 4-7, Mars surface ~6, deep
 space ~8), and that is how they are labelled here, but the unit was inferred
 and not read from RadLab documentation. This is an absorbed dose (Gy), not a
@@ -101,7 +110,7 @@ def fetch(start: str = DEFAULT_START, end: str = DEFAULT_END) -> dict:
         "dataset_id": "RadLab",
         "field": "absorbed_dose_rate",
         "unit": "uGy/h",
-        "unit_note": "Inferred from the magnitudes; not confirmed against RadLab documentation. Absorbed dose, not dose equivalent.",
+        "unit_note": "uGy/hour per the RadLab Data API documentation (visualization.osdr.nasa.gov/radlab/gui/data-api, checked 2026-11-14). Absorbed dose, not dose equivalent.",
         "fetched_at": utc_now(),
         "window": {"start": start + "Z", "end": end + "Z"},
         "series": series,

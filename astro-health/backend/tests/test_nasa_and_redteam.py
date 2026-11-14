@@ -102,7 +102,10 @@ def test_real_baselines_reach_the_statistical_pipeline(api):
 def test_radiation_is_labelled_honestly(api):
     body = api("GET", "/nasa/radiation").json()
     assert body["field"] == "absorbed_dose_rate" and body["unit"] == "uGy/h"
-    assert "Inferred" in body["unit_note"] and "not dose equivalent" in body["unit_note"]
+    # The unit is confirmed against the RadLab Data API documentation, and the
+    # note must still say this is absorbed dose, never dose equivalent.
+    assert "RadLab Data API documentation" in body["unit_note"]
+    assert "not dose equivalent" in body["unit_note"]
     where = {s["spacecraft"]: s["location"] for s in body["series"]}
     assert where["ISS"] == "low Earth orbit" and where["Curiosity"].startswith("Mars surface")
     for series in body["series"]:

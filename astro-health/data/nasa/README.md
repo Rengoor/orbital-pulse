@@ -13,11 +13,16 @@ Default window for RadLab and DONKI: 2024-05-08 to 2024-05-14, the May 2024 stor
 
 ## Things to know
 
-- **RadLab unit.** The API returns a bare number. It is labelled uGy/h because
-  the magnitudes fit (quiet ISS 4-7, Mars surface about 6), but that was
-  inferred, not read from RadLab documentation. It is an absorbed dose (Gy),
-  not a dose equivalent (Sv), so it is **not** fed to the `dose_rate_usv_h`
-  channel or compared with the pipeline's dose limits.
+- **RadLab unit.** Confirmed: the RadLab Data API documentation
+  (https://visualization.osdr.nasa.gov/radlab/gui/data-api, checked
+  2026-11-14) states `absorbed_dose_rate` is in uGy/hour, matching the
+  magnitudes (quiet ISS 4-7, Mars surface about 6). It is an absorbed dose
+  (Gy), not a dose equivalent (Sv), so it is still **not** fed to the
+  `dose_rate_usv_h` channel or compared with the pipeline's dose limits, and
+  nothing converts it with an assumed quality factor. The API also offers a
+  `dose_equivalent_rate` field in uSv/hour where available; fetching that
+  field directly is the sanctioned route if radiation measurements are ever
+  to reach the decision pipelines.
 - **Blood ranges.** `range_min` / `range_max` are the laboratory reference
   ranges published in the datasets. They are not project thresholds and not
   NASA medical limits.

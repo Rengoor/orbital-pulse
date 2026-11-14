@@ -21,9 +21,10 @@ Current as of 2026-11-14.
   with the thresholds.
 - **The on-board LLM has only been tested with canned replies**, never a real
   local model. It stays disabled (`LLM_ENABLED` unset) until that test is run.
-- **RadLab values are absorbed dose with an inferred unit** (uGy/h, not
-  confirmed against RadLab documentation), so they are context only and never
-  fed to the decision pipelines (`data/nasa/README.md`).
+- **RadLab values are absorbed dose** (uGy/h, confirmed against the RadLab
+  Data API documentation 2026-11-14), not dose equivalent, so they are
+  context only and never fed to the decision pipelines; nothing converts
+  them with an assumed quality factor (`data/nasa/README.md`).
 - **Earth reviewer verdicts are simulated** (`"simulated": true` in every
   review); no flight surgeon is in the loop.
 - **Signing is one shared HMAC key**: records are tamper-evident only against

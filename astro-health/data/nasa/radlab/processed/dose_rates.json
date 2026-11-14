@@ -4,7 +4,7 @@
   "dataset_id": "RadLab",
   "field": "absorbed_dose_rate",
   "unit": "uGy/h",
-  "unit_note": "Inferred from the magnitudes; not confirmed against RadLab documentation. Absorbed dose, not dose equivalent.",
+  "unit_note": "uGy/hour per the RadLab Data API documentation (visualization.osdr.nasa.gov/radlab/gui/data-api, checked 2026-11-14). Absorbed dose, not dose equivalent.",
   "fetched_at": "2026-11-14T20:38:07Z",
   "window": {
     "start": "2024-05-08T00:00Z",
