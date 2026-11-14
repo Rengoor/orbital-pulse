@@ -19,7 +19,7 @@ Opening the files straight from disk (`file://`) also works in most browsers, bu
 | Path | What it is |
 |---|---|
 | `index.html` | Start page linking every screen and component |
-| `hud/` | **View 1, helmet HUD.** Reserved; not implemented yet |
+| `hud/index.html` | **View 1, helmet HUD.** The wearer's own tier, action and vitals, live from the backend only; NO LINK when unreachable. See `hud/README.md` |
 | `pages/helmet-hud.html` | Earlier helmet display prototype, kept for reference |
 | `tablet/index.html` | **View 2, tablet.** Advanced health monitoring: Commander, CMO and My health roles with medical-privacy gating |
 | `tablet/crew-console.html` | Tablet crew console: Holo body / Dashboard / AR views, crew switcher, decision card, advisor |

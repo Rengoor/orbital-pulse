@@ -40,6 +40,7 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
     for path in (
         "/ui/index.html",
         "/ui/pages/helmet-hud.html",
+        "/ui/hud/index.html",
         "/ui/tablet/index.html",
         "/ui/tablet/crew-console.html",
         "/ui/earth/index.html",
@@ -56,12 +57,44 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
 def test_three_views_each_have_their_own_directory():
     for view in ("hud", "tablet", "earth"):
         assert (_FRONTEND_DIR / view / "README.md").is_file(), f"missing {view}/"
-    # The HUD is reserved but deliberately not implemented yet.
-    assert [p.name for p in (_FRONTEND_DIR / "hud").iterdir()] == ["README.md"]
     start = (_FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
-    for link in ("tablet/index.html", "earth/index.html"):
+    for link in ("hud/index.html", "tablet/index.html", "earth/index.html"):
         assert (_FRONTEND_DIR / link).is_file()
         assert f'href="{link}"' in start
+
+
+def test_hud_is_display_only():
+    """The HUD reads the backend verdict and never labels its own input as NASA data."""
+    page = (_FRONTEND_DIR / "hud" / "index.html").read_text(encoding="utf-8")
+    script = page[page.index("<body>"):]
+    assert "API.status(" in script and "API.record(" in script
+    assert "source: 'simulated'" in script
+    for forbidden in ("nasa_osdr", "nasa_radlab", "nasa_donki", "NASA-" + "compliant", "localStorage"):
+        assert forbidden not in script, forbidden
+    # Action wording comes from Vitalis.ACTIONS, not free text in the page.
+    assert "V.ACTIONS[" in script
+    assert (_FRONTEND_DIR / "hud" / "README.md").is_file()
+
+
+def test_hud_status_contract(client):
+    """Every field the HUD reads is present in /status and /records/{id}."""
+    assert client("GET", "/status/eva_hud_test").status_code == 404  # HUD shows "No data", no action
+
+    ts = "2026-11-14T09:12:00Z"
+    readings = [
+        {"id": "h1", "ts": ts, "channel": "heart_rate", "value": 150, "unit": "bpm", "source": "simulated", "quality": "ok"},
+        {"id": "h2", "ts": ts, "channel": "dose_rate_usv_h", "value": 0.6, "unit": "uSv/h", "source": "simulated", "quality": "ok"},
+    ]
+    client("POST", "/checkin", json={"astronaut_id": "eva_hud_test", "readings": readings, "now": ts})
+    status = client("GET", "/status/eva_hud_test").json()
+    for key in ("tier", "action", "additional_actions", "disagreement_status", "record_id", "ts"):
+        assert key in status
+    record = client("GET", f"/records/{status['record_id']}").json()
+    trace = record["verdict"]["decision_trace"]
+    # Rule ids are "<channel>.<bound>"; the HUD highlights only the channels they name.
+    assert trace["triggered_rules"] == ["heart_rate.red_high"]
+    assert {e["reading_id"]: e["status"] for e in record["integrity"]["readings"]} == {"h1": "valid", "h2": "valid"}
+    assert "failsafe" not in record["verdict"] or record["verdict"]["failsafe"] is False
 
 
 def test_earth_base_review_log(client):
