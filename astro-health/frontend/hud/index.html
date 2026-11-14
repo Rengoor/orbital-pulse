@@ -83,7 +83,32 @@
   .vital .src.s-sim { color: var(--ink); border-left: 3px solid var(--sim); padding-left: 6px; }
   .nolink { left: 56px; bottom: 40px; max-width: 420px; }
 
+  /* Layouts chosen by hand gesture (gestures.mjs). Switches are instant: nothing animates.
+     Docked: the health panels are pushed to the edges. The tier word, shape and action
+     stay; only nominal vitals are hidden. Any change of status restores the normal layout.
+     Expanded: larger text and values, still at the edges ([V2 11022] 11.1.6.5). */
+  .visor[data-layout="docked"] .tr { right: 20px; top: 24px; width: 236px; gap: 4px; padding: 8px 12px; }
+  .visor[data-layout="docked"] .tier { font-size: 20px; line-height: 24px; }
+  .visor[data-layout="docked"] .tier svg { width: 26px; height: 26px; }
+  .visor[data-layout="docked"] .act { font-size: 16px; line-height: 20px; }
+  .visor[data-layout="docked"] .tl { left: 20px; top: 24px; }
+  .visor[data-layout="docked"] .vrow { left: 20px; bottom: 20px; }
+  .visor[data-layout="expanded"] .tr { width: 400px; }
+  .visor[data-layout="expanded"] .tier { font-size: 34px; line-height: 40px; }
+  .visor[data-layout="expanded"] .tier svg { width: 44px; height: 44px; }
+  .visor[data-layout="expanded"] .act { font-size: 24px; line-height: 30px; }
+  .visor[data-layout="expanded"] .act svg { width: 28px; height: 28px; }
+  .visor[data-layout="expanded"] .txt, .visor[data-layout="expanded"] .vital .src { font-size: 19px; line-height: 24px; }
+  .visor[data-layout="expanded"] .lbl { font-size: 20px; line-height: 24px; }
+  .visor[data-layout="expanded"] .num { font-size: 46px; }
+  .visor[data-layout="expanded"] .unit { font-size: 19px; }
+  .visor[data-layout="expanded"] .vital { min-width: 200px; }
+
   /* Demo controls, outside the visor. 48px targets for gloved hands (BRAND.md). */
+  .cam { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+  #cam-preview { padding: 0 var(--space-6) var(--space-6); }
+  .cam video { width: 160px; height: 120px; border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--hull); transform: scaleX(-1); object-fit: cover; }
+  .cam video[hidden] { display: none; }
   .ctl { display: grid; grid-template-columns: 1fr auto; gap: var(--space-4); align-items: start; }
   .ctl-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
   .ctl .vt-btn { min-height: 48px; }
@@ -98,6 +123,7 @@
 </head>
 <body>
 <div id="root"></div>
+<div id="cam-preview" class="cam"><video id="cam-video" hidden muted playsinline aria-label="Camera preview, processed on this device only"></video></div>
 <script>
   /* Helmet HUD. This page decides nothing. Every tier, action and flag on it is
      read from the backend's verdict (GET /status, GET /records/{id}). It holds no
@@ -349,6 +375,15 @@
     var sim = React.useState(null), simErr = React.useState(null), light = React.useState('sun');
     var audioOn = React.useState(false);
     var recordRef = React.useRef(null), cueKey = React.useRef(null), seq = React.useRef(0);
+    // Panel layout, set by hand gesture, the D/N/E keys or the buttons below the visor.
+    var layout = React.useState('normal');
+    var gest = React.useState({ on: false, starting: false, hand: false, last: null, err: null });
+    // The camera <video> lives outside the React root (see #cam-preview): the vendored
+    // runtime rebuilds the DOM on every render and has no refs, which would destroy it.
+    var gestRef = React.useRef(null);
+    var camVideo = document.getElementById('cam-video');
+    var LAYOUT_OF = { dock: 'docked', normal: 'normal', expand: 'expanded' };
+    var LAYOUT_WORD = { docked: 'Docked', normal: 'Normal', expanded: 'Expanded' };
 
     // Poll the backend. Any failure is NO LINK at once: no fallback, no local rules.
     React.useEffect(function () {
@@ -396,9 +431,50 @@
       if (key === null || key === cueKey.current) return;
       var first = cueKey.current === null;
       cueKey.current = key;
-      if (first || key === 'NONE') return;
+      if (first) return;
+      // A change of status always restores the normal layout, so a docked HUD can
+      // never keep a new status or a newly flagged vital out of view.
+      layout[1]('normal');
+      if (key === 'NONE') return;
       playCue(CUE[key.split(':')[0]] || 'warning');
     }, [key]);
+
+    // Keyboard fallback for the same three layouts.
+    React.useEffect(function () {
+      function onKey(e) {
+        if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        var cmd = { d: 'dock', n: 'normal', e: 'expand' }[String(e.key).toLowerCase()];
+        if (cmd) layout[1](LAYOUT_OF[cmd]);
+      }
+      window.addEventListener('keydown', onKey);
+      return function () { window.removeEventListener('keydown', onKey); };
+    }, []);
+    React.useEffect(function () { return function () { if (gestRef.current) gestRef.current.stop(); }; }, []);
+
+    function startCamera() {
+      gest[1]({ on: false, starting: true, hand: false, last: null, err: null });
+      import('./gestures.mjs').then(function (m) {
+        return m.startGestures(camVideo, {
+          onCommand: function (c) {
+            layout[1](LAYOUT_OF[c.command]);
+            gest[1](function (p) { return Object.assign({}, p, { last: c.gesture + ' → ' + LAYOUT_WORD[LAYOUT_OF[c.command]] }); });
+          },
+          onHand: function (seen) { gest[1](function (p) { return Object.assign({}, p, { hand: seen }); }); }
+        });
+      }).then(function (ctl) {
+        gestRef.current = ctl;
+        camVideo.hidden = false;
+        gest[1]({ on: true, starting: false, hand: false, last: null, err: null });
+      }).catch(function (e) {
+        gest[1]({ on: false, starting: false, hand: false, last: null, err: (e && (e.message || e.name)) || String(e) });
+      });
+    }
+    function stopCamera() {
+      if (gestRef.current) gestRef.current.stop();
+      gestRef.current = null;
+      camVideo.hidden = true;
+      gest[1]({ on: false, starting: false, hand: false, last: null, err: null });
+    }
 
     function enableAudio() {
       var Ctx = window.AudioContext || window.webkitAudioContext;
@@ -412,9 +488,11 @@
     var mt = MET_EPOCH ? met(now) : null;
     var simulated = !!sim[0] || (state.record && (state.record.readings || []).some(function (r) { return r.source === 'simulated'; }));
     var vitals = state.link === 'up' ? vitalsFrom(state.record) : [];
+    // Docked hides only nominal vitals; a flagged or unusable one always stays.
+    if (layout[0] === 'docked') vitals = vitals.filter(function (row) { return row.flag || row.integrity; });
 
     return h('div', { className: 'hw' },
-      h('div', { className: 'visor', 'data-theme': 'night', 'data-light': light[0] },
+      h('div', { className: 'visor', 'data-theme': 'night', 'data-light': light[0], 'data-layout': layout[0] },
         h(Scene, { light: light[0] }), h('div', { className: 'tint' }),
         h('div', { className: 'p tl', role: 'group', 'aria-label': 'Time and link' },
           mt ? h('span', { className: 'mono' }, mt) : null,
@@ -423,6 +501,8 @@
           state.link === 'down' ? h('span', { className: 'lbl bad' }, h(I, { name: 'antenna' }), 'NO LINK') :
             state.link === 'up' ? h('span', { className: 'txt' }, 'Link up') : h('span', { className: 'txt' }, 'Connecting'),
           audioOn[0] ? null : h('span', { className: 'txt' }, 'Audio cues off'),
+          layout[0] !== 'normal' ? h('span', { className: 'txt' }, LAYOUT_WORD[layout[0]] + ' view') : null,
+          gest[0].on ? h('span', { className: 'txt' }, gest[0].hand ? 'Gestures: hand seen' : 'Gestures on') : null,
           simulated ? h('span', { className: 'sim' }, 'Simulated input') : null),
         h(StatusPlate, { link: state.link, status: state.status, record: state.record, lastTs: state.lastTs, now: now }),
         state.link === 'down'
@@ -442,7 +522,23 @@
             'Tier, action and flags all come from the backend verdict. Readings are simulated, in the backend’s units, with the current time. Stop the backend and the HUD shows NO LINK at the next poll.')),
         h('div', { style: { display: 'grid', gap: 'var(--space-3)', justifyItems: 'end' } },
           h(V.SegmentedControl, { ariaLabel: 'Lighting', value: light[0], onChange: light[1], options: [{ value: 'sun', label: 'Sunlit', icon: 'sun' }, { value: 'shade', label: 'Shadow', icon: 'cube' }] }),
-          h(V.Button, { variant: 'secondary', icon: 'check', disabled: audioOn[0], onClick: enableAudio }, audioOn[0] ? 'Audio cues on' : 'Enable audio cues'))));
+          h(V.Button, { variant: 'secondary', icon: 'check', disabled: audioOn[0], onClick: enableAudio }, audioOn[0] ? 'Audio cues on' : 'Enable audio cues'))),
+
+      h('div', { style: { display: 'grid', gap: 'var(--space-3)' } },
+        h('span', { className: 'vt-lbl' }, 'Hand gestures (laptop camera)'),
+        h('div', { className: 'cam' },
+          gest[0].on
+            ? h(V.Button, { size: 'sm', variant: 'secondary', onClick: stopCamera }, 'Stop camera')
+            : h(V.Button, { size: 'sm', variant: 'secondary', disabled: gest[0].starting, onClick: startCamera }, gest[0].starting ? 'Starting camera' : 'Start camera gestures'),
+          ['dock', 'normal', 'expand'].map(function (c) {
+            var l = LAYOUT_OF[c];
+            return h(V.Button, { key: c, size: 'sm', variant: layout[0] === l ? 'primary' : 'secondary', onClick: function () { layout[1](l); } }, LAYOUT_WORD[l]);
+          })),
+        gest[0].err ? h('p', { className: 'note err' }, 'Camera gestures could not start: ' + gest[0].err) : null,
+        gest[0].last ? h('p', { className: 'note' }, 'Last gesture: ' + gest[0].last) : null,
+        h('p', { className: 'note' }, h('b', null, 'Swipe right'), ' to push the health panels aside, ', h('b', null, 'swipe left'), ' or ', h('b', null, 'hold a fist'),
+          ' to bring them back, ', h('b', null, 'hold an open palm'), ' to expand. Keys D, N and E do the same. The camera is processed on this device only; no frame leaves the page. ',
+          'A change of status always restores the normal view.')));
   }
   ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 </script>

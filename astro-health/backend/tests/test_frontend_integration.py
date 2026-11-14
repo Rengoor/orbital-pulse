@@ -76,6 +76,42 @@ def test_hud_is_display_only():
     assert (_FRONTEND_DIR / "hud" / "README.md").is_file()
 
 
+_MEDIAPIPE_SHA256 = {
+    "vision_bundle.mjs": "870da5cfc43bfcf2a8b0f14e8152dae8c7e701722e1191b0e592b94b81b4127a",
+    "wasm/vision_wasm_internal.js": "85c1a342be70427987f900969a5f26e17557351111364e6585e97fb03e93e108",
+    "wasm/vision_wasm_internal.wasm": "bcc13df22d3d69ec8cbe8e280989356d844ae00f4523eb82072d2484f44134dc",
+    "gesture_recognizer.task": "97952348cf6a6a4915c2ea1496b4b37ebabc50cbbf80571435643c455f2b0482",
+}
+
+
+def test_hud_gestures_are_local_and_layout_only():
+    """Camera gestures load only vendored files (pinned by hash) and only change layout."""
+    import hashlib
+    import re
+
+    vendor = _FRONTEND_DIR / "js" / "vendor" / "mediapipe"
+    for name, digest in _MEDIAPIPE_SHA256.items():
+        assert hashlib.sha256((vendor / name).read_bytes()).hexdigest() == digest, name
+
+    module = (_FRONTEND_DIR / "hud" / "gestures.mjs").read_text(encoding="utf-8")
+    assert not re.search(r"https?://", module), "gestures.mjs must not load anything from the network"
+    for forbidden in ("fetch(", "XMLHttpRequest", "WebSocket", "sendBeacon", "API."):
+        assert forbidden not in module, forbidden
+
+    page = (_FRONTEND_DIR / "hud" / "index.html").read_text(encoding="utf-8")
+    assert "import('./gestures.mjs')" in page
+    # A change of status always restores the normal layout.
+    assert "layout[1]('normal');" in page
+
+
+def test_hud_gesture_files_served(client):
+    for path in ("/ui/hud/gestures.mjs", "/ui/js/vendor/mediapipe/vision_bundle.mjs",
+                 "/ui/js/vendor/mediapipe/wasm/vision_wasm_internal.wasm"):
+        resp = client("GET", path)
+        assert resp.status_code == 200, path
+    assert client("GET", "/ui/js/vendor/mediapipe/wasm/vision_wasm_internal.wasm").headers["content-type"] == "application/wasm"
+
+
 def test_hud_status_contract(client):
     """Every field the HUD reads is present in /status and /records/{id}."""
     assert client("GET", "/status/eva_hud_test").status_code == 404  # HUD shows "No data", no action

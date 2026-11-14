@@ -24,6 +24,28 @@ Open http://127.0.0.1:8000/ui/hud/index.html. The page accepts these query param
 Browsers block sound until the page is clicked. Press **Enable audio cues** once.
 Until then, the HUD shows "Audio cues off".
 
+## Hand gestures (laptop camera)
+
+Press **Start camera gestures** under the visor and allow the camera. Hand tracking
+runs on this device with the vendored MediaPipe Gesture Recognizer
+(`../js/vendor/mediapipe/`). No camera frame leaves the page, and nothing is fetched
+from the network. The camera works only on `localhost`/`127.0.0.1` or over https,
+because browsers block it on plain-http LAN addresses.
+
+| Gesture | Layout |
+|---|---|
+| Swipe right | **Docked**: the health panels are pushed to the edges. The tier word, shape and action stay. Only nominal vitals are hidden; a flagged or unusable vital always stays. |
+| Swipe left, or hold a fist | **Normal** |
+| Hold an open palm still | **Expanded**: larger text and values, still at the edges ([V2 11022] 11.1.6.5) |
+
+The keys D, N and E and the three buttons do the same.
+
+* Gestures change only the HUD's layout. They never touch a verdict, a reading or the backend.
+* **Any change of status (tier, NO LINK, fail-safe) restores the normal layout at once.** A docked HUD can never keep a new alert out of view (project decision).
+* Layout switches are instant. Nothing animates (BRAND.md).
+* Interpretation thresholds (swipe distance and time, hold time, confidence, cooldown) are in `TUNING` in `gestures.mjs`. They are project decisions tuned for a laptop webcam, not suit hardware. `GestureInterpreter` is pure and can be tested with synthetic frames.
+* The camera preview `<video>` sits outside the React root. The vendored React-compatible runtime rebuilds the DOM on every render and has no refs, which would destroy a video element inside it.
+
 ## What it reads
 
 | On screen | Source |
