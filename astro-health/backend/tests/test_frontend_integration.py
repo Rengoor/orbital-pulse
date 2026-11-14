@@ -112,6 +112,29 @@ def test_earth_base_review_log(client):
     assert client("GET", "/earth/reviews", params={"record_id": "other"}).json()["reviews"] == []
 
 
+def test_retired_tablet_pages_hold_no_demo_data():
+    """The retired tablet pages and the API client must not ship scripted crew.
+
+    The old StationTablet and crew console rendered hard-coded crew as if live and
+    api.js labelled simulated values as NASA data with fabricated provenance
+    (buildReadingsForCrew / syncCrewWithBackend). This pins their removal.
+    """
+    for name in ("index.html", "crew-console.html"):
+        page = (_FRONTEND_DIR / "tablet" / name).read_text(encoding="utf-8")
+        for forbidden in ("DEFAULT_CREW", "nasa_osdr", "nasa_radlab", "Advisory", "<script"):
+            assert forbidden not in page, f"{name} still contains {forbidden}"
+
+    api_js = (_FRONTEND_DIR / "js" / "api.js").read_text(encoding="utf-8")
+    for forbidden in (
+        "buildReadingsForCrew",   # labelled simulated readings as nasa_* with made-up provenance
+        "syncCrewWithBackend",    # merged scripted crew with live records and seeded the store
+        "checkinCrewMember",
+        "nasa_osdr",
+        "nasa_radlab",
+    ):
+        assert forbidden not in api_js, f"api.js still contains {forbidden}"
+
+
 def test_vitalis_ui_has_no_external_cdn_or_font_urls():
     """Verify every HTML, CSS, and JS asset runs 100% locally without external CDN calls."""
     for ext in ("*.html", "*.css", "*.js"):

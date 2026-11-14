@@ -3,231 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitalis · MissionConsole</title>
-<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<title>Vitalis · Crew console (retired)</title>
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/vitalis.css">
 <style>
-  .mc { padding: var(--space-6); display: grid; gap: var(--space-4); width: 1232px; box-sizing: border-box; }
-  .mc-top { display: flex; align-items: center; gap: var(--space-6); }
-  .mc-brand { display: grid; gap: 2px; margin-right: auto; }
-  .mc-brand b { font: 600 22px/1 var(--font-display); letter-spacing: -.01em; color: var(--ink); }
-  .mc-brand b i { font-style: normal; color: var(--signal); }
-  .mc-met { font: 500 12px/16px var(--font-mono); color: var(--ink-muted); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
-  .mc-top .vt-crew { flex-wrap: nowrap; }
-  .mc-top .vt-crew button { padding-right: var(--space-3); }
-  .mc-main { display: grid; grid-template-columns: 1fr 380px; gap: var(--space-4); align-items: start; }
-  .mc-holo { display: grid; grid-template-columns: 1fr 270px; gap: var(--space-4); align-items: center; }
-  .mc-stack { display: grid; gap: var(--space-3); }
-  .mc-grid { display: grid; grid-template-columns: repeat(3, 236px); justify-content: space-between; gap: var(--space-3); }
-  .mc-side { display: grid; gap: var(--space-4); }
-  .mc-hero { display: flex; align-items: baseline; gap: var(--space-3); margin: 0 0 var(--space-4); }
-  .mc-hero h1 { margin: 0; font: 600 32px/36px var(--font-display); letter-spacing: -.01em; }
-  .mc-ar { position: relative; height: 600px; border-radius: var(--radius-md); overflow: hidden; background: var(--void); perspective: 700px; }
-  .mc-floor { position: absolute; left: -40%; right: -40%; bottom: -30%; height: 90%; transform: rotateX(74deg); transform-origin: 50% 100%;
-    background-image: repeating-linear-gradient(0deg, var(--line) 0 1px, transparent 1px 48px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 48px); }
-  .mc-reticle { position: absolute; left: 50%; bottom: 70px; width: 260px; height: 46px; margin-left: -130px; border-radius: var(--radius-pill); border: 1.5px dashed var(--holo); box-shadow: var(--glow-holo); }
-  .mc-ar .vt-body { position: absolute; left: 50%; top: 24px; width: 500px; margin-left: -110px; }
-  .mc-ar-ui { position: absolute; left: var(--space-6); top: var(--space-6); display: grid; gap: var(--space-3); max-width: 280px; }
-  .mc-ar-ui p { margin: 0; font: 400 13px/18px var(--font-sans); color: var(--ink-muted); }
-  .mc-ar-cross { position: absolute; inset: var(--space-4); pointer-events: none; border: 1px solid var(--line); border-radius: var(--radius-md); }
-  .mc-dl { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--line); display: grid; gap: 6px; font: 400 12px/16px var(--font-mono); color: var(--ink-muted); }
-  .mc-dl-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  body { margin: 0; background: var(--void); color: var(--ink); }
+  .retired { max-width: 640px; margin: 15vh auto; padding: var(--space-6); display: grid; gap: var(--space-4); border: 1px dashed var(--line-strong); border-radius: var(--radius-md); background: var(--hull); }
+  h1 { margin: 0; font: 600 22px/28px var(--font-display); }
+  h1 i { font-style: normal; color: var(--signal); }
+  p { margin: 0; font: 400 14px/21px var(--font-sans); color: var(--ink-muted); }
+  p b { color: var(--ink); font-weight: 600; }
+  a { color: var(--holo); }
 </style>
-<script src="../js/vendor/react.production.min.js"></script>
-<script src="../js/vendor/react-dom.production.min.js"></script>
-<script src="../js/vitalis.js"></script>
-<script src="../js/api.js"></script>
 </head>
 <body>
-<div id="root"></div>
-<script>
-  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement;
-  var ZL = { neuro: 'Sleep', resp: 'Cabin CO2', cardio: 'Heart rate', radiation: 'Dose rate', metabolic: 'Glucose', thermal: 'Skin temp', msk: 'Exercise' };
-  function z(id, tier, value, unit, sub, trend, band) { return { id: id, tier: tier, value: value, unit: unit, sub: sub, trend: trend, band: band }; }
-  var DEFAULT_CREW = [
-    { id: 'ml', name: 'M. Lindqvist', role: 'FE', tier: 'RED', zones: [
-        z('neuro', 'YELLOW', '5.1', 'h', 'mood 3/5', [7.2, 6.8, 6.1, 5.9, 5.4, 5.1], [6.5, 9]),
-        z('resp', 'YELLOW', '3850', 'ppm', 'cabin rising', [2400, 2600, 2900, 3300, 3600, 3850], [0, 3000]),
-        z('cardio', 'RED', '104', 'bpm', 'BP 138/88', [70, 72, 78, 86, 93, 99, 104], [55, 85]),
-        z('radiation', 'YELLOW', '2.9', 'µSv/h', 'SPE active', [0.4, 0.4, 0.5, 1.6, 2.4, 2.9], [0, 1]),
-        z('metabolic', 'GREY', null, 'mmol/L', 'sensor fault', [5.1, 5.3], [3.9, 7.8]),
-        z('thermal', 'GREEN', '36.9', '°C', '1 min ago', [36.7, 36.8, 36.8, 36.9, 36.9], [36.1, 37.4]),
-        z('msk', 'RED', '4', 'min', 'target 150/wk', [60, 45, 30, 12, 4], [40, 120]) ],
-      card: { tier: 'RED', headline: 'Heart rate 19 bpm above baseline during a solar particle event', action: 'ALERT_CMO', proposal: { action: 'REST_AND_HYDRATE' },
-        reasons: ['HR above the YELLOW band for 40 min', 'Dose rate 2.9 µSv/h, 7x quiet-sun', 'Advisor may not lower a tier (rule R-07)'] } },
-    { id: 'ao', name: 'A. Okafor', role: 'CDR', tier: 'GREEN', zones: [
-        z('neuro', 'GREEN', '7.4', 'h', 'mood 4/5', [7.1, 7.3, 7.0, 7.6, 7.4], [6.5, 9]),
-        z('resp', 'GREEN', '2100', 'ppm', 'scrubbers nominal', [2300, 2200, 2150, 2100], [0, 3000]),
-        z('cardio', 'GREEN', '64', 'bpm', 'BP 118/76', [66, 63, 65, 62, 64], [55, 85]),
-        z('radiation', 'GREEN', '0.38', 'µSv/h', 'RadLab', [0.4, 0.39, 0.37, 0.38], [0, 1]),
-        z('metabolic', 'GREEN', '5.4', 'mmol/L', '20 min ago', [5.6, 5.2, 5.5, 5.4], [3.9, 7.8]),
-        z('thermal', 'GREEN', '36.6', '°C', '1 min ago', [36.6, 36.5, 36.6, 36.6], [36.1, 37.4]),
-        z('msk', 'GREEN', '92', 'min', '118/150 wk', [70, 85, 92, 88, 92], [40, 120]) ],
-      card: { tier: 'GREEN', headline: 'All channels inside personal baseline', action: 'NO_ACTION', proposal: { action: 'NO_ACTION' },
-        reasons: ['7 of 7 channels reporting', 'Next scheduled check-in 14:00Z'] } },
-    { id: 'rt', name: 'R. Tanaka', role: 'MS', tier: 'YELLOW', zones: [
-        z('neuro', 'YELLOW', '5.8', 'h', '3rd short night', [6.9, 6.2, 6.0, 5.8], [6.5, 9]),
-        z('resp', 'GREEN', '2600', 'ppm', 'node 2', [2500, 2550, 2600], [0, 3000]),
-        z('cardio', 'GREEN', '72', 'bpm', 'BP 124/80', [70, 71, 73, 72], [55, 85]),
-        z('radiation', 'GREEN', '0.41', 'µSv/h', 'RadLab', [0.4, 0.42, 0.41], [0, 1]),
-        z('metabolic', 'YELLOW', '8.3', 'mmol/L', 'post-meal', [6.1, 7.4, 8.0, 8.3], [3.9, 7.8]),
-        z('thermal', 'GREEN', '36.7', '°C', '3 min ago', [36.7, 36.7, 36.8], [36.1, 37.4]),
-        z('msk', 'GREEN', '64', 'min', '101/150 wk', [50, 58, 64], [40, 120]) ],
-      card: { tier: 'YELLOW', headline: 'Sleep debt building over three nights', action: 'RECHECK_IN_1H', proposal: { action: 'NO_ACTION' },
-        reasons: ['5.8 h last night, baseline 7.1 h', 'Glucose above band 40 min after a meal'] } },
-    { id: 'sr', name: 'S. Rahman', role: 'CMO', tier: 'GREY', zones: [
-        z('neuro', 'GREY', null, 'h', 'no wearable', [], [6.5, 9]),
-        z('resp', 'GREEN', '2600', 'ppm', 'node 2', [2500, 2600], [0, 3000]),
-        z('cardio', 'GREY', null, 'bpm', 'strap off 3 h', [71, 70], [55, 85]),
-        z('radiation', 'GREEN', '0.40', 'µSv/h', 'RadLab', [0.4, 0.4], [0, 1]),
-        z('metabolic', 'GREY', null, 'mmol/L', 'no draw today', [], [3.9, 7.8]),
-        z('thermal', 'GREY', null, '°C', 'strap off 3 h', [], [36.1, 37.4]),
-        z('msk', 'GREEN', '80', 'min', '130/150 wk', [70, 80], [40, 120]) ],
-      card: { tier: 'GREY', headline: 'Not enough data to judge', action: 'RECHECK_IN_1H', proposal: { action: 'NO_ACTION' },
-        reasons: ['Chest strap off for 3 h', 'GREY is never shown as nominal'] } }
-  ];
-  var ADVICE = {
-    cardio: function (c, zz) { return zz.value ? 'Heart rate is ' + zz.value + ' bpm (' + zz.sub + '). ' + (zz.tier === 'GREEN' ? 'Steady against baseline; nothing to do.' : 'Sit for 10 minutes, drink 300 ml and recheck. If it stays above 90, the CMO takes a manual BP.') : 'No heart data. Refit the chest strap so the Checker can judge.'; },
-    resp: function (c, zz) { return 'Cabin CO2 at ' + zz.value + ' ppm near ' + c.name + '. ' + (zz.tier === 'GREEN' ? 'Scrubbers are keeping up.' : 'Move to node 1 for exercise and ask ECLSS to check the scrubber bed.'); },
-    neuro: function (c, zz) { return zz.value ? zz.value + ' h sleep last period. ' + (zz.tier === 'GREEN' ? 'On track.' : 'Protect the next sleep window: no screens 30 min before, cabin lights to night.') : 'No sleep data from the wearable.'; },
-    radiation: function (c, zz) { return 'Dose rate ' + zz.value + ' µSv/h. ' + (zz.tier === 'GREEN' ? 'Quiet sun.' : 'Solar particle event in progress: shelter in the water-walled crew quarters until the rate drops below 1 µSv/h.'); },
-    metabolic: function (c, zz) { return zz.value ? 'Glucose ' + zz.value + ' mmol/L (' + zz.sub + '). ' + (zz.tier === 'GREEN' ? 'In band.' : 'Recheck in an hour before deciding anything.') : 'Glucose reading missing (' + zz.sub + '). Treat as unknown, not as fine.'; },
-    thermal: function (c, zz) { return zz.value ? 'Skin temperature ' + zz.value + ' °C. In band.' : 'No temperature reading.'; },
-    msk: function (c, zz) { return zz.value + ' min exercise today (' + zz.sub + '). ' + (zz.tier === 'RED' ? 'Bone and muscle loss risk: schedule a 45 min ARED block before sleep.' : 'Keep the schedule.'); }
-  };
-  function stampFor(card) {
-    var A = V.ACTIONS;
-    var propAct = (card.proposal && card.proposal.action) || card.proposal || 'NO_ACTION';
-    var p = (A[propAct] || A.NO_ACTION).rank, f = (A[card.action] || A.NO_ACTION).rank;
-    return f > p ? 'escalated' : 'checked';
-  }
-
-  function App() {
-    var crewState = React.useState(DEFAULT_CREW);
-    var apiInfo = React.useState({ online: false, chainValid: true, downlink: { pending: [], anchors: [] }, note: '' });
-    var cs = React.useState('ml'), vs = React.useState('holo'), zs = React.useState('cardio'), ts = React.useState(511591), ar = React.useState('');
-
-    function refreshFromBackend() {
-      if (!API) return;
-      API.syncCrewWithBackend(DEFAULT_CREW).then(function (res) {
-        if (res.online) {
-          crewState[1](res.crew);
-          apiInfo[1](function (prev) {
-            return { online: true, chainValid: res.chainValid, downlink: res.downlink, note: prev.note };
-          });
-        }
-      });
-    }
-
-    React.useEffect(function () { refreshFromBackend(); }, []);
-    React.useEffect(function () { var id = setInterval(function () { ts[1](function (t) { return t + 1; }); }, 1000); return function () { clearInterval(id); }; }, []);
-
-    var CREW = crewState[0];
-    var crew = CREW.filter(function (c) { return c.id === cs[0]; })[0] || CREW[0];
-    var t = ts[0], met = 'MET ' + Math.floor(t / 3600) + ':' + String(Math.floor(t / 60) % 60).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
-    var zones = crew.zones.map(function (q) { return Object.assign({}, q, { value: q.value }); });
-    var sel = zones.filter(function (q) { return q.id === zs[0]; })[0] || zones[0];
-
-    function triggerCheckin(label) {
-      if (!API || !apiInfo[0].online) {
-        apiInfo[1](function (p) { return Object.assign({}, p, { note: 'Local demo mode (' + label + ')' }); });
-        return;
-      }
-      API.checkinCrewMember(crew).then(function (res) {
-        apiInfo[1](function (p) {
-          return Object.assign({}, p, { note: label + ' logged · rec ' + res.record_id.slice(0, 8) + ' (' + res.verdict.tier + ')' });
-        });
-        refreshFromBackend();
-      });
-    }
-
-    function releaseQueue() {
-      if (!API || !apiInfo[0].online) return;
-      API.releaseDownlink(1.3, true).then(function (res) {
-        var sentCount = (res.sent || []).length;
-        apiInfo[1](function (p) {
-          return Object.assign({}, p, { note: 'Downlink released ' + sentCount + ' packet(s) to Earth' });
-        });
-        refreshFromBackend();
-      });
-    }
-
-    function readout(q, width) {
-      return h(V.VitalReadout, { key: q.id, label: ZL[q.id], value: q.value, unit: q.unit, tier: q.tier, trend: q.trend, band: q.band, source: q.id === 'radiation' ? 'nasa_radlab' : (q.id === 'cardio' ? 'nasa_osdr' : 'simulated'), updated: q.sub, width: width, selected: q.id === sel.id, onClick: function () { zs[1](q.id); } });
-    }
-    var dose = crew.zones.filter(function (q) { return q.id === 'radiation'; })[0];
-    var left;
-    if (vs[0] === 'holo') {
-      left = h(V.Panel, { title: 'Holo body · ' + crew.name, meta: met, roomy: true, scan: true },
-        h('div', { className: 'mc-holo' },
-          h(V.BodyMap, { key: crew.id, zones: zones, selected: sel.id, onSelect: function (id) { if (id) zs[1](id); } }),
-          h('div', { className: 'mc-stack' }, ['cardio', 'resp', 'radiation'].map(function (id) { return readout(zones.filter(function (q) { return q.id === id; })[0], 270); }))));
-    } else if (vs[0] === 'dash') {
-      left = h(V.Panel, { title: 'All vitals · ' + crew.name, meta: met, roomy: true },
-        h('div', { className: 'mc-grid' }, zones.filter(function (q) { return q.id !== 'radiation'; }).map(function (q) { return readout(q, 236); })),
-        h('div', { style: { display: 'flex', gap: 'var(--space-6)', alignItems: 'center', marginTop: 'var(--space-4)' } },
-          h(V.DoseGauge, { value: crew.id === 'ml' ? 31.8 : 11.4, limit: 50, rate: dose.value, event: crew.id === 'ml' ? 'SPE · DONKI 2026-11-14' : null }),
-          h('div', { style: { flex: 1 } }, h(V.Advisory, { key: 'dash' + crew.id, stream: true, status: stampFor(crew.card), verdictNote: crew.card.action, model: 'onboard-7b',
-            text: 'Summary for ' + crew.name + ': ' + crew.card.headline.toLowerCase() + '. ' + crew.card.reasons[0] + '.' }))));
-    } else {
-      left = h(V.Panel, { title: 'AR anchor · ' + crew.name, meta: met, roomy: true, plain: true },
-        h('div', { className: 'mc-ar' },
-          h('div', { className: 'mc-floor' }), h('div', { className: 'mc-reticle' }), h('div', { className: 'mc-ar-cross' }),
-          h(V.BodyMap, { key: 'ar' + crew.id, zones: zones, selected: sel.id, onSelect: function (id) { if (id) zs[1](id); } }),
-          h('div', { className: 'mc-ar-ui' },
-            h('span', { className: 'vt-lbl' }, 'Place the hologram'),
-            h('p', null, 'Point at a surface in the cabin. Hotspots stay tappable at arm’s length; every target is at least 48 px for gloved hands.'),
-            h(V.Button, { variant: 'secondary', icon: 'cube', onClick: function () {
-              if (navigator.xr && navigator.xr.isSessionSupported) navigator.xr.isSessionSupported('immersive-ar').then(function (ok) { ar[1](ok ? 'WebXR AR available on this device.' : 'No WebXR AR here: showing the in-cabin preview.'); }).catch(function () { ar[1]('No WebXR AR here: showing the in-cabin preview.'); });
-              else ar[1]('No WebXR AR here: showing the in-cabin preview.');
-            } }, 'Enter AR'),
-            ar[0] ? h('p', null, ar[0]) : null)));
-    }
-    var adviceText = (ADVICE[sel.id] || function () { return ''; })(crew, sel);
-    var dl = apiInfo[0].downlink || { pending: [], anchors: [] };
-    var latestAnchor = dl.anchors && dl.anchors.length ? dl.anchors[dl.anchors.length - 1] : null;
-    var propAct = (crew.card.proposal && crew.card.proposal.action) || crew.card.proposal || 'NO_ACTION';
-
-    return h('div', { className: 'mc' },
-      h('div', { className: 'mc-top' },
-        h('div', { className: 'mc-brand' },
-          h('b', null, 'Vitalis', h('i', null, '.')),
-          h('span', { className: 'mc-met' },
-            'Lunar transit · ' + met,
-            h(V.SourceLabel, {
-              source: apiInfo[0].online ? 'nasa_osdr' : 'simulated',
-              dataset: apiInfo[0].online ? ('API LIVE · ' + (apiInfo[0].chainValid ? 'CHAIN OK' : 'CHAIN BROKEN')) : 'OFFLINE DEMO'
-            }))),
-        h(V.CrewSwitcher, { crew: CREW, value: cs[0], onChange: function (id) { cs[1](id); } }),
-        h(V.SegmentedControl, { value: vs[0], onChange: vs[1], ariaLabel: 'View', options: [
-          { value: 'holo', label: 'Holo body', icon: 'body' }, { value: 'dash', label: 'Dashboard', icon: 'grid' }, { value: 'ar', label: 'AR', icon: 'cube' }] })),
-      h('div', { className: 'mc-main' },
-        left,
-        h('div', { className: 'mc-side' },
-          h(V.DecisionCard, Object.assign({}, crew.card, {
-              key: crew.id,
-              simulated: !apiInfo[0].online,
-              source: apiInfo[0].online ? 'nasa_osdr' : undefined,
-              ts: crew.card.ts || met,
-              proposal: { action: propAct, by: 'LLM advisor' },
-              checkerVersion: crew.card.checkerVersion || '0.3.1',
-              rulesetHash: crew.card.rulesetHash || 'a91f03cc7e2b'
-            }),
-            crew.card.tier === 'RED'
-              ? h(V.Button, { variant: 'primary', icon: 'medic', onClick: function () { triggerCheckin('CMO alert'); } }, 'Page CMO')
-              : h(V.Button, { variant: 'secondary', size: 'sm', icon: 'clock', onClick: function () { triggerCheckin('Recheck'); } }, 'Recheck now')),
-          h(V.Advisory, { key: crew.id + sel.id, stream: true, status: sel.tier === 'GREY' ? 'pending' : 'checked', verdictNote: ZL[sel.id], model: 'onboard-7b', text: adviceText }),
-          h(V.Panel, { title: 'Link to Earth', meta: apiInfo[0].online ? (dl.pending.length + ' queued') : 'local' },
-            h(V.DelayDial, { oneWaySeconds: 1.3, vehicle: 'Gateway' }),
-            apiInfo[0].online ? h('div', { className: 'mc-dl' },
-              h('div', { className: 'mc-dl-row' },
-                h('span', null, latestAnchor ? ('Anchor #' + latestAnchor.seq + ' · ' + latestAnchor.hash.slice(0, 10)) : 'No chain anchors yet'),
-                h(V.Button, { variant: 'ghost', size: 'sm', icon: 'antenna', disabled: !dl.pending.length, onClick: releaseQueue },
-                  dl.pending.length ? ('Flush ' + dl.pending.length) : 'Synced')),
-              apiInfo[0].note ? h('div', { style: { color: 'var(--holo)' } }, apiInfo[0].note) : null) : null))));
-  }
-  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
-</script>
+<div class="retired">
+  <h1>Vitalis<i>.</i> Crew console — retired</h1>
+  <p><b>This design study is retired.</b> It displayed scripted demo crew
+    (hard-coded readings and advisory text) and, when a backend was reachable,
+    mixed that script with live records. Nothing on it could be trusted as
+    current, so it no longer renders.</p>
+  <p>Use the <a href="monitor.html">crew health monitor</a> instead: it shows
+    only what the backend decided, labels every reading's source, and shows
+    nothing at all when there is no link.</p>
+  <p>The retired page is preserved in git history
+    (<code>frontend/tablet/crew-console.html</code> before November 2026).</p>
+</div>
 </body>
 </html>

@@ -21,8 +21,9 @@ Opening the files straight from disk (`file://`) also works in most browsers, bu
 | `index.html` | Start page linking every screen and component |
 | `hud/index.html` | **View 1, helmet HUD.** The wearer's own tier, action and vitals, live from the backend only; NO LINK when unreachable. See `hud/README.md` |
 | `pages/helmet-hud.html` | Earlier helmet display prototype, kept for reference |
-| `tablet/index.html` | **View 2, tablet.** Advanced health monitoring: Commander, CMO and My health roles with medical-privacy gating |
-| `tablet/crew-console.html` | Tablet crew console: Holo body / Dashboard / AR views, crew switcher, decision card, advisor |
+| `tablet/monitor.html` | **View 2, tablet.** Crew health monitor, live from the backend only; shows nothing when there is no link. See `tablet/README.md` |
+| `tablet/index.html` | Retired role-based tablet design study (showed scripted demo crew as if live); the page now only points to the monitor |
+| `tablet/crew-console.html` | Retired crew-console design study, retired for the same reason |
 | `earth/index.html` | **View 3, Earth base.** Every log (decisions, chain, checkpoints, downlink, reviews) with verify, replay and review |
 | `components/*.html` | One live demo per component |
 | `js/vitalis.js` | The component library. Defines `window.Vitalis` (BodyMap, VitalReadout, Sparkline, DoseGauge, DecisionCard, Advisory, TierBadge, SourceLabel, DelayDial, CrewSwitcher, SegmentedControl, Button, Panel, Icon) |
