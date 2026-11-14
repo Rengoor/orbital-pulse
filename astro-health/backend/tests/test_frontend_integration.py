@@ -39,9 +39,10 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
 
     for path in (
         "/ui/index.html",
-        "/ui/pages/mission-console.html",
-        "/ui/pages/station-tablet.html",
         "/ui/pages/helmet-hud.html",
+        "/ui/tablet/index.html",
+        "/ui/tablet/crew-console.html",
+        "/ui/earth/index.html",
         "/ui/js/vitalis.js",
         "/ui/js/api.js",
         "/ui/js/vendor/react.production.min.js",
@@ -50,6 +51,32 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
     ):
         resp = client("GET", path)
         assert resp.status_code == 200, f"{path} returned {resp.status_code}"
+
+
+def test_three_views_each_have_their_own_directory():
+    for view in ("hud", "tablet", "earth"):
+        assert (_FRONTEND_DIR / view / "README.md").is_file(), f"missing {view}/"
+    # The HUD is reserved but deliberately not implemented yet.
+    assert [p.name for p in (_FRONTEND_DIR / "hud").iterdir()] == ["README.md"]
+    start = (_FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
+    for link in ("tablet/index.html", "earth/index.html"):
+        assert (_FRONTEND_DIR / link).is_file()
+        assert f'href="{link}"' in start
+
+
+def test_earth_base_review_log(client):
+    assert client("GET", "/earth/reviews").json() == {"reviews": [], "chain": {"valid": True, "broken_at": None}}
+
+    ts = "2026-11-14T09:12:00Z"
+    reading = {"id": "r1", "ts": ts, "channel": "heart_rate", "value": 150, "unit": "bpm", "source": "simulated"}
+    record_id = client("POST", "/checkin", json={"astronaut_id": "ml", "readings": [reading], "now": ts}).json()["record_id"]
+    client("POST", "/earth/review", json={"record_id": record_id, "cmo_note": "seen", "outcome": "AGREE"})
+    client("POST", "/earth/review", json={"record_id": record_id, "cmo_note": "", "outcome": "FOLLOW_UP"})
+
+    log = client("GET", "/earth/reviews").json()
+    assert [r["outcome"] for r in log["reviews"]] == ["AGREE", "FOLLOW_UP"]
+    assert log["chain"] == {"valid": True, "broken_at": None}
+    assert client("GET", "/earth/reviews", params={"record_id": "other"}).json()["reviews"] == []
 
 
 def test_vitalis_ui_has_no_external_cdn_or_font_urls():

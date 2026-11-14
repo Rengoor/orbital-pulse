@@ -333,6 +333,18 @@
         flush: !!flush
       });
     },
+    trust: function (recordId) {
+      return request('GET', '/records/' + encodeURIComponent(recordId) + '/trust');
+    },
+    reviews: function () {
+      return request('GET', '/earth/reviews');
+    },
+    anchor: function () {
+      return request('GET', '/earth/anchor');
+    },
+    verifyAnchor: function (checkpoint) {
+      return request('POST', '/earth/anchor/verify', checkpoint);
+    },
     buildReadingsForCrew: buildReadingsForCrew,
     syncCrewWithBackend: syncCrewWithBackend
   };

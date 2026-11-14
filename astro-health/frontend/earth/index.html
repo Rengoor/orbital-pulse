@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · Earth base</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/vitalis.css">
+<style>
+  body { margin: 0; }
+  .eb { padding: var(--space-6); display: grid; gap: var(--space-4); max-width: 1480px; margin: 0 auto; box-sizing: border-box; }
+  .eb-top { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+  .eb-brand { display: grid; gap: 2px; margin-right: auto; }
+  .eb-brand b { font: 600 22px/1 var(--font-display); color: var(--ink); }
+  .eb-brand b i { font-style: normal; color: var(--signal); }
+  .eb-sub { font: 500 12px/16px var(--font-mono); color: var(--ink-muted); }
+  .eb-stat { display: grid; gap: 2px; justify-items: end; }
+  .eb-stat .v { font: 500 13px/18px var(--font-mono); color: var(--ink); }
+  .ok { color: var(--tier-green) !important; } .bad { color: var(--tier-red) !important; } .warn { color: var(--tier-yellow) !important; }
+
+  .eb-banner { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--hull); font: 400 13px/18px var(--font-sans); color: var(--ink-muted); }
+  .eb-banner svg { width: 18px; height: 18px; flex: none; color: var(--holo); }
+  .eb-banner b { color: var(--ink); font-weight: 600; }
+  .eb-banner.alert { border-color: var(--tier-red); } .eb-banner.alert svg { color: var(--tier-red); }
+
+  .eb-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+  .eb-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); align-items: start; }
+  @media (max-width: 1080px) { .eb-main, .eb-row { grid-template-columns: minmax(0, 1fr); } }
+
+  .eb-tools { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; margin-bottom: var(--space-3); }
+  .eb-tools select, .eb-tools input, .eb-note { background: var(--void); color: var(--ink); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 8px 10px; font: 400 13px/18px var(--font-sans); min-height: 36px; box-sizing: border-box; }
+  .eb-tools select:focus-visible, .eb-note:focus-visible, .log tbody tr:focus-visible { outline: 2px solid var(--holo); outline-offset: 2px; }
+  .eb-note { width: 100%; }
+
+  .log-wrap { max-height: 520px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+  .log { width: 100%; border-collapse: collapse; font: 400 13px/18px var(--font-sans); }
+  .log th { position: sticky; top: 0; background: var(--hull-raised); text-align: left; padding: 8px 10px; white-space: nowrap; z-index: 1; }
+  .log td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+  .log tbody tr { cursor: pointer; }
+  .log tbody tr:hover { background: var(--hull-raised); }
+  .log tbody tr[aria-selected="true"] { background: var(--holo-wash); box-shadow: inset 2px 0 0 var(--holo); }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-muted); }
+  .chip { display: inline-block; padding: 1px 6px; border-radius: var(--radius-xs); border: 1px solid var(--line-strong); font: 500 11px/16px var(--font-mono); color: var(--ink-muted); white-space: nowrap; }
+  .chip.split { color: var(--tier-yellow); border-color: var(--tier-yellow); }
+  .chip.fail { color: var(--tier-red); border-color: var(--tier-red); }
+
+  .det { display: grid; gap: var(--space-4); }
+  .det h3 { margin: 0 0 var(--space-2); }
+  .det p { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink); }
+  .det-head { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  .det-act { font: 600 15px/20px var(--font-sans); color: var(--ink); }
+  .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px var(--space-4); font: 400 12px/18px var(--font-mono); margin: 0; }
+  .kv dt { color: var(--ink-muted); } .kv dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+  .lst { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font: 400 13px/18px var(--font-sans); }
+  .lst li { display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
+  .btns { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .result { font: 500 13px/18px var(--font-mono); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--void); overflow-wrap: anywhere; }
+  .empty { padding: var(--space-6); text-align: center; color: var(--ink-muted); font: 400 14px/20px var(--font-sans); }
+  .scroll { max-height: 300px; overflow: auto; }
+</style>
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/vitalis.js"></script>
+<script src="../js/api.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  /* Earth base display: every log the vehicle has produced, and the tools to
+     check them. This page decides nothing. Each tier, action and explanation
+     is shown exactly as the Checker recorded it; verification, replay and
+     review are calls to the backend, never logic in this page. When the
+     backend cannot be reached the page says so and shows no data at all. */
+  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+
+  var REFRESH_MS = 4000;
+  var CHECKPOINT_KEY = 'vitalis.earth.checkpoint';
+  var LINKS = [
+    { value: '0.001', label: 'Low Earth orbit · live' },
+    { value: '1.3', label: 'Moon · 1.3 s' },
+    { value: '182', label: 'Mars, near · 3 min' },
+    { value: '1338', label: 'Mars, far · 22 min' }
+  ];
+  var STATUS_TEXT = {
+    AGREEMENT: 'Agreed', DISAGREEMENT: 'Split', PARTIAL_ASSESSMENT: 'Partial', UNVERIFIABLE: 'Unverifiable'
+  };
+
+  function short(x, n) { return x ? String(x).slice(0, n || 10) : '--'; }
+  function clock(ts) { return ts ? String(ts).slice(11, 19) : '--'; }
+  function day(ts) { return ts ? String(ts).slice(0, 10) : ''; }
+  function actionText(a) { return (V.ACTIONS[a] || {}).text || a || '--'; }
+  function loadCheckpoint() { try { return JSON.parse(localStorage.getItem(CHECKPOINT_KEY) || 'null'); } catch (e) { return null; } }
+  function saveCheckpoint(c) { try { localStorage.setItem(CHECKPOINT_KEY, JSON.stringify(c)); } catch (e) { /* kept in memory only */ } }
+
+  function StatusChip(p) {
+    var s = p.verdict.disagreement_status;
+    if (p.verdict.failsafe) return h('span', { className: 'chip fail' }, 'FAIL-SAFE');
+    if (!s) return h('span', { className: 'chip' }, '--');
+    return h('span', { className: 'chip' + (s === 'AGREEMENT' ? '' : ' split') }, STATUS_TEXT[s] || s);
+  }
+
+  /* ---------- Decision log ---------- */
+  function DecisionLog(p) {
+    var crewIds = [];
+    p.records.forEach(function (r) { if (crewIds.indexOf(r.astronaut_id) < 0) crewIds.push(r.astronaut_id); });
+    crewIds.sort();
+    var rows = p.records.filter(function (r) {
+      return (p.crew === 'all' || r.astronaut_id === p.crew) && (p.tier === 'all' || r.verdict.tier === p.tier);
+    });
+    return h(V.Panel, { title: 'Decision log', meta: rows.length + ' of ' + p.records.length + ' records' },
+      h('div', { className: 'eb-tools' },
+        h('label', { className: 'vt-lbl', htmlFor: 'f-crew' }, 'Crew'),
+        h('select', { id: 'f-crew', value: p.crew, onChange: function (e) { p.onCrew(e.target.value); } },
+          h('option', { value: 'all' }, 'Everyone'),
+          crewIds.map(function (id) { return h('option', { key: id, value: id }, id); })),
+        h('label', { className: 'vt-lbl', htmlFor: 'f-tier' }, 'Tier'),
+        h('select', { id: 'f-tier', value: p.tier, onChange: function (e) { p.onTier(e.target.value); } },
+          h('option', { value: 'all' }, 'All tiers'),
+          ['RED', 'GREY', 'YELLOW', 'GREEN'].map(function (t) { return h('option', { key: t, value: t }, V.TIERS[t].word + ' (' + t + ')'); }))),
+      rows.length === 0
+        ? h('div', { className: 'empty' }, p.records.length ? 'No records match this filter.' : 'No decisions recorded yet. Records appear here as soon as the vehicle logs a check-in.')
+        : h('div', { className: 'log-wrap' },
+            h('table', { className: 'log' },
+              h('thead', null, h('tr', null,
+                ['Time (UTC)', 'Crew', 'Tier', 'Authorized action', 'Assessments', 'Record'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+              h('tbody', null, rows.map(function (r) {
+                var v = r.verdict, sel = r.id === p.selected;
+                function pick() { p.onSelect(r.id); }
+                return h('tr', { key: r.id, 'aria-selected': sel, tabIndex: 0, onClick: pick, onKeyDown: function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } } },
+                  h('td', { className: 'mono' }, clock(r.ts), ' ', h('span', { className: 'muted' }, day(r.ts))),
+                  h('td', { className: 'mono' }, r.astronaut_id),
+                  h('td', null, h(V.TierBadge, { tier: v.tier })),
+                  h('td', null, actionText(v.action),
+                    (v.additional_actions || []).map(function (a) { return h('div', { key: a, className: 'muted' }, '+ ' + actionText(a)); })),
+                  h('td', null, h(StatusChip, { verdict: v })),
+                  h('td', { className: 'mono muted' }, short(r.id, 8)));
+              })))));
+  }
+
+  /* ---------- Selected decision ---------- */
+  function Detail(p) {
+    var r = p.record, note = React.useState('');
+    if (!r) return h(V.Panel, { title: 'Selected decision' }, h('div', { className: 'empty' }, 'Select a record in the log to inspect it.'));
+    var v = r.verdict, t = v.decision_trace || {}, m = r.execution_manifest || {}, q = t.data_quality || {};
+    var changed = (t.gates || []).filter(function (g) { return g.changed; });
+    var pipes = m.pipelines || {};
+    return h(V.Panel, { title: 'Selected decision', meta: r.astronaut_id + ' · ' + clock(r.ts) },
+      h('div', { className: 'det' },
+        h('div', null,
+          h('div', { className: 'det-head' },
+            h(V.TierBadge, { tier: v.tier, size: 'lg' }),
+            h('span', { className: 'det-act' }, actionText(v.action)),
+            h(StatusChip, { verdict: v })),
+          (v.additional_actions || []).length
+            ? h('p', { style: { marginTop: 'var(--space-2)' } }, 'Also required, from the worst severity still known (' + v.known_severity + '): ' + v.additional_actions.map(actionText).join(', ') + '.')
+            : null,
+          h('p', { style: { marginTop: 'var(--space-2)' } }, t.explanation || (v.reasons || []).join(' ') || 'No explanation was recorded.')),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Assessments'),
+          h('ul', { className: 'lst' },
+            (t.contributing_proposals || r.proposals || []).map(function (c) {
+              return h('li', { key: c.pipeline_id }, h(V.TierBadge, { tier: c.tier }), h('span', { className: 'mono' }, c.pipeline_id),
+                c.advisory ? h('span', { className: 'chip' }, 'advisory') : null,
+                (c.rule_ids || []).map(function (id) { return h('span', { key: id, className: 'chip' }, id); }));
+            }),
+            Object.keys(pipes).filter(function (k) { return pipes[k] !== 'ok'; }).map(function (k) {
+              return h('li', { key: 'st-' + k }, h('span', { className: 'mono' }, k), h('span', { className: 'chip' + (pipes[k] === 'disabled' ? '' : ' fail') }, pipes[k]));
+            }))),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Reasons'),
+          (v.reasons || []).length
+            ? h('ul', { className: 'lst' }, v.reasons.map(function (x, i) { return h('li', { key: i }, x); }))
+            : h('p', { className: 'muted' }, 'None: every assessment was nominal.')),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Data quality'),
+          h('p', null, q.status === undefined ? 'Not assessed.' : (q.valid + ' of ' + q.total + ' readings usable · ' + q.status)),
+          (q.issues || []).length ? h('ul', { className: 'lst', style: { marginTop: 'var(--space-2)' } }, q.issues.map(function (x, i) {
+            return h('li', { key: i }, h('span', { className: 'chip fail' }, x.status), h('span', { className: 'mono' }, x.channel + ' · ' + x.reading_id), h('span', { className: 'muted' }, (x.issues || []).join('; ')));
+          })) : null),
+
+        changed.length ? h('div', null, h('h3', { className: 'vt-lbl' }, 'What changed the tier'),
+          h('ul', { className: 'lst' }, changed.map(function (g, i) {
+            return h('li', { key: i }, h('span', { className: 'chip' }, g.gate), h('span', { className: 'mono' }, g.tier_in + ' → ' + g.tier_out), h('span', { className: 'muted' }, g.detail));
+          }))) : null,
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Record and decision environment'),
+          h('dl', { className: 'kv' },
+            h('dt', null, 'record'), h('dd', null, r.id),
+            h('dt', null, 'hash'), h('dd', null, r.hash),
+            h('dt', null, 'previous'), h('dd', null, r.prev_hash),
+            h('dt', null, 'signed by'), h('dd', null, (r.key_id || '--') + ((m.signing || {}).demo_key ? ' · DEMO KEY' : '')),
+            h('dt', null, 'policy'), h('dd', null, short(m.policy_hash, 16)),
+            h('dt', null, 'limits'), h('dd', null, short(m.limits_hash, 16)),
+            h('dt', null, 'config'), h('dd', null, short(m.config_hash, 16)),
+            h('dt', null, 'baselines'), h('dd', null, short(m.baselines_hash, 16)),
+            h('dt', null, 'checker'), h('dd', null, v.checker_version || '--'),
+            h('dt', null, 'clock'), h('dd', null, m.clock_source || '--'),
+            h('dt', null, 'advisor'), h('dd', null, (m.llm || {}).enabled ? ('on · ' + ((m.llm || {}).model || 'default model')) : 'off'))),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Verify'),
+          h('div', { className: 'btns' },
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'shield', onClick: function () { p.onVerify(r); } }, 'Verify chain to here'),
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'clock', onClick: function () { p.onReplay(r); } }, 'Replay decision')),
+          p.result ? h('div', { className: 'result ' + (p.result.ok ? 'ok' : 'bad'), role: 'status', style: { marginTop: 'var(--space-2)' } }, p.result.text) : null),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Ground review (simulated reviewer)'),
+          h('input', { className: 'eb-note', type: 'text', value: note[0], placeholder: 'Note for the record', 'aria-label': 'Review note',
+            onChange: function (e) { note[1](e.target.value); } }),
+          h('div', { className: 'btns', style: { marginTop: 'var(--space-2)' } },
+            ['AGREE', 'DISAGREE', 'FOLLOW_UP'].map(function (o) {
+              return h(V.Button, { key: o, variant: 'secondary', size: 'sm', icon: o === 'AGREE' ? 'check' : o === 'DISAGREE' ? 'flare' : 'antenna',
+                onClick: function () { p.onReview(r, o, note[0]); note[1](''); } }, o === 'FOLLOW_UP' ? 'Follow up' : o.charAt(0) + o.slice(1).toLowerCase());
+            })),
+          h('p', { className: 'muted', style: { marginTop: 'var(--space-2)', fontSize: 12 } }, 'A review is appended to its own signed log. It never changes the decision above.'))));
+  }
+
+  /* ---------- Chain and checkpoint ---------- */
+  function ChainPanel(p) {
+    var c = p.checkpoint;
+    return h(V.Panel, { title: 'Chain integrity', meta: p.records.length + ' records' },
+      h('div', { className: 'det' },
+        h('div', null,
+          h('p', { className: p.chain ? (p.chain.valid ? 'ok' : 'bad') : 'muted' },
+            !p.chain ? 'Not checked yet.' : p.chain.valid ? 'Every record links, hashes and verifies.' : ('BROKEN at record ' + short(p.chain.broken_at, 8) + '. Records from there on cannot be trusted.')),
+          h('div', { className: 'btns', style: { marginTop: 'var(--space-2)' } },
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'shield', disabled: !p.records.length, onClick: p.onVerifyAll }, 'Verify whole chain'))),
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Checkpoint held on Earth'),
+          c ? h('dl', { className: 'kv' },
+                h('dt', null, 'taken'), h('dd', null, c.ts),
+                h('dt', null, 'records'), h('dd', null, String(c.record_count)),
+                h('dt', null, 'head'), h('dd', null, short(c.head_hash, 16)),
+                h('dt', null, 'key'), h('dd', null, c.key_id))
+            : h('p', { className: 'muted' }, 'None saved. A checkpoint lets Earth notice records being removed or history being rewritten, which the chain alone cannot.'),
+          h('div', { className: 'btns', style: { marginTop: 'var(--space-2)' } },
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'card', onClick: p.onSaveCheckpoint }, c ? 'Replace checkpoint' : 'Save checkpoint'),
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'check', disabled: !c, onClick: p.onCheckCheckpoint }, 'Check against it')),
+          p.checkResult ? h('div', { className: 'result ' + (p.checkResult.valid ? 'ok' : 'bad'), role: 'status', style: { marginTop: 'var(--space-2)' } }, p.checkResult.reason) : null)));
+  }
+
+  /* ---------- Downlink log ---------- */
+  function DownlinkPanel(p) {
+    var d = p.downlink || { pending: [], anchors: [] };
+    return h(V.Panel, { title: 'Downlink log', meta: d.pending.length + ' queued · ' + p.received.length + ' received' },
+      h('div', { className: 'det' },
+        h('div', { className: 'eb-tools', style: { marginBottom: 0 } },
+          h('label', { className: 'vt-lbl', htmlFor: 'f-link' }, 'Link'),
+          h('select', { id: 'f-link', value: p.delay, onChange: function (e) { p.onDelay(e.target.value); } },
+            LINKS.map(function (l) { return h('option', { key: l.value, value: l.value }, l.label); })),
+          h(V.Button, { variant: 'secondary', size: 'sm', icon: 'antenna', onClick: function () { p.onRelease(false); } }, 'Receive'),
+          h(V.Button, { variant: 'ghost', size: 'sm', onClick: function () { p.onRelease(true); } }, 'Receive digest')),
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Waiting on the vehicle'),
+          d.pending.length ? h('ul', { className: 'lst scroll' }, d.pending.map(function (s) {
+            return h('li', { key: s.record_id }, h(V.TierBadge, { tier: s.tier }), h('span', { className: 'mono' }, s.astronaut_id + ' · ' + clock(s.ts)), h('span', { className: 'muted' }, actionText(s.action)));
+          })) : h('p', { className: 'muted' }, 'Nothing queued.')),
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Received on Earth'),
+          p.received.length ? h('ul', { className: 'lst scroll' }, p.received.map(function (s) {
+            return h('li', { key: s.record_id }, h(V.TierBadge, { tier: s.tier }), h('span', { className: 'mono' }, s.astronaut_id + ' · ' + clock(s.ts)), h('span', { className: 'muted' }, actionText(s.action)));
+          })) : h('p', { className: 'muted' }, 'Nothing received in this session. Urgent summaries always come first; on a long link routine ones wait for the digest.')),
+        h('p', { className: 'muted mono', style: { fontSize: 12 } }, d.anchors.length + ' signed anchors produced' + (d.anchors.length ? ' · latest ' + short(d.anchors[d.anchors.length - 1].hash, 12) : ''))));
+  }
+
+  /* ---------- Review log ---------- */
+  function ReviewPanel(p) {
+    var rv = p.reviews ? p.reviews.reviews.slice().reverse() : [];
+    var chain = p.reviews ? p.reviews.chain : null;
+    return h(V.Panel, { title: 'Review log', meta: rv.length + ' reviews' },
+      h('div', { className: 'det' },
+        chain ? h('p', { className: chain.valid ? 'ok' : 'bad' }, chain.valid ? 'Review chain verifies.' : 'Review chain BROKEN at entry ' + chain.broken_at + '.') : null,
+        rv.length ? h('ul', { className: 'lst scroll' }, rv.map(function (x, i) {
+          return h('li', { key: i },
+            h('span', { className: 'chip' + (x.outcome === 'AGREE' ? '' : ' split') }, x.outcome),
+            h('span', { className: 'mono' }, clock(x.ts) + ' · ' + x.reviewer),
+            h('span', { className: 'mono muted' }, 'record ' + short(x.record_id, 8)),
+            x.note ? h('span', null, x.note) : null,
+            x.simulated ? h('span', { className: 'chip' }, 'simulated') : null);
+        })) : h('p', { className: 'muted' }, 'No reviews yet. Select a decision and record one.')));
+  }
+
+  /* ---------- App ---------- */
+  function App() {
+    var link = React.useState({ state: 'connecting', key: null });
+    var records = React.useState([]), downlink = React.useState(null), reviews = React.useState(null);
+    var selected = React.useState(null), crew = React.useState('all'), tier = React.useState('all');
+    var result = React.useState(null), chain = React.useState(null);
+    var checkpoint = React.useState(loadCheckpoint()), checkResult = React.useState(null);
+    var delay = React.useState('1.3'), received = React.useState([]);
+
+    function refresh() {
+      return Promise.all([API.health(), API.records(null, 1000), API.downlink(), API.reviews()]).then(function (res) {
+        link[1]({ state: 'online', key: res[0].signing_key || null });
+        records[1](res[1]); downlink[1](res[2]); reviews[1](res[3]);
+      }).catch(function () {
+        // No link: show nothing rather than stale or sample data.
+        link[1](function (p) { return { state: 'offline', key: p.key }; });
+        records[1]([]); downlink[1](null); reviews[1](null); chain[1](null);
+      });
+    }
+    React.useEffect(function () {
+      refresh();
+      var id = setInterval(refresh, REFRESH_MS);
+      return function () { clearInterval(id); };
+    }, []);
+
+    var current = records[0].filter(function (r) { return r.id === selected[0]; })[0] || null;
+    function fail(e) { result[1]({ ok: false, text: 'Request failed: ' + e.message }); }
+
+    function verify(r) {
+      API.verify(r.id).then(function (v) {
+        result[1](v.valid ? { ok: true, text: 'Chain verifies from the first record to this one.' }
+          : { ok: false, text: 'Chain is BROKEN at record ' + short(v.broken_at, 8) + '.' });
+      }).catch(fail);
+    }
+    function replay(r) {
+      API.replay(r.id).then(function (n) {
+        if (n.hash === r.hash) result[1]({ ok: true, text: 'Replay reproduced the identical record (same hash).' });
+        else if (n.verdict.tier === r.verdict.tier && n.verdict.action === r.verdict.action) result[1]({ ok: false, text: 'Same decision, but the record differs: the decision environment is not what it was.' });
+        else result[1]({ ok: false, text: 'DIVERGED: recorded ' + r.verdict.tier + ' / ' + r.verdict.action + ', replay gives ' + n.verdict.tier + ' / ' + n.verdict.action + '.' });
+      }).catch(fail);
+    }
+    function review(r, outcome, note) {
+      API.review(r.id, outcome, note, 'ground_flight_surgeon').then(function () {
+        result[1]({ ok: true, text: 'Review recorded: ' + outcome + '.' }); refresh();
+      }).catch(fail);
+    }
+    function verifyAll() {
+      var newest = records[0][0];
+      if (!newest) return;
+      API.verify(newest.id).then(function (v) { chain[1](v); }).catch(function () { chain[1](null); });
+    }
+    function saveCp() { API.anchor().then(function (a) { saveCheckpoint(a); checkpoint[1](a); checkResult[1](null); }).catch(function () {}); }
+    function checkCp() { API.verifyAnchor(checkpoint[0]).then(checkResult[1]).catch(function (e) { checkResult[1]({ valid: false, reason: 'Request failed: ' + e.message }); }); }
+    function release(flush) {
+      API.releaseDownlink(Number(delay[0]), flush).then(function (res) {
+        received[1](function (prev) { return res.sent.concat(prev); }); refresh();
+      }).catch(function () {});
+    }
+
+    var online = link[0].state === 'online', key = link[0].key;
+    var urgent = records[0].filter(function (r) { return r.verdict.tier === 'RED' || r.verdict.tier === 'GREY'; }).length;
+
+    return h('div', { className: 'eb' },
+      h('div', { className: 'eb-top' },
+        h('div', { className: 'eb-brand' }, h('b', null, 'Vitalis', h('i', null, '.'), ' Earth base'),
+          h('span', { className: 'eb-sub' }, 'Every decision the vehicle has recorded, and the tools to check it')),
+        h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Link'),
+          h('span', { className: 'v ' + (online ? 'ok' : link[0].state === 'offline' ? 'bad' : 'muted') }, online ? 'Connected' : link[0].state === 'offline' ? 'No link' : 'Connecting')),
+        h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Urgent on record'), h('span', { className: 'v ' + (urgent ? 'warn' : '') }, online ? String(urgent) : '--')),
+        h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Signing key'),
+          h('span', { className: 'v ' + (key && key.demo_key ? 'bad' : '') }, key ? key.key_id + (key.demo_key ? ' · DEMO' : '') : '--'))),
+
+      !online && link[0].state === 'offline'
+        ? h('div', { className: 'eb-banner alert', role: 'alert' }, h(I, { name: 'antenna' }),
+            h('span', null, h('b', null, 'No link to the vehicle. '), 'Nothing is shown because nothing here would be live. Start the backend, then this page reconnects by itself (' + API.baseUrl + ').'))
+        : h('div', { className: 'eb-banner' }, h(I, { name: 'shield' }),
+            h('span', null, h('b', null, 'Read-only oversight. '), 'This console shows what the Checker decided and recorded. Verifying, replaying and reviewing never alter a decision.')),
+
+      h('div', { className: 'eb-main' },
+        h(DecisionLog, { records: records[0], selected: selected[0], crew: crew[0], tier: tier[0], onCrew: crew[1], onTier: tier[1],
+          onSelect: function (id) { selected[1](id); result[1](null); } }),
+        h(Detail, { key: current ? current.id : 'none', record: current, result: result[0], onVerify: verify, onReplay: replay, onReview: review })),
+
+      h('div', { className: 'eb-row' },
+        h(ChainPanel, { records: records[0], chain: chain[0], checkpoint: checkpoint[0], checkResult: checkResult[0],
+          onVerifyAll: verifyAll, onSaveCheckpoint: saveCp, onCheckCheckpoint: checkCp }),
+        h(DownlinkPanel, { downlink: downlink[0], delay: delay[0], onDelay: delay[1], received: received[0], onRelease: release }),
+        h(ReviewPanel, { reviews: reviews[0] })));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
