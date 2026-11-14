@@ -23,6 +23,14 @@
     if (global.location && LOOPBACK_HOSTS[global.location.hostname] && global.location.port === '8000') {
       return global.location.origin;
     }
+    // Served by the backend itself (it mounts this UI at /ui): talk to that same
+    // server. This is what lets another machine on the local network use the UI
+    // when the backend is started with --host 0.0.0.0; the page never calls any
+    // host other than the one it was loaded from.
+    if (global.location && /^https?:$/.test(global.location.protocol) &&
+        global.location.pathname.indexOf('/ui/') === 0) {
+      return global.location.origin;
+    }
     return 'http://127.0.0.1:8000';
   }
 
