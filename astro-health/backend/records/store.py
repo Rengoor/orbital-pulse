@@ -114,10 +114,10 @@ class RecordStore:
 
     # -- reviews --------------------------------------------------------------
 
-    def add_review(self, review: dict) -> dict:
+    def add_review(self, review: dict, signing_key: str | None = None) -> dict:
         """Seal *review* into the review chain and store it."""
         with self._lock:
-            sealed = seal(review, self._head_hash("reviews"))
+            sealed = seal(review, self._head_hash("reviews"), signing_key=signing_key)
             with self._conn:
                 self._conn.execute(
                     "INSERT INTO reviews (record_id, body) VALUES (?, ?)",

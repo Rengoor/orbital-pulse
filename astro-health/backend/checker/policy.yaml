@@ -1,5 +1,13 @@
 # Checker policy (action whitelist, tier rules). Versioned; its hash goes into every record.
 version: "0.1.0"
+# Action whitelist in ascending order of clinical urgency (least to most severe).
+action_order:
+  - NO_ACTION
+  - RECHECK_IN_1H
+  - REST_AND_HYDRATE
+  - USE_PROTOCOL_CARD
+  - ALERT_CMO
+  - CONTACT_GROUND_URGENT
 actions:
   - NO_ACTION
   - RECHECK_IN_1H
@@ -12,3 +20,17 @@ default_actions:
   YELLOW: REST_AND_HYDRATE
   RED: ALERT_CMO
   GREY: CONTACT_GROUND_URGENT
+# Maximum tolerated difference between two readings on the same channel and timestamp.
+contradiction_tolerances:
+  bp_systolic: 5.0
+  bp_diastolic: 5.0
+  heart_rate: 3.0
+  glucose: 5.0
+  temperature: 0.2
+  sleep_hours: 0.25
+  mood: 0.5
+  co2_ppm: 50.0
+  exercise_minutes: 2.0
+  dose_rate_usv_h: 1.0
+  blood_analyte: 0.1
+

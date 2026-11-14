@@ -21,6 +21,20 @@ def default_signing_key() -> str:
     return os.environ.get("SIGNING_KEY", _DEMO_SIGNING_KEY)
 
 
+def require_signing_key(signing_key: str | None = None) -> str:
+    """Return a non-demo signing key, or raise RuntimeError.
+
+    Used at API startup so the server refuses to boot with an unset, empty, or
+    demo signing key.
+    """
+    key = signing_key if signing_key is not None else os.environ.get("SIGNING_KEY")
+    if not key or key == _DEMO_SIGNING_KEY:
+        raise RuntimeError(
+            "SIGNING_KEY must be set to a non-demo secret before starting the API"
+        )
+    return key
+
+
 def sign(message: str, signing_key: str | None = None) -> str:
     """HMAC-SHA256 of *message* as a hex string."""
     key = signing_key if signing_key is not None else default_signing_key()

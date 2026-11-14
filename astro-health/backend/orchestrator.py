@@ -203,7 +203,12 @@ def decide(
     proposals = _run_pipelines(readings, context)
 
     policy_path = str(rules.get("policy_path") or DEFAULT_POLICY_PATH)
-    verdict = check(proposals, readings, policy_path)
+    verdict = check(
+        proposals,
+        readings,
+        policy_path,
+        reevaluate=lambda remaining: _run_pipelines(remaining, context),
+    )
 
     ts = format_ts(now)
     provenance = []

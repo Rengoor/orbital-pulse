@@ -62,8 +62,11 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
             now=now,
             prev_hash=prev_hash,
             astronaut_id=body.astronaut_id,
+            signing_key=state.signing_key,
         )
     )
+    # Automatically enqueue the downlink summary and chain anchor on every check-in.
+    state.queue.enqueue(record, signing_key=state.signing_key)
 
     # Verdict summary only, never the full Record: keeps the downlink payload small.
     return {"record_id": record["id"], "verdict": record["verdict"]}

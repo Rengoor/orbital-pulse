@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · DecisionCard</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/vitalis.css">
+
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/vitalis.js"></script>
+</head>
+<body>
+<div id="root" class="vt-stage"></div>
+<script>
+  var V = window.Vitalis, h = React.createElement;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h(V.DecisionCard, {
+      tier: 'RED', headline: 'Heart rate 18 bpm above baseline during a solar particle event',
+      action: 'ALERT_CMO', proposal: { action: 'REST_AND_HYDRATE', by: 'LLM advisor' },
+      reasons: ['HR above the YELLOW band for 40 min', 'Dose rate 2.9 µSv/h, 7x quiet-sun', 'Advisor may not lower a tier (rule R-07)'],
+      simulated: true, ts: 'MET 142:06 · 09:12Z',
+      provenance: [{ dataset_id: 'osdr:OSD-569', field: 'hr_baseline' }, { dataset_id: 'donki', field: 'SEP' }],
+      checkerVersion: '0.3.1', rulesetHash: 'a91f03cc7e2b'
+    }, h(V.Button, { variant: 'primary', icon: 'medic' }, 'Page CMO'), h(V.Button, { variant: 'ghost' }, 'Details')));
+</script>
+</body>
+</html>

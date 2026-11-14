@@ -18,6 +18,7 @@ from backend.downlink.delay import (
 from backend.downlink.queue import (
     LONG_DELAY_S,
     DownlinkQueue,
+    build_anchor,
     payload_bytes,
     summarize,
 )
@@ -107,9 +108,12 @@ def test_summary_carries_the_verdict_and_hash_but_no_raw_readings():
 def test_enqueue_does_not_alias_or_change_the_record():
     record = _record(1, "RED")
     before = copy.deepcopy(record)
-    summary = DownlinkQueue().enqueue(record)
+    queue = DownlinkQueue()
+    summary = queue.enqueue(record)
     summary["reasons"].append("edited")
     assert record == before
+    assert queue.latest_anchor()["record_id"] == "rec1"
+    assert queue.anchors() == [build_anchor(record)]
 
 
 def test_urgent_first_then_oldest_first():

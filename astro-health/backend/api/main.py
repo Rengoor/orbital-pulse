@@ -4,9 +4,13 @@ Owner: person A
 """
 
 import logging
+import os
+from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend.api.routes.checkin import router as checkin_router
 from backend.api.routes.earth import router as earth_router
@@ -15,10 +19,19 @@ from backend.api.routes.status import router as status_router
 from backend.api.state import AppState
 
 logger = logging.getLogger(__name__)
+_FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 
 def create_app() -> FastAPI:
     app = FastAPI(title="AstroHealth Backend")
+
+    # Local-only CORS: permit local UI servers (127.0.0.1 / localhost) and file:// origins.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost)(:\d+)?$|^null$",
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     # Loaded once, at startup: rules, baselines, policy whitelist, record store.
     # (Schema validators are compiled when backend.orchestrator is imported.)
@@ -33,6 +46,13 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"ok": True}
 
+    @app.get("/", include_in_schema=False)
+    def root_redirect() -> RedirectResponse:
+        return RedirectResponse(url="/ui/index.html")
+
+    if (_FRONTEND_DIR / "index.html").exists():
+        app.mount("/ui", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="vitalis_ui")
+
     @app.exception_handler(Exception)
     async def unexpected_fault(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path)
@@ -44,4 +64,4 @@ def create_app() -> FastAPI:
     return app
 
 
-app = create_app()
+app = create_app() if os.environ.get("SIGNING_KEY") and os.environ.get("SIGNING_KEY") != "demo-only-change-me" else None

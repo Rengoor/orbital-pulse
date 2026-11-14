@@ -1,13 +1,53 @@
-# frontend/
+# vitalis-ui
 
-**Owner:** person C
+The Vitalis front end: design tokens, a React component library and three working screens (mission console, helmet display, station tablet). No build step: plain HTML, CSS and one JavaScript file, with React 18 loaded from jsDelivr.
 
-Streamlit app. Screens are named after the challenge verbs: Gather, Evaluate, Act. One file per page, so pages never collide.
+## Run it
 
-## Rules for this folder
+From this folder:
 
-- Talk to the backend over HTTP only (`BACKEND_URL`). Never import backend code.
-- `MOCK_MODE=1` reads `../data/fixtures/` so the UI works before the backend exists.
-- Every screen shows the real/simulated label for its data.
-- Status and one action come first; details on demand.
-- Colour is never the only signal (icon and text too); GREY means insufficient data.
+```bash
+python -m http.server 8080
+```
+
+Then open http://localhost:8080. Add `?theme=day` to any URL for the day theme.
+
+Opening the files straight from disk (`file://`) also works in most browsers, but a local server is more reliable.
+
+## What's where
+
+| Path | What it is |
+|---|---|
+| `index.html` | Start page linking every screen and component |
+| `pages/mission-console.html` | Crew console: Holo body / Dashboard / AR views, crew switcher, decision card, advisor |
+| `pages/helmet-hud.html` | Helmet display prototype: your own vitals, flags after 3 confirming readings, scenario simulator |
+| `pages/station-tablet.html` | Habitat tablet: Commander, CMO and My health roles with medical-privacy gating |
+| `components/*.html` | One live demo per component |
+| `js/vitalis.js` | The component library. Defines `window.Vitalis` (BodyMap, VitalReadout, Sparkline, DoseGauge, DecisionCard, Advisory, TierBadge, SourceLabel, DelayDial, CrewSwitcher, SegmentedControl, Button, Panel, Icon) |
+| `css/vitalis.css` | Component styles. Every colour, space and radius is a token |
+| `css/tokens.css` | CSS custom properties for both themes, generated from `tokens/tokens.json` |
+| `tokens/tokens.json` | Source of truth for colours, type, spacing, radii and shadows |
+| `types/index.d.ts` | Prop types for every component (documentation) |
+| `BRAND.md` | Usage rules: tiers, copy, motion, helmet and tablet rules, privacy |
+
+## Using the components in your own page
+
+```html
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/vitalis.css">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="js/vitalis.js"></script>
+<div id="root"></div>
+<script>
+  var V = window.Vitalis, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    h(V.VitalReadout, { label: 'Heart rate', value: 96, unit: 'bpm', tier: 'YELLOW', source: 'simulated' }));
+</script>
+```
+
+## Connecting to the backend
+
+All screens currently use hard-coded demo data defined at the top of each page's script (`CREW`, `ZONES`, `SCEN`). To go live, replace those arrays with data from the FastAPI backend (`backend/api`, port 8000). The tier and action strings already match `data/schemas/card.schema.json` and `verdict.schema.json`, and `source` values match `reading.schema.json`.
+
+Thresholds and crew data are illustrative placeholders, not medical limits.
