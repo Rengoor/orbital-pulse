@@ -246,3 +246,237 @@ def test_more_draws_narrower_band(base_draws, extra_draws):
     expected_combined_width = 4.0 * stats_combined.std
     actual_combined_width = stats_combined.high - stats_combined.low
     assert math.isclose(actual_combined_width, expected_combined_width, rel_tol=1e-9)
+
+
+# ---------------------------------------------------------------------------
+# CUSUM tests (A-04)
+# ---------------------------------------------------------------------------
+
+from datetime import datetime
+from pathlib import Path
+
+import jsonschema
+import yaml
+
+from backend.pipelines.a_statistical.cusum import (
+    CUSUMState,
+    cusum_alarm,
+    cusum_update,
+    run_cusum_series,
+)
+from backend.pipelines.a_statistical.patterns import evaluate_patterns
+from backend.pipelines.a_statistical.pipeline import run as run_pipeline_a
+
+_REPO = Path(__file__).resolve().parents[2]
+with open(_REPO / "data" / "schemas" / "proposal.schema.json") as _f:
+    _PROPOSAL_SCHEMA = json.load(_f)
+with open(_REPO / "backend" / "pipelines" / "a_statistical" / "config.yaml") as _f:
+    _CONFIG = yaml.safe_load(_f)
+
+
+def test_cusum_config_has_real_parameters():
+    assert _CONFIG["cusum"] == {"k": 0.5, "h": 4.0}
+
+
+def test_cusum_update_does_not_mutate_input():
+    state = CUSUMState(s_pos=1.0, s_neg=-1.0)
+    new = cusum_update(state, value=5.0, mean=0.0, std=1.0, k=0.5)
+    assert (state.s_pos, state.s_neg) == (1.0, -1.0)
+    assert new is not state
+    assert new.s_pos == pytest.approx(5.5)
+    assert new.s_neg == 0.0
+
+
+def test_cusum_alarm_thresholds():
+    assert cusum_alarm(CUSUMState(4.1, 0.0), h=4.0)
+    assert cusum_alarm(CUSUMState(0.0, -4.1), h=4.0)
+    assert not cusum_alarm(CUSUMState(4.0, -4.0), h=4.0)
+
+
+def test_cusum_series_quiet_on_baseline_values():
+    alarm, history = run_cusum_series([10.0] * 20, mean=10.0, std=1.0, k=0.5, h=4.0)
+    assert alarm is False
+    assert len(history) == 20
+    assert all(s.s_pos == 0.0 and s.s_neg == 0.0 for s in history)
+
+
+def test_cusum_series_alarms_on_sustained_upward_drift():
+    # +1.5 sigma every step accumulates 1.0 per step, so it crosses h=4 on step 5.
+    alarm, history = run_cusum_series([11.5] * 6, mean=10.0, std=1.0, k=0.5, h=4.0)
+    assert alarm is True
+    assert not cusum_alarm(history[3], 4.0)
+    assert cusum_alarm(history[4], 4.0)
+
+
+def test_cusum_series_alarms_on_sustained_downward_drift():
+    alarm, _ = run_cusum_series([8.0] * 6, mean=10.0, std=1.0, k=0.5, h=4.0)
+    assert alarm is True
+
+
+@given(
+    values=st.lists(st.floats(min_value=-10, max_value=10, allow_nan=False), min_size=1, max_size=50),
+    mean=st.floats(min_value=-5, max_value=5, allow_nan=False),
+    std=st.floats(min_value=0.1, max_value=5, allow_nan=False),
+    k=st.floats(min_value=0.1, max_value=2.0, allow_nan=False),
+)
+def test_cusum_state_invariant(values, mean, std, k):
+    """s_pos >= 0 and s_neg <= 0 after every update."""
+    state = CUSUMState(s_pos=0.0, s_neg=0.0)
+    for v in values:
+        state = cusum_update(state, v, mean, std, k)
+        assert state.s_pos >= 0
+        assert state.s_neg <= 0
+
+
+# ---------------------------------------------------------------------------
+# Pattern tests (A-05)
+# ---------------------------------------------------------------------------
+
+def _reading(rid, channel, value, quality="ok"):
+    return {
+        "id": rid,
+        "astronaut_id": "crew_1",
+        "ts": "2026-11-14T08:00:00Z",
+        "channel": channel,
+        "value": value,
+        "unit": "x",
+        "source": "simulated",
+        "quality": quality,
+    }
+
+
+_FATIGUE = {
+    "id": "fatigue_cluster",
+    "tier": "YELLOW",
+    "conditions": [
+        {"channel": "sleep_hours", "op": "lt", "threshold": 6.0},
+        {"channel": "mood", "op": "lt", "threshold": 4.0},
+    ],
+}
+
+
+def test_patterns_empty_rules_returns_empty_list():
+    assert evaluate_patterns([_reading("r1", "mood", 1.0)], {}, []) == []
+
+
+def test_pattern_fires_only_when_all_conditions_hold():
+    both = [_reading("r1", "sleep_hours", 5.0), _reading("r2", "mood", 3.0)]
+    one = [_reading("r1", "sleep_hours", 5.0), _reading("r2", "mood", 7.0)]
+    assert evaluate_patterns(both, {}, [_FATIGUE])[0].matched is True
+    assert evaluate_patterns(one, {}, [_FATIGUE])[0].matched is False
+
+
+def test_pattern_does_not_fire_when_a_channel_is_missing():
+    match = evaluate_patterns([_reading("r1", "sleep_hours", 5.0)], {}, [_FATIGUE])[0]
+    assert match.matched is False
+    assert match.rule_id == "fatigue_cluster"
+
+
+def test_pattern_uses_most_recent_reading_per_channel():
+    readings = [
+        _reading("r1", "sleep_hours", 5.0),
+        _reading("r2", "mood", 3.0),
+        _reading("r3", "mood", 8.0),  # later reading recovers
+    ]
+    assert evaluate_patterns(readings, {}, [_FATIGUE])[0].matched is False
+
+
+@pytest.mark.parametrize(
+    "op,value,expected",
+    [
+        ("lt", 4.9, True), ("lt", 5.0, False),
+        ("gt", 5.1, True), ("gt", 5.0, False),
+        ("lte", 5.0, True), ("lte", 5.1, False),
+        ("gte", 5.0, True), ("gte", 4.9, False),
+        ("eq", 5.0, True), ("eq", 5.1, False),
+    ],
+)
+def test_pattern_operators(op, value, expected):
+    rule = {"id": "r", "tier": "YELLOW", "conditions": [{"channel": "mood", "op": op, "threshold": 5.0}]}
+    assert evaluate_patterns([_reading("r1", "mood", value)], {}, [rule])[0].matched is expected
+
+
+@pytest.mark.parametrize("rule", _CONFIG["patterns"], ids=lambda r: r["id"])
+def test_each_configured_pattern_fires_and_clears(rule):
+    """Every pattern in config.yaml fires just past its thresholds and not at them."""
+    nudge = {"lt": -0.5, "lte": 0.0, "gt": 0.5, "gte": 0.0, "eq": 0.0}
+    miss = {"lt": 0.0, "lte": 0.5, "gt": 0.0, "gte": -0.5, "eq": 0.5}
+    firing = [
+        _reading(f"r{i}", c["channel"], c["threshold"] + nudge[c["op"]])
+        for i, c in enumerate(rule["conditions"])
+    ]
+    assert evaluate_patterns(firing, {}, [rule])[0].matched is True
+    # Break only the first condition: the pattern must no longer fire.
+    c0 = rule["conditions"][0]
+    firing[0] = _reading("r0", c0["channel"], c0["threshold"] + miss[c0["op"]])
+    assert evaluate_patterns(firing, {}, [rule])[0].matched is False
+
+
+# ---------------------------------------------------------------------------
+# Pipeline tests (A-06)
+# ---------------------------------------------------------------------------
+
+_NOW = datetime(2026, 11, 14, 8, 0, 0)
+
+
+def _context(baselines=None, rules=None):
+    return {"baselines": baselines or {}, "rules": rules or {}, "now": _NOW}
+
+
+def test_pipeline_green_with_no_readings():
+    proposal = run_pipeline_a([], _context())
+    assert proposal["pipeline_id"] == "a_statistical"
+    assert proposal["tier"] == "GREEN"
+    assert proposal["data_fault"] is False
+
+
+def test_pipeline_cusum_alarm_gives_yellow_and_lists_reading_ids():
+    baselines = {"heart_rate": compute_baseline([70.0, 72.0, 68.0, 71.0, 69.0], channel="heart_rate")}
+    readings = [_reading(f"hr{i}", "heart_rate", 95.0) for i in range(6)]
+    proposal = run_pipeline_a(readings, _context(baselines=baselines, rules={"cusum": {"k": 0.5, "h": 4.0}}))
+    assert proposal["tier"] == "YELLOW"
+    assert proposal["reading_ids"] == [f"hr{i}" for i in range(6)]
+    assert any("heart_rate" in reason for reason in proposal["reasons"])
+
+
+def test_pipeline_skips_cusum_without_a_baseline():
+    readings = [_reading(f"hr{i}", "heart_rate", 250.0) for i in range(6)]
+    assert run_pipeline_a(readings, _context())["tier"] == "GREEN"
+
+
+def test_pipeline_worst_of_cusum_and_pattern():
+    baselines = {"heart_rate": compute_baseline([70.0, 72.0, 68.0, 71.0, 69.0], channel="heart_rate")}
+    red_rule = {"id": "red_rule", "tier": "RED", "conditions": [{"channel": "mood", "op": "lt", "threshold": 2.0}]}
+    readings = [_reading(f"hr{i}", "heart_rate", 95.0) for i in range(6)] + [_reading("m1", "mood", 1.0)]
+    proposal = run_pipeline_a(readings, _context(baselines=baselines, rules={"patterns": [red_rule]}))
+    assert proposal["tier"] == "RED"
+    assert proposal["rule_ids"] == ["red_rule"]
+    assert "m1" in proposal["reading_ids"]
+
+
+_reading_st = st.fixed_dictionaries(
+    {
+        "id": st.uuids().map(str),
+        "astronaut_id": st.just("crew_1"),
+        "ts": st.just("2026-11-14T08:00:00Z"),
+        "channel": st.sampled_from(["heart_rate", "bp_systolic", "glucose", "mood", "sleep_hours", "dose_rate_usv_h"]),
+        "value": st.floats(min_value=0, max_value=300, allow_nan=False),
+        "unit": st.just("x"),
+        "source": st.just("simulated"),
+        "quality": st.sampled_from(["ok", "suspect", "fault"]),
+    }
+)
+
+
+@given(readings=st.lists(_reading_st, min_size=1, max_size=10), with_baseline=st.booleans())
+def test_pipeline_a_always_schema_valid(readings, with_baseline):
+    """a_statistical.run() output always validates against proposal.schema.json."""
+    baselines = (
+        {"heart_rate": compute_baseline([70.0, 72.0, 68.0, 71.0], channel="heart_rate")}
+        if with_baseline
+        else {}
+    )
+    proposal = run_pipeline_a(readings, _context(baselines=baselines, rules=_CONFIG))
+    jsonschema.validate(proposal, _PROPOSAL_SCHEMA)
+    assert proposal["pipeline_id"] == "a_statistical"
+    assert set(proposal["reading_ids"]) <= {r["id"] for r in readings}

@@ -1,11 +1,19 @@
 # PLACEHOLDER: every threshold needs sourcing from NASA documents and medical review.
-# Written independently of pipeline A (person B). null = not yet sourced.
+# Written independently of pipeline A (person B). null = no limit on that side.
+#
+# The numbers below are working values so the pipeline can run end to end:
+# vitals are general adult clinical reference ranges, and the CO2 and dose-rate
+# rows are rough operational guesses. None of them has been checked against a
+# NASA source yet, which is what `source: PLACEHOLDER` records. Replace the
+# value and the source together.
+#
+# A value exactly on a limit is inside it. Readings must use the listed unit.
 channels:
-  bp_systolic: {unit: mmHg, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  bp_diastolic: {unit: mmHg, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  heart_rate: {unit: bpm, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  glucose: {unit: mg/dL, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  temperature: {unit: C, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  sleep_hours: {unit: h, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  co2_ppm: {unit: ppm, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
-  dose_rate_usv_h: {unit: uSv/h, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  bp_systolic: {unit: mmHg, yellow_low: 90, yellow_high: 140, red_low: 80, red_high: 180, source: PLACEHOLDER}
+  bp_diastolic: {unit: mmHg, yellow_low: 60, yellow_high: 90, red_low: 50, red_high: 120, source: PLACEHOLDER}
+  heart_rate: {unit: bpm, yellow_low: 50, yellow_high: 100, red_low: 40, red_high: 130, source: PLACEHOLDER}
+  glucose: {unit: mg/dL, yellow_low: 70, yellow_high: 180, red_low: 54, red_high: 250, source: PLACEHOLDER}
+  temperature: {unit: C, yellow_low: 36.0, yellow_high: 37.5, red_low: 35.0, red_high: 38.5, source: PLACEHOLDER}
+  sleep_hours: {unit: h, yellow_low: 6.0, yellow_high: null, red_low: 4.0, red_high: null, source: PLACEHOLDER}
+  co2_ppm: {unit: ppm, yellow_low: null, yellow_high: 4000, red_low: null, red_high: 7000, source: PLACEHOLDER}
+  dose_rate_usv_h: {unit: uSv/h, yellow_low: null, yellow_high: 50, red_low: null, red_high: 200, source: PLACEHOLDER}

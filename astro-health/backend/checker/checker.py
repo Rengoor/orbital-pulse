@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 
 from backend.checker.gates import (
+    TIER_ORDER,
     gate_data_fault,
     gate_grey_escalation,
     gate_whitelist,
@@ -29,6 +30,17 @@ _VERDICT_SCHEMA_PATH = (
 
 # Fallback action when the tier is not found in policy.yaml::default_actions.
 _FALLBACK_ACTION = "CONTACT_GROUND_URGENT"
+
+# Advisory pipelines: may raise the tier, can never lower it. Their data_fault
+# claims must not be able to unlock a downgrade or suppress GREY escalation.
+ADVISORY_PIPELINE_IDS = frozenset({"d_llm"})
+
+
+def _adjudicate_tier(proposals: list[dict], readings: list[dict]) -> str:
+    """Gates 1-3 in order: worst_of -> data_fault -> grey_escalation."""
+    tier = gate_worst_of(proposals)
+    tier = gate_data_fault(proposals, tier)
+    return gate_grey_escalation(readings, proposals, tier)
 
 
 def _hash_policy(policy_path: str) -> str:
@@ -57,6 +69,8 @@ def check(
       1. gate_worst_of(proposals)        → tier
       2. gate_data_fault(proposals, tier) → tier (may lower by one step)
       3. gate_grey_escalation(readings, proposals, tier) → tier (may raise to GREY)
+         (then the advisory floor: never below the tier the non-LLM pipelines
+         reach on their own)
       4. _default_action(tier)            → action
       5. gate_whitelist(action, policy_actions) → action
 
@@ -88,17 +102,22 @@ def check(
     policy_actions: list[str] = policy.get("actions", [])
 
     # --- Compute ruleset hash -----------------------------------------------
+    # Same digest as _hash_policy(policy_path), taken over the exact bytes that
+    # were parsed above so the hash can never describe a different file state.
     ruleset_hash = hashlib.sha256(policy_text).hexdigest()
 
     # --- Apply gates in order -----------------------------------------------
-    # Gate 1: Worst-of tier across all proposals
-    tier = gate_worst_of(proposals)
+    # Gates 1-3: worst-of tier, data-fault downgrade, GREY escalation.
+    tier = _adjudicate_tier(proposals, readings)
 
-    # Gate 2: Data-fault downgrade (unanimous agreement required)
-    tier = gate_data_fault(proposals, tier)
-
-    # Gate 3: GREY escalation on unverified sensor faults
-    tier = gate_grey_escalation(readings, proposals, tier)
+    # Advisory floor: the verdict is never lower than what the non-advisory
+    # pipelines produce on their own, so an advisory (LLM) proposal can raise
+    # the tier but can never lower it, whatever it claims about data faults.
+    core = [p for p in proposals if p.get("pipeline_id") not in ADVISORY_PIPELINE_IDS]
+    if core and len(core) != len(proposals):
+        core_tier = _adjudicate_tier(core, readings)
+        if TIER_ORDER[core_tier] > TIER_ORDER[tier]:
+            tier = core_tier
 
     # Gate 4: Default action for the resulting tier
     action = _default_action(tier, policy)
@@ -116,6 +135,13 @@ def check(
         "tier": tier,
         "action": action,
         "reasons": reasons,
+        "overruled_pipelines": sorted(
+            {
+                p["pipeline_id"]
+                for p in proposals
+                if TIER_ORDER[p["tier"]] < TIER_ORDER[tier]
+            }
+        ),
         "checker_version": CHECKER_VERSION,
         "ruleset_hash": ruleset_hash,
     }

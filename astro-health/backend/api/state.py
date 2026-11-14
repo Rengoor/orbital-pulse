@@ -1,0 +1,74 @@
+"""What the app loads once at startup and every route shares.
+
+Owner: person A
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import yaml
+from fastapi import Request
+
+from backend.records.store import RecordStore
+from backend.orchestrator import load_rules
+from backend.pipelines.a_statistical.baseline import compute_baseline
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+_DEFAULT_BASELINES_PATH = (
+    _REPO_ROOT / "data" / "nasa" / "osdr_inspiration4" / "processed" / "baselines.json"
+)
+
+
+def load_all_baselines(draws_path: str | os.PathLike | None = None) -> dict:
+    """``{astronaut_id: {channel: BaselineStats}}`` from a pre-flight draws file.
+
+    The file maps astronaut id to ``{channel: [draws]}``. Path comes from the
+    argument, then ``BASELINES_PATH``, then the processed Inspiration4 file.
+    Returns ``{}`` when no file exists yet: pipeline A then skips CUSUM for
+    channels without a baseline instead of guessing one.
+    """
+    path = Path(draws_path or os.environ.get("BASELINES_PATH") or _DEFAULT_BASELINES_PATH)
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as f:
+        draws = json.load(f)
+    return {
+        astronaut_id: {
+            channel: compute_baseline(values, channel=channel)
+            for channel, values in channels.items()
+            if values
+        }
+        for astronaut_id, channels in draws.items()
+    }
+
+
+@dataclass
+class AppState:
+    rules: dict
+    baselines: dict
+    policy_actions: list[str]
+    store: RecordStore = field(default_factory=RecordStore)
+
+    @classmethod
+    def load(cls) -> "AppState":
+        rules = load_rules()
+        # Fails loudly if policy.yaml is missing or unreadable: the app must
+        # not serve requests without a valid policy.
+        with open(rules["policy_path"], encoding="utf-8") as f:
+            policy = yaml.safe_load(f)
+        if not isinstance(policy, dict) or not policy.get("actions"):
+            raise RuntimeError(f"{rules['policy_path']} has no 'actions' whitelist")
+        return cls(
+            rules=rules,
+            baselines=load_all_baselines(),
+            policy_actions=list(policy["actions"]),
+            store=RecordStore(os.environ.get("RECORDS_PATH") or None),
+        )
+
+
+def get_state(request: Request) -> AppState:
+    return request.app.state.ctx

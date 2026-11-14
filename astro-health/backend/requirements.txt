@@ -6,4 +6,5 @@ pyyaml
 numpy
 httpx
 pytest
-# optional: add your LLM provider SDK here if d_llm is enabled
+hypothesis
+# d_llm (LLM_ENABLED=1) needs no extra package: it calls a local Ollama server through httpx.
