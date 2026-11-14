@@ -13,9 +13,11 @@ from pathlib import Path
 import yaml
 from fastapi import Request
 
-from backend.records.store import RecordStore
+from backend.downlink.queue import DownlinkQueue
 from backend.orchestrator import load_rules
 from backend.pipelines.a_statistical.baseline import compute_baseline
+from backend.records.signing import require_signing_key
+from backend.records.store import RecordStore
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _DEFAULT_BASELINES_PATH = (
@@ -51,10 +53,13 @@ class AppState:
     rules: dict
     baselines: dict
     policy_actions: list[str]
+    signing_key: str = ""
     store: RecordStore = field(default_factory=RecordStore)
+    queue: DownlinkQueue = field(default_factory=DownlinkQueue)
 
     @classmethod
     def load(cls) -> "AppState":
+        signing_key = require_signing_key()
         rules = load_rules()
         # Fails loudly if policy.yaml is missing or unreadable: the app must
         # not serve requests without a valid policy.
@@ -66,7 +71,9 @@ class AppState:
             rules=rules,
             baselines=load_all_baselines(),
             policy_actions=list(policy["actions"]),
+            signing_key=signing_key,
             store=RecordStore(os.environ.get("RECORDS_PATH") or None),
+            queue=DownlinkQueue(),
         )
 
 

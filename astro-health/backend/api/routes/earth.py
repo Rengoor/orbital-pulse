@@ -38,7 +38,7 @@ def _rules_with(state: AppState, override: dict | None) -> dict:
 def verify(record_id: str, state: AppState = Depends(get_state)) -> dict:
     """Walk the hash chain from genesis to this record."""
     _require_record(state, record_id)
-    return verify_chain(state.store.all(), upto_record_id=record_id)
+    return verify_chain(state.store.all(), upto_record_id=record_id, signing_key=state.signing_key)
 
 
 @router.get("/anchor")
@@ -71,7 +71,12 @@ def replay_record(body: ReplayRequest, state: AppState = Depends(get_state)) -> 
     """
     record = _require_record(state, body.record_id)
     try:
-        return replay(record, state.baselines, _rules_with(state, body.rules_override))
+        return replay(
+            record,
+            state.baselines,
+            _rules_with(state, body.rules_override),
+            signing_key=state.signing_key,
+        )
     except _BAD_RULES as exc:
         raise HTTPException(status_code=422, detail=f"rules override is not usable: {exc}") from exc
 
@@ -88,7 +93,14 @@ def review(body: ReviewRequest, state: AppState = Depends(get_state)) -> dict:
     """Attach a signed, simulated ground review to a Record (in the review chain)."""
     _require_record(state, body.record_id)
     return state.store.add_review(
-        build_review(body.record_id, body.outcome, note=body.cmo_note, reviewer=body.reviewer)
+        build_review(
+            body.record_id,
+            body.outcome,
+            note=body.cmo_note,
+            reviewer=body.reviewer,
+            signing_key=state.signing_key,
+        ),
+        signing_key=state.signing_key,
     )
 
 
@@ -107,3 +119,35 @@ def rulechange_diff(body: RuleChangeRequest, state: AppState = Depends(get_state
         return rulechange(records, state.baselines, _rules_with(state, body.rules_override))
     except _BAD_RULES as exc:
         raise HTTPException(status_code=422, detail=f"rules override is not usable: {exc}") from exc
+
+
+@router.get("/downlink")
+def downlink_pending(state: AppState = Depends(get_state)) -> dict:
+    """Return pending downlink summaries (urgent first) and automatically produced chain anchors."""
+    return {
+        "pending": state.queue.pending(),
+        "anchors": state.queue.anchors(),
+    }
+
+
+class DownlinkReleaseRequest(BaseModel):
+    one_way_delay_s: float = 0.0
+    max_items: int | None = None
+    flush: bool = False
+
+
+@router.post("/downlink/release")
+def downlink_release(body: DownlinkReleaseRequest, state: AppState = Depends(get_state)) -> dict:
+    """Release sendable downlink summaries for the given link delay, along with the latest chain anchor."""
+    if body.one_way_delay_s < 0:
+        raise HTTPException(status_code=422, detail="one_way_delay_s must be non-negative")
+    sent = state.queue.release(
+        one_way_delay_s=body.one_way_delay_s,
+        max_items=body.max_items,
+        flush=body.flush,
+    )
+    return {
+        "sent": sent,
+        "pending_count": len(state.queue),
+        "latest_anchor": state.queue.latest_anchor(),
+    }

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · Button</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/vitalis.css">
+
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/vitalis.js"></script>
+</head>
+<body>
+<div id="root" class="vt-stage" style="align-items:center"></div>
+<script>
+  var V = window.Vitalis, h = React.createElement;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(V.Button, { variant: 'primary', icon: 'antenna' }, 'Contact ground'),
+    h(V.Button, { variant: 'secondary', icon: 'cube' }, 'Enter AR'),
+    h(V.Button, { variant: 'ghost' }, 'Details'),
+    h(V.Button, { variant: 'secondary', size: 'sm' }, 'Recheck'),
+    h(V.Button, { variant: 'primary', disabled: true }, 'Sending')
+  ));
+</script>
+</body>
+</html>

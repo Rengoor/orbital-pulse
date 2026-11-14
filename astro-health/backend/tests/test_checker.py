@@ -23,6 +23,8 @@ from backend.checker.checker import (
 from backend.checker.gates import (
     SEVERITY_ORDER,
     TIER_ORDER,
+    detect_contradictions,
+    drop_confirmed_fault_readings,
     gate_data_fault,
     gate_grey_escalation,
     gate_whitelist,
@@ -133,13 +135,40 @@ def test_worst_of_gate(proposals):
 # gate_data_fault
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize(
-    "current,expected",
-    [("GREY", "RED"), ("RED", "YELLOW"), ("YELLOW", "GREEN"), ("GREEN", "GREEN")],
-)
-def test_gate_data_fault_lowers_exactly_one_step_when_unanimous(current, expected):
-    proposals = [_proposal(current, data_fault=True), _proposal("GREEN", data_fault=True)]
-    assert gate_data_fault(proposals, current) == expected
+def test_gate_data_fault_never_lowers_grey_even_when_unanimous():
+    proposals = [
+        _proposal("GREY", data_fault=True, reading_ids=["r1"]),
+        _proposal("RED", data_fault=True, reading_ids=["r1"]),
+    ]
+    assert gate_data_fault(proposals, "GREY", readings=[_reading("r1", "fault")]) == "GREY"
+
+
+def test_gate_data_fault_drops_confirmed_fault_and_reevaluates_on_what_remains():
+    readings = [_reading("r1", "fault"), _reading("r2", "ok")]
+    proposals = [
+        _proposal("RED", data_fault=True, pipeline_id="a", reading_ids=["r1"]),
+        _proposal("YELLOW", data_fault=True, pipeline_id="b", reading_ids=["r1"]),
+    ]
+    remaining, dropped = drop_confirmed_fault_readings(readings, proposals)
+    assert dropped == {"r1"}
+    assert [r["id"] for r in remaining] == ["r2"]
+
+    tier = gate_data_fault(
+        proposals,
+        "RED",
+        readings=readings,
+        reevaluate=lambda rem: [_proposal("YELLOW" if any(r["id"] == "r2" for r in rem) else "GREEN")],
+    )
+    assert tier == "YELLOW"
+
+
+def test_gate_data_fault_when_all_readings_dropped_returns_green():
+    readings = [_reading("r1", "fault")]
+    proposals = [
+        _proposal("RED", data_fault=True, pipeline_id="a", reading_ids=["r1"]),
+        _proposal("YELLOW", data_fault=True, pipeline_id="b", reading_ids=["r1"]),
+    ]
+    assert gate_data_fault(proposals, "RED", readings=readings) == "GREEN"
 
 
 @pytest.mark.parametrize("current", TIERS)
@@ -149,20 +178,21 @@ def test_gate_data_fault_holds_when_one_pipeline_disagrees(current):
 
 
 def test_gate_data_fault_requires_boolean_true():
-    # A truthy non-boolean must not unlock a downgrade.
+    # A truthy non-boolean must not unlock fault dropping.
     proposals = [{**_proposal("RED"), "data_fault": "yes"}]
     assert gate_data_fault(proposals, "RED") == "RED"
 
 
 @given(proposals=st.lists(proposal_st, min_size=1, max_size=8))
 def test_data_fault_safety(proposals):
-    """Tier is lowered only when ALL proposals agree data_fault=True, and by one step."""
+    """Tier is lowered only when ALL proposals agree data_fault=True, and GREY never steps down."""
     worst = gate_worst_of(proposals)
     after = gate_data_fault(proposals, worst)
     assert TIER_ORDER[after] <= TIER_ORDER[worst]
-    assert TIER_ORDER[worst] - TIER_ORDER[after] <= 1
+    if worst == "GREY":
+        assert after == "GREY"
     if TIER_ORDER[after] < TIER_ORDER[worst]:
-        assert all(p["data_fault"] for p in proposals)
+        assert all(p["data_fault"] is True for p in proposals)
 
 
 # ---------------------------------------------------------------------------
@@ -193,10 +223,47 @@ def test_gate_whitelist_escalates_when_action_is_not_listed(action, whitelist, e
     whitelist=st.lists(st.sampled_from(SEVERITY_ORDER), min_size=1, unique=True),
 )
 def test_gate_whitelist_never_picks_a_milder_action_when_a_stronger_one_is_listed(action, whitelist):
-    chosen = gate_whitelist(action, whitelist)
+    chosen = gate_whitelist(action, whitelist, action_order=_POLICY["action_order"])
     assert chosen in whitelist
     if any(SEVERITY_ORDER.index(a) >= SEVERITY_ORDER.index(action) for a in whitelist):
         assert SEVERITY_ORDER.index(chosen) >= SEVERITY_ORDER.index(action)
+
+
+def test_gate_whitelist_reads_action_strength_order_from_policy(tmp_path):
+    policy = copy.deepcopy(_POLICY)
+    # Custom policy action_order where USE_PROTOCOL_CARD is ranked above ALERT_CMO
+    policy["action_order"] = [
+        "NO_ACTION",
+        "RECHECK_IN_1H",
+        "REST_AND_HYDRATE",
+        "ALERT_CMO",
+        "USE_PROTOCOL_CARD",
+        "CONTACT_GROUND_URGENT",
+    ]
+    policy["actions"] = ["NO_ACTION", "USE_PROTOCOL_CARD", "CONTACT_GROUND_URGENT"]
+    path = tmp_path / "policy.yaml"
+    path.write_text(yaml.safe_dump(policy))
+    verdict = check([_proposal("RED")], [], str(path))
+    assert verdict["action"] == "USE_PROTOCOL_CARD"
+
+
+# ---------------------------------------------------------------------------
+# Contradiction detection with tolerance band
+# ---------------------------------------------------------------------------
+
+def test_contradiction_within_tolerance_band_does_not_escalate():
+    r1 = {**_reading("r1"), "channel": "heart_rate", "value": 72.0}
+    r2 = {**_reading("r2"), "channel": "heart_rate", "value": 74.5}  # diff 2.5 <= 3.0 tolerance
+    assert detect_contradictions([r1, r2]) == set()
+    assert gate_grey_escalation([r1, r2], [_proposal("GREEN")], "GREEN") == "GREEN"
+
+
+def test_contradiction_beyond_tolerance_band_escalates_to_grey():
+    r1 = {**_reading("r1"), "channel": "heart_rate", "value": 72.0}
+    r2 = {**_reading("r2"), "channel": "heart_rate", "value": 80.0}  # diff 8.0 > 3.0 tolerance
+    assert detect_contradictions([r1, r2]) == {"r1", "r2"}
+    assert gate_grey_escalation([r1, r2], [_proposal("GREEN")], "GREEN") == "GREY"
+    assert check([_proposal("GREEN")], [r1, r2], POLICY_PATH)["tier"] == "GREY"
 
 
 # ---------------------------------------------------------------------------
@@ -278,16 +345,19 @@ def test_default_action_per_tier_comes_from_policy():
         # pipelines disagree: escalation wins
         ([_proposal("GREEN", pipeline_id="a"), _proposal("RED", pipeline_id="b")], [_reading("r1")],
          "RED", "ALERT_CMO"),
-        # unanimous confirmed data fault: one step down, no further
+        # unanimous confirmed data fault drops the faulted reading and re-evaluates on what remains
         ([_proposal("RED", True, "a", ["r1"]), _proposal("YELLOW", True, "b", ["r1"])], [_reading("r1", "fault")],
-         "YELLOW", "REST_AND_HYDRATE"),
-        # only one pipeline says data fault: no downgrade
+         "GREEN", "NO_ACTION"),
+        # unanimous confirmed data fault never steps GREY down to RED
+        ([_proposal("GREY", True, "a", ["r1"]), _proposal("RED", True, "b", ["r1"])], [_reading("r1", "fault")],
+         "GREY", "CONTACT_GROUND_URGENT"),
+        # only one pipeline says data fault: no drop
         ([_proposal("RED", True, "a", ["r1"]), _proposal("GREEN", False, "b")], [_reading("r1", "fault")],
          "RED", "ALERT_CMO"),
         # fault reading nobody vouches for: GREY, even from GREEN
         ([_proposal("GREEN", pipeline_id="a")], [_reading("r1", "fault")],
          "GREY", "CONTACT_GROUND_URGENT"),
-        # downgrade happens first, then the unclaimed fault still forces GREY
+        # confirmed fault drops r1, but unclaimed fault r2 still forces GREY
         ([_proposal("RED", True, "a", ["r1"])], [_reading("r1", "fault"), _reading("r2", "fault")],
          "GREY", "CONTACT_GROUND_URGENT"),
         # a dead pipeline reports GREY
@@ -344,10 +414,11 @@ def test_action_whitelist(proposals, readings):
 
 
 @given(proposals=st.lists(proposal_st, min_size=1, max_size=8), readings=readings_st)
-def test_verdict_never_more_than_one_step_below_worst_proposal(proposals, readings):
+def test_verdict_never_steps_down_grey_and_holds_worst_without_unanimous_fault(proposals, readings):
     verdict = check(proposals, readings, POLICY_PATH)
     worst = max(TIER_ORDER[p["tier"]] for p in proposals)
-    assert TIER_ORDER[verdict["tier"]] >= worst - 1
+    if worst == TIER_ORDER["GREY"]:
+        assert verdict["tier"] == "GREY"
     if not all(p["data_fault"] for p in proposals):
         assert TIER_ORDER[verdict["tier"]] >= worst
 

@@ -7,6 +7,7 @@ Owner: person A and person B
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Callable
 from pathlib import Path
 
 import yaml
@@ -15,6 +16,7 @@ from backend.checker.gates import (
     PIPELINE_NOT_RUNNING,
     PIPELINE_OK,
     TIER_ORDER,
+    confirmed_fault_reading_ids,
     gate_data_fault,
     gate_data_requirements,
     gate_grey_escalation,
@@ -66,7 +68,16 @@ def _default_action(tier: str, policy: dict) -> str:
     return policy.get("default_actions", {}).get(tier, _FALLBACK_ACTION)
 
 
-def _adjudicate_tier(proposals: list[dict], readings: list[dict], steps: list[dict] | None = None) -> str:
+Reevaluate = Callable[[list[dict]], list[dict]]
+
+
+def _adjudicate_tier(
+    proposals: list[dict],
+    readings: list[dict],
+    steps: list[dict] | None = None,
+    tolerances: dict[str, float] | None = None,
+    reevaluate: Reevaluate | None = None,
+) -> str:
     """Gates 1-3 in order: worst_of -> data_fault -> grey_escalation."""
 
     def note(gate: str, before: str | None, after: str, detail: str) -> None:
@@ -84,30 +95,34 @@ def _adjudicate_tier(proposals: list[dict], readings: list[dict], steps: list[di
     tier = gate_worst_of(proposals)
     note("worst_of", None, tier, "most severe tier proposed by any pipeline")
 
-    lowered = gate_data_fault(proposals, tier)
+    lowered = gate_data_fault(proposals, tier, readings=readings, reevaluate=reevaluate)
     note(
         "data_fault",
         tier,
         lowered,
-        "every pipeline confirmed a data fault: one step down"
+        "every pipeline confirmed a data fault: those readings were dropped and the rest re-evaluated"
         if lowered != tier
-        else "no unanimous data fault: tier stands",
+        else "no confirmed data fault changed the tier",
     )
     tier = lowered
 
-    escalated = gate_grey_escalation(readings, proposals, tier)
+    escalated = gate_grey_escalation(readings, proposals, tier, tolerances=tolerances)
     note(
         "grey_escalation",
         tier,
         escalated,
-        "a sensor-reported fault that no pipeline accounts for"
+        "a sensor-reported fault that no pipeline accounts for, or readings that contradict each other"
         if escalated != tier
-        else "no unexplained sensor fault",
+        else "no unexplained sensor fault or contradiction",
     )
     return escalated
 
 
-def _known_severity(proposals: list[dict]) -> str | None:
+def _known_severity(
+    proposals: list[dict],
+    readings: list[dict] | None = None,
+    reevaluate: Reevaluate | None = None,
+) -> str | None:
     """Worst medical severity among proposals that could assess the data.
 
     GREY proposals say "I cannot tell", so they contribute nothing here. The
@@ -116,7 +131,7 @@ def _known_severity(proposals: list[dict]) -> str | None:
     known = [p for p in proposals if p["tier"] != UNVERIFIABLE]
     if not known:
         return None
-    return gate_data_fault(proposals, gate_worst_of(known))
+    return gate_data_fault(proposals, gate_worst_of(known), readings=readings, reevaluate=reevaluate)
 
 
 def _disagreement_status(tier: str, proposals: list[dict], pipeline_status: dict | None) -> str:
@@ -152,12 +167,15 @@ def check(
     policy_path: str,
     integrity: dict | None = None,
     pipeline_status: dict[str, str] | None = None,
+    *,
+    reevaluate: Reevaluate | None = None,
 ) -> dict:
     """Apply gates in order and return a schema-validated Verdict.
 
     Gate order:
       1. gate_worst_of(proposals)        → tier
-      2. gate_data_fault(proposals, tier) → tier (may lower by one step)
+      2. gate_data_fault(proposals, tier) → tier (a fault every pipeline confirms
+         drops those readings and re-evaluates on the rest; never a blind step down)
       3. gate_grey_escalation(readings, proposals, tier) → tier (may raise to GREY)
          (then the advisory floor: never below the tier the non-LLM pipelines
          reach on their own)
@@ -185,6 +203,9 @@ def check(
     pipeline_status:
         ``{pipeline_id: status}`` from the orchestrator. When omitted, gate 5
         is skipped.
+    reevaluate:
+        ``reevaluate(remaining_readings) -> proposals``: re-runs the pipelines
+        on what is left after confirmed-fault readings are dropped.
 
     Returns
     -------
@@ -201,18 +222,20 @@ def check(
     # --- Load policy and compute the ruleset hash over the bytes parsed --------
     policy, ruleset_hash = load_policy(policy_path)
     policy_actions: list[str] = policy.get("actions", [])
+    action_order: list[str] | None = policy.get("action_order")
+    tolerances: dict[str, float] | None = policy.get("contradiction_tolerances")
 
     # --- Gates 1-3 -----------------------------------------------------------
     steps: list[dict] = []
-    tier = _adjudicate_tier(proposals, readings, steps)
+    tier = _adjudicate_tier(proposals, readings, steps, tolerances=tolerances, reevaluate=reevaluate)
 
     # Advisory floor: the verdict is never lower than what the non-advisory
     # pipelines produce on their own, so an advisory (LLM) proposal can raise
     # the tier but can never lower it, whatever it claims about data faults.
     core = [p for p in proposals if p.get("pipeline_id") not in ADVISORY_PIPELINE_IDS]
-    known = _known_severity(proposals)
+    known = _known_severity(proposals, readings, reevaluate)
     if core and len(core) != len(proposals):
-        core_tier = _adjudicate_tier(core, readings)
+        core_tier = _adjudicate_tier(core, readings, tolerances=tolerances, reevaluate=reevaluate)
         floored = core_tier if TIER_ORDER[core_tier] > TIER_ORDER[tier] else tier
         steps.append(
             {
@@ -224,7 +247,7 @@ def check(
             }
         )
         tier = floored
-        core_known = _known_severity(core)
+        core_known = _known_severity(core, readings, reevaluate)
         if core_known is not None and (known is None or TIER_ORDER[core_known] > TIER_ORDER[known]):
             known = core_known
 
@@ -232,6 +255,20 @@ def check(
     unverifiable: list[str] = []
     data_reasons: list[str] = []
     if integrity is not None:
+        # Fault correction is not medical recovery: a reading dropped as a
+        # confirmed fault no longer counts as evidence. If too little is left,
+        # the data requirements below fail and the verdict is GREY, not GREEN.
+        dropped = confirmed_fault_reading_ids(proposals, readings)
+        if dropped:
+            integrity = {
+                **integrity,
+                "readings": [
+                    {**e, "status": "confirmed_fault", "issues": [*e["issues"], "confirmed_data_fault"]}
+                    if e["reading_id"] in dropped and e["status"] in ("valid", "fault")
+                    else e
+                    for e in integrity["readings"]
+                ],
+            }
         found = data_reasons = gate_data_requirements(integrity, policy.get("data_requirements") or {})
         unverifiable += found
         steps.append(
@@ -263,12 +300,12 @@ def check(
             tier = UNVERIFIABLE
 
     # --- Gates 6-7: the one authorized action ----------------------------------
-    action = gate_whitelist(_default_action(tier, policy), policy_actions)
+    action = gate_whitelist(_default_action(tier, policy), policy_actions, action_order=action_order)
 
     # What is known must not be lost because something else is unknown.
     additional_actions: list[str] = []
     if tier == UNVERIFIABLE and known is not None:
-        known_action = gate_whitelist(_default_action(known, policy), policy_actions)
+        known_action = gate_whitelist(_default_action(known, policy), policy_actions, action_order=action_order)
         mildest = (policy.get("severity_order") or ["GREEN"])[0]
         if known != mildest and known_action != action:
             additional_actions.append(known_action)

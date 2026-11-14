@@ -1,0 +1,76 @@
+/* Vitalis — generated from tokens.json */
+:root, [data-theme="night"] {
+  --void: #070b10;
+  --hull: #0e151d;
+  --hull-raised: #15202b;
+  --line: #22313f;
+  --line-strong: #4a6a88;
+  --ink: #e8eef3;
+  --ink-muted: #8ea2b4;
+  --holo: #4fe0d0;
+  --holo-wash: rgba(79,224,208,0.12);
+  --signal: #ff6a2b;
+  --on-signal: #1a0a02;
+  --tier-green: #5be37d;
+  --tier-yellow: #ffd23f;
+  --tier-red: #ff4d5e;
+  --tier-grey: #8a96a3;
+  --tier-green-wash: rgba(91,227,125,0.12);
+  --tier-yellow-wash: rgba(255,210,63,0.12);
+  --tier-red-wash: rgba(255,77,94,0.14);
+  --tier-grey-wash: rgba(138,150,163,0.12);
+  --sim: #c6a6ff;
+  --glow-holo: 0 0 24px rgba(79,224,208,0.35);
+  --glow-alert: 0 0 28px rgba(255,77,94,0.45);
+  --panel: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 32px rgba(0,0,0,0.45);
+}
+[data-theme="day"] {
+  --void: #eef1f4;
+  --hull: #ffffff;
+  --hull-raised: #f6f8fa;
+  --line: #d5dde4;
+  --line-strong: #7a8b9b;
+  --ink: #0b1620;
+  --ink-muted: #4a5b6b;
+  --holo: #0a7d73;
+  --holo-wash: rgba(10,125,115,0.08);
+  --signal: #c94a12;
+  --on-signal: #ffffff;
+  --tier-green: #1d7a3a;
+  --tier-yellow: #8a6100;
+  --tier-red: #c4172c;
+  --tier-grey: #5f6b78;
+  --tier-green-wash: rgba(29,122,58,0.08);
+  --tier-yellow-wash: rgba(138,97,0,0.09);
+  --tier-red-wash: rgba(196,23,44,0.08);
+  --tier-grey-wash: rgba(95,107,120,0.08);
+  --sim: #6b3fc4;
+  --glow-holo: 0 0 0 1px rgba(10,125,115,0.25);
+  --glow-alert: 0 0 0 2px rgba(196,23,44,0.35);
+  --panel: 0 1px 2px rgba(11,22,32,0.08), 0 8px 24px rgba(11,22,32,0.06);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 999px;
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+.display-xl { font-family: var(--font-display); font-size: 56px; line-height: 1; font-weight: 600; letter-spacing: -0.02em; }
+.display { font-family: var(--font-display); font-size: 32px; line-height: 36px; font-weight: 600; letter-spacing: -0.01em; }
+.title { font-family: var(--font-display); font-size: 18px; line-height: 24px; font-weight: 500; }
+.body { font-family: var(--font-sans); font-size: 15px; line-height: 22px; font-weight: 400; }
+.body-sm { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.label { font-family: var(--font-sans); font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.14em; }
+.readout-xl { font-family: var(--font-mono); font-size: 44px; line-height: 1; font-weight: 500; letter-spacing: -0.02em; }
+.readout { font-family: var(--font-mono); font-size: 22px; line-height: 26px; font-weight: 500; }
+.data { font-family: var(--font-mono); font-size: 12px; line-height: 16px; font-weight: 400; }

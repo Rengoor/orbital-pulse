@@ -245,8 +245,8 @@ def test_call_llm_talks_only_to_the_local_server(monkeypatch):
 
     seen = {}
 
-    def fake_post(url, json, timeout):
-        seen.update(url=url, body=json)
+    def fake_post(url, json, timeout, **kwargs):
+        seen.update(url=url, body=json, kwargs=kwargs)
         request = httpx.Request("POST", url)
         return httpx.Response(200, json={"message": {"content": "reply text"}}, request=request)
 
@@ -258,6 +258,7 @@ def test_call_llm_talks_only_to_the_local_server(monkeypatch):
     assert seen["url"] == "http://localhost:11434/api/chat"
     assert seen["body"]["model"] == llm_pipeline.DEFAULT_MODEL
     assert seen["body"]["stream"] is False
+    assert seen["kwargs"].get("trust_env") is False
     assert [m["role"] for m in seen["body"]["messages"]] == ["system", "user"]
 
     monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:9999/")
@@ -265,6 +266,25 @@ def test_call_llm_talks_only_to_the_local_server(monkeypatch):
     llm_pipeline.call_llm("s", "u")
     assert seen["url"] == "http://127.0.0.1:9999/api/chat"
     assert seen["body"]["model"] == "mistral"
+
+
+@pytest.mark.parametrize(
+    "remote_host",
+    [
+        "https://api.openai.com",
+        "http://192.168.1.50:11434",
+        "http://10.0.0.5:11434",
+        "http://example.com:11434",
+        "https://localhost:11434",
+    ],
+)
+def test_call_llm_rejects_any_non_loopback_host(monkeypatch, remote_host):
+    monkeypatch.setenv("OLLAMA_HOST", remote_host)
+    with pytest.raises(ValueError, match="loopback"):
+        llm_pipeline.call_llm("s", "u")
+
+    monkeypatch.setenv("LLM_ENABLED", "1")
+    assert llm_pipeline.run([_reading()], {"now": _NOW}) is None
 
 
 def test_pipeline_returns_none_when_no_local_server_is_running(monkeypatch):

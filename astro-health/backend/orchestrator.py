@@ -317,16 +317,31 @@ def decide(
         policy, policy_hash = load_policy(policy_path)
 
         # Stage 1: which readings are usable at all.
-        integrity = input_gate.evaluate(readings, now, policy.get("data_requirements") or {})
+        integrity = input_gate.evaluate(
+            readings,
+            now,
+            policy.get("data_requirements") or {},
+            tolerances=policy.get("contradiction_tolerances"),
+        )
         usable = input_gate.usable_readings(readings, integrity)
 
         # Stage 2: blind pipelines. Shared context is baselines, rules, now -
         # never another pipeline's output.
         context = {"baselines": own_baselines, "rules": rules, "now": now}
-        proposals, pipeline_status = _run_pipelines(usable, context, policy.get("pipelines") or {})
+        pipeline_policy = policy.get("pipelines") or {}
+        proposals, pipeline_status = _run_pipelines(usable, context, pipeline_policy)
 
         # Stage 3: the referee.
-        verdict = check(proposals, usable, policy_path, integrity=integrity, pipeline_status=pipeline_status)
+        verdict = check(
+            proposals,
+            usable,
+            policy_path,
+            integrity=integrity,
+            pipeline_status=pipeline_status,
+            # When every pipeline confirms a data fault, the Checker drops those
+            # readings and asks for a fresh assessment of what remains.
+            reevaluate=lambda remaining: _run_pipelines(remaining, context, pipeline_policy)[0],
+        )
     except Exception as exc:  # noqa: BLE001 - the governance layer failed: fail safe, never open
         logger.exception("decide() could not complete; issuing the fail-safe verdict")
         verdict = failsafe_verdict(f"{type(exc).__name__}: {exc}")
