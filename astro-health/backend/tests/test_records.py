@@ -259,11 +259,17 @@ def test_a_failed_build_appends_nothing(store):
 
 
 def test_store_offers_no_way_to_update_or_delete():
+    # Records, reviews and acks are append-only chains with no update or
+    # delete. The downlink_* methods manage the transient send queue, whose
+    # rows are summaries removed when sent; the chained originals stay.
     public = {name for name in dir(RecordStore) if not name.startswith("_")}
     assert public == {
-        "add_review", "all", "append_with", "close", "get", "latest", "list",
-        "reviews", "verify_chain", "verify_reviews",
+        "add_ack", "add_review", "acks", "all", "append_with", "close",
+        "downlink_add", "downlink_load", "downlink_remove", "get", "latest",
+        "list", "reviews", "verify_acks", "verify_chain", "verify_reviews",
     }
+    chain_methods = public - {"downlink_add", "downlink_load", "downlink_remove", "close"}
+    assert not any(m.startswith(("update", "delete", "remove")) for m in chain_methods)
 
 
 def test_records_survive_reopening_the_file(tmp_path):

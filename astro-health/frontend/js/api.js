@@ -117,6 +117,15 @@
         flush: !!flush
       });
     },
+    ack: function (recordId, acknowledgedBy, note) {
+      return request('POST', '/records/' + encodeURIComponent(recordId) + '/ack', {
+        acknowledged_by: acknowledgedBy,
+        note: note || ''
+      });
+    },
+    acks: function (recordId) {
+      return request('GET', '/records/' + encodeURIComponent(recordId) + '/acks');
+    },
     trust: function (recordId) {
       return request('GET', '/records/' + encodeURIComponent(recordId) + '/trust');
     },

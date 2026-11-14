@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 from fastapi import Request
 
-from backend.downlink.queue import DownlinkQueue
+from backend.downlink.queue import DownlinkQueue, PersistentDownlinkQueue
 from backend.orchestrator import load_rules
 from backend.pipelines.a_statistical.baseline import compute_baseline
 from backend.records.signing import require_signing_key
@@ -67,13 +67,16 @@ class AppState:
             policy = yaml.safe_load(f)
         if not isinstance(policy, dict) or not policy.get("actions"):
             raise RuntimeError(f"{rules['policy_path']} has no 'actions' whitelist")
+        store = RecordStore(os.environ.get("RECORDS_PATH") or None)
         return cls(
             rules=rules,
             baselines=load_all_baselines(),
             policy_actions=list(policy["actions"]),
             signing_key=signing_key,
-            store=RecordStore(os.environ.get("RECORDS_PATH") or None),
-            queue=DownlinkQueue(),
+            store=store,
+            # Writes through to the store, so with RECORDS_PATH set a restart
+            # no longer drops queued (possibly urgent) downlink summaries.
+            queue=PersistentDownlinkQueue(store),
         )
 
 

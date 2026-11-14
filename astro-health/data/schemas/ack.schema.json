@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ack.schema.json",
+  "title": "Acknowledgement",
+  "description": "v0.1: an astronaut (or the CMO) confirming they have seen a verdict. New schema added 2026-11; additive changes only from here.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "acknowledged_by",
+    "ts",
+    "signature"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "acknowledged_by": {
+      "type": "string",
+      "description": "Who confirmed seeing the verdict, e.g. the astronaut's own id or the CMO's."
+    },
+    "note": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "string"
+    }
+  }
+}

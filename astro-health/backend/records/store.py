@@ -31,6 +31,20 @@ CREATE TABLE IF NOT EXISTS reviews (
     record_id TEXT NOT NULL,
     body      TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS acks (
+    seq       INTEGER PRIMARY KEY AUTOINCREMENT,
+    record_id TEXT NOT NULL,
+    body      TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS downlink_pending (
+    arrival   INTEGER PRIMARY KEY,
+    record_id TEXT NOT NULL,
+    body      TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS downlink_anchors (
+    seq       INTEGER PRIMARY KEY AUTOINCREMENT,
+    body      TEXT NOT NULL
+);
 """
 
 
@@ -145,3 +159,63 @@ class RecordStore:
                 return False, position
             prev_hash = review["hash"]
         return True, None
+
+    # -- acknowledgements ------------------------------------------------------
+
+    def add_ack(self, ack: dict, signing_key: str | None = None) -> dict:
+        """Seal *ack* into the acknowledgement chain and store it."""
+        with self._lock:
+            sealed = seal(ack, self._head_hash("acks"), signing_key=signing_key)
+            with self._conn:
+                self._conn.execute(
+                    "INSERT INTO acks (record_id, body) VALUES (?, ?)",
+                    (sealed["record_id"], json.dumps(sealed, sort_keys=True)),
+                )
+            return sealed
+
+    def acks(self, record_id: str | None = None) -> list[dict]:
+        """Acknowledgements, oldest first, optionally for one Record."""
+        if record_id is None:
+            return self._rows("SELECT body FROM acks ORDER BY seq")
+        return self._rows("SELECT body FROM acks WHERE record_id = ? ORDER BY seq", (record_id,))
+
+    def verify_acks(self) -> tuple[bool, int | None]:
+        """(valid, position of the first broken ack) for the acknowledgement chain."""
+        prev_hash = GENESIS
+        for position, ack in enumerate(self.acks()):
+            if ack.get("prev_hash") != prev_hash or not verify_entry(ack):
+                return False, position
+            prev_hash = ack["hash"]
+        return True, None
+
+    # -- downlink queue persistence -------------------------------------------
+
+    def downlink_load(self) -> tuple[list[tuple[int, dict]], list[dict]]:
+        """((arrival, summary) rows oldest first, anchors oldest first)."""
+        with self._lock:
+            pending = [
+                (row[0], json.loads(row[1]))
+                for row in self._conn.execute(
+                    "SELECT arrival, body FROM downlink_pending ORDER BY arrival"
+                )
+            ]
+        anchors = self._rows("SELECT body FROM downlink_anchors ORDER BY seq")
+        return pending, anchors
+
+    def downlink_add(self, arrival: int, summary: dict, anchor: dict) -> None:
+        with self._lock, self._conn:
+            self._conn.execute(
+                "INSERT INTO downlink_pending (arrival, record_id, body) VALUES (?, ?, ?)",
+                (arrival, summary["record_id"], json.dumps(summary, sort_keys=True)),
+            )
+            self._conn.execute(
+                "INSERT INTO downlink_anchors (body) VALUES (?)",
+                (json.dumps(anchor, sort_keys=True),),
+            )
+
+    def downlink_remove(self, record_ids: list[str]) -> None:
+        with self._lock, self._conn:
+            self._conn.executemany(
+                "DELETE FROM downlink_pending WHERE record_id = ?",
+                [(record_id,) for record_id in record_ids],
+            )

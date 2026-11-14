@@ -101,3 +101,32 @@ class DownlinkQueue:
         sent_ids = {s["record_id"] for s in sendable}
         self._pending = [item for item in self._pending if item[1]["record_id"] not in sent_ids]
         return sendable
+
+
+class PersistentDownlinkQueue(DownlinkQueue):
+    """A DownlinkQueue whose pending summaries and anchors survive a restart.
+
+    Every enqueue and release writes through to the given RecordStore, and
+    construction loads whatever an earlier process left behind. With an
+    in-memory store this behaves exactly like the plain queue; with
+    RECORDS_PATH set, a restart no longer silently drops queued summaries
+    (which would have lost un-downlinked urgent traffic).
+    """
+
+    def __init__(self, store, long_delay_s: float = LONG_DELAY_S) -> None:
+        super().__init__(long_delay_s)
+        self._store = store
+        self._pending, self._anchors = store.downlink_load()
+        self._arrivals = max((arrival for arrival, _ in self._pending), default=-1) + 1
+
+    def enqueue(self, record: dict, signing_key: str | None = None) -> dict:
+        arrival = self._arrivals
+        summary = super().enqueue(record, signing_key=signing_key)
+        self._store.downlink_add(arrival, summary, self._anchors[-1])
+        return summary
+
+    def release(self, one_way_delay_s: float, max_items: int | None = None, flush: bool = False) -> list[dict]:
+        sent = super().release(one_way_delay_s, max_items=max_items, flush=flush)
+        if sent:
+            self._store.downlink_remove([s["record_id"] for s in sent])
+        return sent
