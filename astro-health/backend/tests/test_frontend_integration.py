@@ -102,6 +102,9 @@ def test_hud_gestures_are_local_and_layout_only():
     assert "import('./gestures.mjs')" in page
     # A change of status always restores the normal layout.
     assert "layout[1]('normal');" in page
+    # Acknowledge goes to the backend's signed chain; the test hook is opt-in only.
+    assert "API.ack(" in page
+    assert "params.get('gesture_test') === '1'" in page
 
 
 def test_hud_gesture_files_served(client):

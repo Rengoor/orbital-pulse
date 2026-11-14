@@ -16,6 +16,14 @@
   #cam-video { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; transform: scaleX(-1); background: var(--void); z-index: 0; }
   #cam-video[hidden] { display: none; }
   #root { position: relative; z-index: 1; }
+  /* Tracked hand, fingertip cursor and pinch hint, drawn over everything. It never takes
+     clicks. It moves with your hand: a control aid, not health information (project
+     decision; key H hides it). */
+  #hand-overlay { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 3; }
+  /* The button a pinch would press. */
+  .g-hover { outline: 3px solid var(--holo) !important; outline-offset: 2px; }
+  .ack-btn { justify-self: start; min-height: 48px; }
+  .ackd svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
   .visor { position: fixed; inset: 0; overflow: hidden; }
   .visor svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
 
@@ -125,6 +133,7 @@
 <body>
 <div id="root"></div>
 <video id="cam-video" hidden muted playsinline aria-label="Camera view, processed on this device only"></video>
+<canvas id="hand-overlay" aria-hidden="true"></canvas>
 <script>
   /* Helmet HUD. This page decides nothing. Every tier, action and flag on it is
      read from the backend's verdict (GET /status, GET /records/{id}). It holds no
@@ -345,7 +354,16 @@
         failsafe ? h('span', { className: 'mark fail' }, h(I, { name: 'tier-RED' }), 'Decision system failed') : null,
         s.disagreement_status && s.disagreement_status !== 'AGREEMENT' ? h('span', { className: 'mark' }, h(I, { name: 'tier-YELLOW' }), SPLIT[s.disagreement_status] || s.disagreement_status) : null) : null,
       // Verdict age is always shown, so an old verdict is never taken for a live one (App. F.4.3.1 c).
-      h('div', { className: 'txt dim' }, 'Verdict ' + (isFinite(ts) ? utc(ts).slice(4) + ' UTC, ' + age(ts, now) : 'time unknown')));
+      h('div', { className: 'txt dim' }, 'Verdict ' + (isFinite(ts) ? utc(ts).slice(4) + ' UTC, ' + age(ts, now) : 'time unknown')),
+      // Acknowledge ("dismiss"): logs in the backend's signed acknowledgement chain that the
+      // wearer saw this verdict. It never hides or changes the tier or the action.
+      tier === 'GREEN' || !p.ack ? null
+        : p.ack.key && p.ack.key === p.ack.current
+          ? h('div', { className: 'txt ackd' }, h(I, { name: 'check', className: 'c-GREEN' }),
+              'Acknowledged ' + utc(parseTs(p.ack.ts)).slice(4) + ' UTC')
+          : h(V.Button, { size: 'sm', variant: 'secondary', icon: 'check', className: 'ack-btn', 'aria-label': 'Acknowledge this alert',
+              disabled: p.ack.sending, onClick: p.ack.onAck }, p.ack.sending ? 'Acknowledging' : 'Acknowledge'),
+      p.ack && p.ack.err ? h('div', { className: 'txt' }, 'Not acknowledged: ' + p.ack.err) : null);
   }
 
   function Vital(p) {
@@ -384,7 +402,11 @@
     // The camera <video> lives outside the React root (#cam-video): the vendored
     // runtime rebuilds the DOM on every render and has no refs, which would destroy it.
     var gestRef = React.useRef(null);
-    var camVideo = document.getElementById('cam-video');
+    var camVideo = document.getElementById('cam-video'), handCanvas = document.getElementById('hand-overlay');
+    // Gesture callbacks outlive renders, so they read current values through refs.
+    var layoutRef = React.useRef('normal'); layoutRef.current = layout[0];
+    var showHand = React.useState(true), showHandRef = React.useRef(true); showHandRef.current = showHand[0];
+    var acks = React.useState({ key: null, ts: null, sending: false, err: null });
     var LAYOUT_OF = { dock: 'docked', normal: 'normal', expand: 'expanded' };
     var LAYOUT_WORD = { docked: 'Docked', normal: 'Normal', expanded: 'Expanded' };
 
@@ -448,6 +470,7 @@
         if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
         var k = String(e.key).toLowerCase();
         if (k === 'c') { ctlOpen[1](function (o) { return !o; }); return; }
+        if (k === 'h') { showHand[1](function (o) { return !o; }); return; }
         var cmd = { d: 'dock', n: 'normal', e: 'expand' }[k];
         if (cmd) layout[1](LAYOUT_OF[cmd]);
       }
@@ -461,15 +484,81 @@
       return function () { if (gestRef.current) gestRef.current.stop(); };
     }, []);
 
+    // Acknowledgements of the current verdict, read from the backend (never kept locally).
+    var recId = state.record ? state.record.id : null;
+    var recIdRef = React.useRef(null); recIdRef.current = recId;
+    // An acknowledgement covers the status it was made on (same tier, action, extra
+    // actions and the same triggered rules, i.e. the same cause) for as long as that
+    // status lasts, since each check-in is a new record. A different status or a new
+    // cause needs its own. The backend stores each acknowledgement against the exact
+    // record it was made on (project decision).
+    var s0 = state.status, trace0 = state.record && state.record.verdict && state.record.verdict.decision_trace;
+    var statusKey = s0 ? [s0.tier, s0.action].concat(s0.additional_actions || [], ['#'], ((trace0 && trace0.triggered_rules) || []).slice().sort()).join('|') : null;
+    var statusKeyRef = React.useRef(null); statusKeyRef.current = statusKey;
+    function loadAcks(id, key) {
+      API.acks(id).then(function (r) {
+        var list = r.acks || [];
+        if (!list.length || statusKeyRef.current !== key) return;
+        acks[1](function (p) { return Object.assign({}, p, { key: key, ts: list[list.length - 1].ts, sending: false, err: null }); });
+      }).catch(function () { /* the next poll shows NO LINK if the backend is gone */ });
+    }
+    React.useEffect(function () { if (recId) loadAcks(recId, statusKey); }, [recId]);
+    function acknowledge() {
+      if (!recId) return;
+      var id = recId, key = statusKey;
+      acks[1](function (p) { return Object.assign({}, p, { sending: true, err: null }); });
+      API.ack(id, WEARER, 'Acknowledged on the helmet HUD').then(function () { loadAcks(id, key); })
+        .catch(function (e) { acks[1](function (p) { return Object.assign({}, p, { sending: false, err: e.message }); }); });
+    }
+
+    // What a pinch at screen point (x, y) would press: the button under the fingertip,
+    // or nothing (then a pinch collapses or opens the sidebar).
+    var hovered = { el: null };
+    function buttonAt(x, y) {
+      var el = document.elementFromPoint(x, y), b = el && el.closest ? el.closest('button') : null;
+      return b && !b.disabled ? b : null;
+    }
+    function buttonName(b) { return (b.getAttribute('aria-label') || b.textContent || '').trim(); }
+    function describe(x, y) {
+      var b = buttonAt(x, y);
+      if (hovered.el && hovered.el !== b) hovered.el.classList.remove('g-hover');
+      if (b) b.classList.add('g-hover');
+      hovered.el = b;
+      return b ? 'Pinch: ' + buttonName(b) : 'Pinch: ' + (layoutRef.current === 'docked' ? 'open sidebar' : 'collapse sidebar');
+    }
+    function onGesture(c) {
+      var label;
+      if (c.command === 'pinch') {
+        var b = buttonAt(c.x, c.y);
+        if (b) { label = 'Pinch → ' + buttonName(b); b.click(); }
+        else {
+          var next = layoutRef.current === 'docked' ? 'normal' : 'docked';
+          layout[1](next);
+          label = 'Pinch → ' + LAYOUT_WORD[next];
+        }
+      } else {
+        layout[1](LAYOUT_OF[c.command]);
+        label = c.gesture + ' → ' + LAYOUT_WORD[LAYOUT_OF[c.command]];
+      }
+      gest[1](function (p) { return Object.assign({}, p, { last: label }); });
+    }
+
+    // Test hook (only with ?gesture_test=1): lets a headless browser drive the same
+    // pinch and hover handlers a real hand does.
+    if (params.get('gesture_test') === '1') window.HUDGestureTest = { describe: describe, onGesture: onGesture };
+
     function startCamera() {
       gest[1]({ on: false, starting: true, hand: false, last: null, err: null });
       import('./gestures.mjs').then(function (m) {
         return m.startGestures(camVideo, {
-          onCommand: function (c) {
-            layout[1](LAYOUT_OF[c.command]);
-            gest[1](function (p) { return Object.assign({}, p, { last: c.gesture + ' → ' + LAYOUT_WORD[LAYOUT_OF[c.command]] }); });
-          },
-          onHand: function (seen) { gest[1](function (p) { return Object.assign({}, p, { hand: seen }); }); }
+          canvas: handCanvas,
+          describe: describe,
+          showHand: function () { return showHandRef.current; },
+          onCommand: onGesture,
+          onHand: function (seen) {
+            if (!seen && hovered.el) { hovered.el.classList.remove('g-hover'); hovered.el = null; }
+            gest[1](function (p) { return Object.assign({}, p, { hand: seen }); });
+          }
         });
       }).then(function (ctl) {
         gestRef.current = ctl;
@@ -525,7 +614,8 @@
 
         // The health sidebar (right edge) and its tab.
         h('div', { className: 'side', role: 'region', 'aria-label': 'Health status' },
-          h(StatusPlate, { link: state.link, status: state.status, record: state.record, lastTs: state.lastTs, now: now }),
+          h(StatusPlate, { link: state.link, status: state.status, record: state.record, lastTs: state.lastTs, now: now,
+            ack: Object.assign({}, acks[0], { current: statusKey, onAck: acknowledge }) }),
           noVitals || (vitals.length ? h('div', { className: 'vcol' }, vitals.map(function (row) { return h(Vital, { key: row.reading.channel, row: row }); })) : null)),
         h('button', {
           type: 'button', className: 'tab', style: { right: 16 + ({ docked: 236, normal: 340, expanded: 460 })[layout[0]] + 'px' },
@@ -554,8 +644,11 @@
             h(V.Button, { size: 'sm', variant: 'secondary', disabled: !sim[0], onClick: function () { sim[1](null); } }, 'Stop sending')),
           simErr[0] ? h('p', { className: 'note err' }, 'Check-in not accepted: ' + simErr[0]) : null,
           gest[0].err ? h('p', { className: 'note err' }, 'Camera could not start: ' + gest[0].err) : null,
-          h('p', { className: 'note' }, h('b', null, 'Gestures: '), 'swipe right to collapse the sidebar, swipe left or hold a fist to open it, hold an open palm to expand it. Keys D, N, E do the same; C opens these controls. ',
+          h('p', { className: 'note' }, h('b', null, 'Gestures: '), 'point with your index finger to move the ring; pinch (thumb to index) to press the button under it, or pinch on empty space to collapse or open the sidebar. ',
+            'Flat-hand swipe right or left also collapses or opens it; hold an open palm to expand, a fist for normal. Keys D, N, E do the same; C opens these controls; H hides the hand outline. ',
             'A change of status always reopens the sidebar. The camera is processed on this device only.'),
+          h('div', { className: 'ctl-row' },
+            h(V.Button, { size: 'sm', variant: 'secondary', onClick: function () { showHand[1](!showHand[0]); } }, showHand[0] ? 'Hide hand outline' : 'Show hand outline')),
           h('p', { className: 'note' }, h('b', null, 'The HUD decides nothing. '),
             'Tier, action and flags all come from the backend verdict.'))
         : h('div', { className: 'ctl', style: { padding: 'var(--space-2)' } },

@@ -36,14 +36,39 @@ Hand tracking runs on this device with the vendored MediaPipe Gesture Recognizer
 (`../js/vendor/mediapipe/`). No camera frame leaves the page, and nothing is fetched
 from the network. The camera works only on `localhost`/`127.0.0.1` or over https.
 
-| Gesture | Sidebar |
-|---|---|
-| Swipe right | **Docked**: a narrow rail. The tier word, shape and action stay. Only nominal vitals are hidden; a flagged or unusable vital always stays. |
-| Swipe left, or hold a fist | **Normal**: status and up to four vitals |
-| Hold an open palm still | **Expanded**: wider, larger text and values, still at the edge ([V2 11022] 11.1.6.5) |
+Your tracked hand is drawn over the camera image: a skeleton, a ring on your index
+fingertip that fills while you pinch, and a hint saying what a pinch would do there.
+The button under the ring is outlined. Key H (or the button in Demo controls) hides the
+outline. It moves with your hand: it is a control aid, not health information, and the
+"nothing moves" rule (BRAND.md) still holds for everything else (project decision).
 
-The tab on the sidebar's edge, the keys D, N and E, and the buttons in **Demo controls**
-(key C) do the same. Demo controls also hold the scenario simulator and the audio switch.
+| Gesture | Effect |
+|---|---|
+| Point with your index finger | Moves the ring; the button under it is outlined |
+| **Pinch** (thumb to index) on a button | Presses it (e.g. **Acknowledge**, the sidebar tab, any demo control) |
+| **Pinch** on empty space | Collapses the sidebar to the rail, or opens it again |
+| Flat open hand, swipe right / left | Collapse / open the sidebar |
+| Hold an open palm still | **Expanded** sidebar: wider, larger text, still at the edge ([V2 11022] 11.1.6.5) |
+| Hold a fist still | **Normal** sidebar |
+
+The collapsed **rail** keeps the tier word, shape and action. Only nominal vitals are
+hidden; a flagged or unusable vital always stays. The tab on the sidebar's edge, the keys
+D, N and E, and the buttons in **Demo controls** (key C) do the same. Demo controls also
+hold the scenario simulator and the audio switch.
+
+**Acknowledge (dismiss).** A non-GREEN verdict shows an **Acknowledge** button. Pressing it
+(by pinch, click or keyboard) calls `POST /records/{id}/ack`. That logs a signed
+acknowledgement in the backend's own hash-linked chain, so Earth can tell "shown" from
+"confirmed seen". It **never hides or changes the tier or the action**. The HUD then shows
+"Acknowledged hh:mm:ss UTC" for as long as the same status lasts: the same tier, action,
+extra actions and triggered rules, across new check-ins. A different status or a new cause
+(e.g. radiation after heat) shows the button again (project decision).
+
+Pinch detection details (in `TUNING`): the thumb-to-index gap is measured against palm size
+with hysteresis, so a held pinch fires once. The index finger must be extended, so a fist
+never counts. A pinch acts where the fingertip was about 120 ms before it closed, because
+closing the fingers moves the tip. Swipes count only with a flat open hand, so moving a
+pointing finger across the screen never triggers one.
 
 * Gestures change only the sidebar. They never touch a verdict, a reading or the backend.
 * **Any change of status (tier, NO LINK, fail-safe) reopens the normal sidebar at once.** A docked HUD can never keep a new alert out of view (project decision).
