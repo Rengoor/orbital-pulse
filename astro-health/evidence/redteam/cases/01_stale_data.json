@@ -1,0 +1,6 @@
+{
+  "id": "stale_data",
+  "description": "stale data",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+jsonschema
+pyyaml
+numpy
+httpx
+pytest
+# optional: add your LLM provider SDK here if d_llm is enabled

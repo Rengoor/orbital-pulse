@@ -1,0 +1,6 @@
+{
+  "id": "tampered_record",
+  "description": "tampered record",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

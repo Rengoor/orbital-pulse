@@ -1,0 +1,6 @@
+{
+  "id": "missing_baseline",
+  "description": "missing baseline",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

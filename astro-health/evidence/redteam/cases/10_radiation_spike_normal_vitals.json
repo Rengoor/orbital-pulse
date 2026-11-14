@@ -1,0 +1,6 @@
+{
+  "id": "radiation_spike_normal_vitals",
+  "description": "radiation spike normal vitals",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

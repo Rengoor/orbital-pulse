@@ -1,0 +1,6 @@
+{
+  "id": "pipeline_a_killed",
+  "description": "pipeline a killed",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

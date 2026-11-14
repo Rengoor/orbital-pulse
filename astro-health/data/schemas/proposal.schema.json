@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "proposal.schema.json",
+  "title": "Proposal",
+  "description": "v0.1 DRAFT: freeze together in hour one, then additive changes only.",
+  "type": "object",
+  "required": [
+    "pipeline_id",
+    "tier",
+    "reasons",
+    "data_fault"
+  ],
+  "properties": {
+    "pipeline_id": {
+      "type": "string"
+    },
+    "reading_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tier": {
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED",
+        "GREY"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rule_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_fault": {
+      "type": "boolean"
+    }
+  }
+}

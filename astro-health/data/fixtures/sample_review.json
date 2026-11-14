@@ -1,0 +1,9 @@
+{
+  "record_id": "rec1",
+  "reviewer": "simulated_flight_surgeon",
+  "outcome": "AGREE",
+  "simulated": true,
+  "note": "",
+  "ts": "2026-11-14T08:20:00Z",
+  "signature": "placeholder"
+}

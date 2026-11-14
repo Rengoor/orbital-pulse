@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "card.schema.json",
+  "title": "Card",
+  "description": "v0.1 DRAFT: freeze together in hour one, then additive changes only.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "astronaut_id",
+    "ts",
+    "tier",
+    "headline",
+    "action",
+    "provenance",
+    "simulated_labels"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "astronaut_id": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "tier": {
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED",
+        "GREY"
+      ]
+    },
+    "headline": {
+      "type": "string"
+    },
+    "action": {
+      "enum": [
+        "NO_ACTION",
+        "RECHECK_IN_1H",
+        "REST_AND_HYDRATE",
+        "USE_PROTOCOL_CARD",
+        "ALERT_CMO",
+        "CONTACT_GROUND_URGENT"
+      ]
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "field",
+          "timestamp"
+        ],
+        "properties": {
+          "dataset_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "simulated_labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

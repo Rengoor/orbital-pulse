@@ -1,0 +1,10 @@
+{
+  "id": "r1",
+  "astronaut_id": "crew_1",
+  "ts": "2026-11-14T08:00:00Z",
+  "channel": "heart_rate",
+  "value": 0,
+  "unit": "bpm",
+  "source": "simulated",
+  "quality": "ok"
+}

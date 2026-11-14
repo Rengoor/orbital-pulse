@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reading.schema.json",
+  "title": "Reading",
+  "description": "v0.1 DRAFT: freeze together in hour one, then additive changes only.",
+  "type": "object",
+  "required": [
+    "id",
+    "astronaut_id",
+    "ts",
+    "channel",
+    "value",
+    "unit",
+    "source"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "astronaut_id": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "channel": {
+      "enum": [
+        "bp_systolic",
+        "bp_diastolic",
+        "heart_rate",
+        "glucose",
+        "temperature",
+        "sleep_hours",
+        "mood",
+        "co2_ppm",
+        "exercise_minutes",
+        "dose_rate_usv_h",
+        "blood_analyte"
+      ]
+    },
+    "analyte": {
+      "type": "string"
+    },
+    "value": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "simulated",
+        "nasa_osdr",
+        "nasa_radlab",
+        "nasa_donki",
+        "manual"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "dataset_id",
+        "field",
+        "timestamp"
+      ],
+      "properties": {
+        "dataset_id": {
+          "type": "string"
+        },
+        "field": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "quality": {
+      "enum": [
+        "ok",
+        "suspect",
+        "fault"
+      ]
+    }
+  }
+}

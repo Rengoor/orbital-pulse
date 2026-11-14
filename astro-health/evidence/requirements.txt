@@ -1,0 +1,4 @@
+-r ../backend/requirements.txt
+-r ../data/requirements.txt
+tabulate
+matplotlib

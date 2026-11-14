@@ -1,0 +1,6 @@
+{
+  "id": "stuck_sensor",
+  "description": "stuck sensor",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

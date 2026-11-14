@@ -1,0 +1,6 @@
+{
+  "id": "llm_suggests_dose",
+  "description": "llm suggests dose",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

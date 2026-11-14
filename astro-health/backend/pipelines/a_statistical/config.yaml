@@ -1,0 +1,3 @@
+# Pattern and CUSUM parameters for pipeline A (person A).
+cusum: {k: 0.5, h: 4.0}
+patterns: []

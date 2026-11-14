@@ -1,0 +1,10 @@
+{
+  "tier": "GREEN",
+  "action": "NO_ACTION",
+  "reasons": [
+    "placeholder"
+  ],
+  "overruled_pipelines": [],
+  "checker_version": "0.0.0",
+  "ruleset_hash": "placeholder"
+}

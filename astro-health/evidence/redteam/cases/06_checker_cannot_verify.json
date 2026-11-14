@@ -1,0 +1,6 @@
+{
+  "id": "checker_cannot_verify",
+  "description": "checker cannot verify",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}

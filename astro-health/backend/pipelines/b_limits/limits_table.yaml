@@ -1,0 +1,11 @@
+# PLACEHOLDER: every threshold needs sourcing from NASA documents and medical review.
+# Written independently of pipeline A (person B). null = not yet sourced.
+channels:
+  bp_systolic: {unit: mmHg, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  bp_diastolic: {unit: mmHg, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  heart_rate: {unit: bpm, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  glucose: {unit: mg/dL, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  temperature: {unit: C, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  sleep_hours: {unit: h, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  co2_ppm: {unit: ppm, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}
+  dose_rate_usv_h: {unit: uSv/h, yellow_low: null, yellow_high: null, red_low: null, red_high: null, source: TODO}

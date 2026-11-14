@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.schema.json",
+  "title": "Review",
+  "description": "v0.1 DRAFT: freeze together in hour one, then additive changes only.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "reviewer",
+    "outcome",
+    "simulated",
+    "ts",
+    "signature"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "reviewer": {
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "AGREE",
+        "DISAGREE",
+        "FOLLOW_UP"
+      ]
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "note": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "string"
+    }
+  }
+}

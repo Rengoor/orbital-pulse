@@ -1,0 +1,12 @@
+{
+  "pipeline_id": "a_statistical",
+  "reading_ids": [
+    "r1"
+  ],
+  "tier": "GREEN",
+  "reasons": [
+    "placeholder"
+  ],
+  "rule_ids": [],
+  "data_fault": false
+}

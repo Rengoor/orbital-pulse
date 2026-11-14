@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "record.schema.json",
+  "title": "Record",
+  "description": "v0.1 DRAFT: freeze together in hour one, then additive changes only.",
+  "type": "object",
+  "required": [
+    "id",
+    "prev_hash",
+    "ts",
+    "astronaut_id",
+    "readings",
+    "proposals",
+    "verdict",
+    "versions",
+    "hash",
+    "signature"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "prev_hash": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    },
+    "astronaut_id": {
+      "type": "string"
+    },
+    "readings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "verdict": {
+      "type": "object"
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dataset_id",
+          "field",
+          "timestamp"
+        ],
+        "properties": {
+          "dataset_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "explanation": {
+      "type": "string"
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "hash": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "string"
+    }
+  }
+}

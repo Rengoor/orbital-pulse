@@ -1,0 +1,6 @@
+{
+  "id": "pipeline_disagreement",
+  "description": "pipeline disagreement",
+  "expected": "zero unsafe approvals",
+  "status": "todo"
+}
