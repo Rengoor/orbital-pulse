@@ -12,6 +12,10 @@ the tools to check it:
 - **Downlink log**: what is queued on the vehicle and what Earth has received,
   for a chosen link delay.
 - **Review log**: every ground review, in its own signed chain.
+- **Inputs**: each selected decision lists the readings that went in, their source (real or simulated) and the integrity gate's verdict on each.
+- **NASA data**: which sources are loaded, the space-weather events, and measured radiation by vehicle.
+- **Governance checks**: the last red-team run, attack by attack.
+- **Blood panels**: the Inspiration4 CBC and metabolic results with the laboratory reference ranges.
 
 This page decides nothing: it shows what the backend recorded and calls the
 backend to verify. With no link it shows no data, never sample data.

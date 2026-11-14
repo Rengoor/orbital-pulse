@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitalis · Crew health monitor</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/vitalis.css">
+<style>
+  body { margin: 0; }
+  .mo { padding: var(--space-6); display: grid; gap: var(--space-4); max-width: 1360px; margin: 0 auto; box-sizing: border-box; }
+  .mo-top { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+  .mo-brand { display: grid; gap: 2px; margin-right: auto; }
+  .mo-brand b { font: 600 22px/1 var(--font-display); color: var(--ink); }
+  .mo-brand b i { font-style: normal; color: var(--signal); }
+  .mo-sub { font: 500 12px/16px var(--font-mono); color: var(--ink-muted); }
+  .mo-stat { display: grid; gap: 2px; justify-items: end; }
+  .mo-stat .v { font: 500 13px/18px var(--font-mono); color: var(--ink); }
+  .ok { color: var(--tier-green) !important; } .bad { color: var(--tier-red) !important; } .warn { color: var(--tier-yellow) !important; }
+  .muted { color: var(--ink-muted); } .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .mo-banner { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--tier-red); background: var(--hull); font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+  .mo-banner svg { width: 18px; height: 18px; flex: none; color: var(--tier-red); }
+  .mo-banner b { color: var(--ink); font-weight: 600; }
+
+  .crew { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .crew button { appearance: none; cursor: pointer; display: flex; align-items: center; gap: var(--space-2); min-height: 48px; padding: 0 var(--space-4); border-radius: var(--radius-pill); border: 1px solid var(--line-strong); background: var(--hull); color: var(--ink); font: 600 14px/1 var(--font-sans); }
+  .crew button[aria-pressed="true"] { border-color: var(--holo); box-shadow: var(--glow-holo); }
+  .crew button:focus-visible { outline: 2px solid var(--holo); outline-offset: 2px; }
+
+  .mo-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: var(--space-4); align-items: start; }
+  .mo-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); align-items: start; }
+  @media (max-width: 980px) { .mo-main, .mo-row { grid-template-columns: minmax(0, 1fr); } }
+  .col { display: grid; gap: var(--space-4); }
+
+  .now { display: grid; gap: var(--space-3); }
+  .now-act { font: 600 20px/26px var(--font-sans); color: var(--ink); margin: 0; }
+  .now p { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink); }
+  .chip { display: inline-block; padding: 1px 6px; border-radius: var(--radius-xs); border: 1px solid var(--line-strong); font: 500 11px/16px var(--font-mono); color: var(--ink-muted); white-space: nowrap; }
+  .chip.split { color: var(--tier-yellow); border-color: var(--tier-yellow); } .chip.fail { color: var(--tier-red); border-color: var(--tier-red); }
+
+  .vitals { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--space-3); }
+  .vitals .vt-vital { width: auto !important; }
+  .lst { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font: 400 14px/20px var(--font-sans); }
+  .lst li { display: flex; gap: var(--space-2); align-items: baseline; flex-wrap: wrap; }
+  .lst svg { width: 16px; height: 16px; flex: none; align-self: center; }
+  .empty { padding: var(--space-6); text-align: center; color: var(--ink-muted); font: 400 14px/20px var(--font-sans); }
+  h3 { margin: 0 0 var(--space-2); }
+</style>
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/vitalis.js"></script>
+<script src="../js/api.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  /* Crew health monitor: every channel the backend holds for one crew member,
+     with the Checker's current verdict and why it can be trusted. This page
+     only displays. Each tier, action and explanation is the Checker's own; the
+     page has no thresholds and no sample data. With no link it shows nothing. */
+  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+  var REFRESH_MS = 4000, HISTORY = 24;
+  var RANK = { GREEN: 0, YELLOW: 1, RED: 2, GREY: 3 };
+  var LABELS = {
+    heart_rate: 'Heart rate', bp_systolic: 'Blood pressure, systolic', bp_diastolic: 'Blood pressure, diastolic',
+    glucose: 'Blood glucose', temperature: 'Body temperature', sleep_hours: 'Sleep', mood: 'Mood',
+    co2_ppm: 'Cabin CO2', exercise_minutes: 'Exercise', dose_rate_usv_h: 'Radiation dose rate', blood_analyte: 'Blood analyte'
+  };
+  var ORDER = Object.keys(LABELS);
+  var STATUS = {
+    AGREEMENT: 'All assessments agree', DISAGREEMENT: 'Assessments split: the most cautious one decided',
+    PARTIAL_ASSESSMENT: 'Not every assessment could run', UNVERIFIABLE: 'The data could not be verified'
+  };
+
+  function clock(ts) { return ts ? String(ts).slice(11, 19) : '--'; }
+  function actionText(a) { return (V.ACTIONS[a] || {}).text || a || '--'; }
+
+  /* The tier shown on one channel is read off the record, never computed here:
+     unusable data is GREY; otherwise the worst tier among the pipeline
+     proposals that cite that reading; otherwise nominal. */
+  function channelTier(record, reading) {
+    var entries = (record.integrity || {}).readings || [], i;
+    for (i = 0; i < entries.length; i++) {
+      if (entries[i].reading_id === reading.id && entries[i].status !== 'valid') return { tier: 'GREY', note: entries[i].status + ': ' + (entries[i].issues || []).join('; ') };
+    }
+    var worst = 'GREEN';
+    (record.proposals || []).forEach(function (p) {
+      if ((p.reading_ids || []).indexOf(reading.id) >= 0 && RANK[p.tier] > RANK[worst]) worst = p.tier;
+    });
+    return { tier: worst, note: null };
+  }
+
+  function Channels(p) {
+    var latest = p.history[0];
+    var byChannel = {};
+    (latest.readings || []).forEach(function (r) { byChannel[r.channel + (r.analyte ? ':' + r.analyte : '')] = r; });
+    var keys = Object.keys(byChannel).sort(function (a, b) { return ORDER.indexOf(a.split(':')[0]) - ORDER.indexOf(b.split(':')[0]); });
+    if (!keys.length) return h('div', { className: 'empty' }, 'The latest check-in carried no readings.');
+    return h('div', { className: 'vitals' }, keys.map(function (k) {
+      var r = byChannel[k], t = channelTier(latest, r);
+      // Oldest to newest, for the trend line.
+      var trend = p.history.slice(0, HISTORY).map(function (rec) {
+        var m = (rec.readings || []).filter(function (x) { return x.channel === r.channel && x.analyte === r.analyte; })[0];
+        return m ? Number(m.value) : null;
+      }).filter(function (v) { return v !== null; }).reverse();
+      return h(V.VitalReadout, {
+        key: k, label: (LABELS[r.channel] || r.channel) + (r.analyte ? ' · ' + r.analyte : ''), value: r.value, unit: r.unit, tier: t.tier,
+        trend: trend.length > 1 ? trend : undefined, source: r.source, dataset: r.provenance ? r.provenance.dataset_id : undefined,
+        updated: clock(r.ts), delta: t.note || undefined
+      });
+    }));
+  }
+
+  function Now(p) {
+    var r = p.record, v = r.verdict, t = v.decision_trace || {}, q = t.data_quality || {};
+    var s = v.disagreement_status;
+    return h(V.Panel, { title: 'Current status', meta: 'decided ' + clock(r.ts) + ' UTC' },
+      h('div', { className: 'now' },
+        h('div', null, h(V.TierBadge, { tier: v.tier, size: 'lg' })),
+        h('p', { className: 'now-act' }, actionText(v.action)),
+        (v.additional_actions || []).map(function (a) { return h('p', { key: a, className: 'now-act' }, 'Also: ' + actionText(a)); }),
+        v.failsafe ? h('p', { className: 'bad' }, 'The decision system itself failed. This is the built-in fail-safe, not an assessment.') : null,
+        h('p', null, t.explanation || (v.reasons || []).join(' ') || 'No explanation was recorded.'),
+        h('div', null, s ? h('span', { className: 'chip' + (s === 'AGREEMENT' ? '' : ' split') }, STATUS[s] || s) : null),
+        q.total !== undefined ? h('p', { className: 'muted' }, q.valid + ' of ' + q.total + ' readings usable.') : null));
+  }
+
+  function Trust(p) {
+    var t = p.trust;
+    if (!t) return h(V.Panel, { title: 'Why should I trust this decision?' }, h('div', { className: 'empty' }, 'Loading.'));
+    function row(ok, text) { return h('li', null, h(I, { name: ok ? 'check' : 'flare' }), h('span', { className: ok ? '' : 'warn' }, text)); }
+    var a = t.assessments, d = t.data;
+    return h(V.Panel, { title: 'Why should I trust this decision?' },
+      h('ul', { className: 'lst' },
+        row(a.did_not_run.length === 0, a.contributed.length + ' independent assessment' + (a.contributed.length === 1 ? '' : 's') + ' contributed: ' +
+          a.contributed.map(function (c) { return c.pipeline_id + ' said ' + c.tier; }).join(', ') + '.' +
+          (a.did_not_run.length ? ' Could not run: ' + a.did_not_run.join(', ') + '.' : '')),
+        row(a.status === 'AGREEMENT', a.summary),
+        row(d.status === 'ok', d.status === 'not_assessed' ? 'Data quality was not assessed.' : (d.usable + ' of ' + d.total + ' readings were fresh and valid.' + (d.problems.length ? ' ' + d.problems.length + ' had a problem.' : ''))),
+        row(true, t.rules.triggered.length ? 'Rules that fired: ' + t.rules.triggered.join(', ') + '.' : 'No rule fired.'),
+        t.rules.limits_are_official === false ? row(false, 'The limits used are project-defined, not official NASA medical limits.') : null,
+        d.simulated_inputs.length ? row(false, 'Simulated inputs: ' + d.simulated_inputs.join(', ') + '.') : null,
+        row(t.record.chain_intact, t.record.chain_intact ? 'Recorded, signed, and the record chain is intact.' : 'The record chain is BROKEN: this record may have been altered.'),
+        row(t.human_review.status === 'reviewed', t.human_review.status === 'reviewed'
+          ? 'Reviewed on the ground (' + t.human_review.outcomes.join(', ') + ', simulated reviewer).' : 'Ground review is pending.')));
+  }
+
+  function Problems(p) {
+    var issues = ((p.record.verdict.decision_trace || {}).data_quality || {}).issues || [];
+    if (!issues.length) return null;
+    return h(V.Panel, { title: 'Data problems', meta: issues.length + ' reading(s)' },
+      h('ul', { className: 'lst' }, issues.map(function (x, i) {
+        return h('li', { key: i }, h('span', { className: 'chip fail' }, x.status), h('b', null, LABELS[x.channel] || x.channel), h('span', { className: 'muted' }, (x.issues || []).join('; ')));
+      })));
+  }
+
+  function Environment(p) {
+    var w = p.weather, rad = p.radiation;
+    if (!w && !rad) return null;
+    var iss = rad ? rad.series.filter(function (s) { return s.spacecraft === 'ISS'; }) : [];
+    return h(V.Panel, { title: 'Space environment', meta: h(V.SourceLabel, { source: 'nasa_donki', dataset: 'DONKI + RadLab' }) },
+      h('div', { className: 'now' },
+        w ? h('p', null, 'Storm window ' + w.window.start + ' to ' + w.window.end + ': ' + w.summary.x_class_flares + ' X-class flares (strongest ' + w.summary.strongest_flare +
+          '), ' + w.summary.particle_events + ' particle events, geomagnetic Kp up to ' + w.summary.kp_max + '.') : null,
+        iss.length ? h('p', null, 'Measured inside the ISS in that window: ' + iss.map(function (s) { return s.instrument + ' mean ' + s.window_mean.toFixed(1) + ', peak ' + s.window_max.toFixed(0) + ' ' + rad.unit; }).join('; ') + '.') : null,
+        h('p', { className: 'muted', style: { fontSize: 12 } }, 'Recorded NASA data from a past storm, shown for context. It is not a live feed and not an input to your status above.')));
+  }
+
+  function Recent(p) {
+    return h(V.Panel, { title: 'Recent decisions', meta: p.history.length + ' on record' },
+      h('ul', { className: 'lst' }, p.history.slice(0, 8).map(function (r) {
+        return h('li', { key: r.id }, h(V.TierBadge, { tier: r.verdict.tier }), h('span', { className: 'mono' }, clock(r.ts)), h('span', null, actionText(r.verdict.action)));
+      })));
+  }
+
+  function App() {
+    var link = React.useState('connecting'), records = React.useState([]), who = React.useState(null);
+    var trust = React.useState(null), env = React.useState({}), envLoaded = React.useRef(false);
+
+    function refresh() {
+      return API.records(null, 1000).then(function (rs) {
+        link[1]('online'); records[1](rs);
+        if (!envLoaded.current) {
+          envLoaded.current = true;
+          API.spaceWeather().then(function (w) { env[1](function (p) { return Object.assign({}, p, { weather: w }); }); }).catch(function () {});
+          API.radiation(false).then(function (r) { env[1](function (p) { return Object.assign({}, p, { radiation: r }); }); }).catch(function () {});
+        }
+      }).catch(function () { link[1]('offline'); records[1]([]); trust[1](null); });
+    }
+    React.useEffect(function () { refresh(); var id = setInterval(refresh, REFRESH_MS); return function () { clearInterval(id); }; }, []);
+
+    var crew = [];
+    records[0].forEach(function (r) { if (crew.indexOf(r.astronaut_id) < 0) crew.push(r.astronaut_id); });
+    crew.sort();
+    var current = who[0] && crew.indexOf(who[0]) >= 0 ? who[0] : crew[0];
+    var history = records[0].filter(function (r) { return r.astronaut_id === current; });   // newest first
+    var latest = history[0] || null, latestId = latest ? latest.id : null;
+
+    React.useEffect(function () {
+      trust[1](null);
+      if (latestId) API.trust(latestId).then(trust[1]).catch(function () {});
+    }, [latestId]);
+
+    function latestTier(id) { var r = records[0].filter(function (x) { return x.astronaut_id === id; })[0]; return r ? r.verdict.tier : 'GREY'; }
+
+    return h('div', { className: 'mo' },
+      h('div', { className: 'mo-top' },
+        h('div', { className: 'mo-brand' }, h('b', null, 'Vitalis', h('i', null, '.'), ' Crew health monitor'),
+          h('span', { className: 'mo-sub' }, 'Every monitored channel, the current verdict, and why it can be trusted')),
+        h('div', { className: 'mo-stat' }, h('span', { className: 'vt-lbl' }, 'Link to the decision system'),
+          h('span', { className: 'v ' + (link[0] === 'online' ? 'ok' : link[0] === 'offline' ? 'bad' : 'muted') }, link[0] === 'online' ? 'Connected' : link[0] === 'offline' ? 'No link' : 'Connecting'))),
+
+      link[0] === 'offline' ? h('div', { className: 'mo-banner', role: 'alert' }, h(I, { name: 'antenna' }),
+        h('span', null, h('b', null, 'No link to the decision system. '), 'No status is shown, because none of it would be current. Do not treat a blank screen as an all-clear.')) : null,
+
+      link[0] === 'online' && !crew.length ? h(V.Panel, null, h('div', { className: 'empty' }, 'No check-ins recorded yet. Status appears here as soon as the first one is logged.')) : null,
+
+      crew.length ? h('div', { className: 'crew', role: 'group', 'aria-label': 'Crew member' }, crew.map(function (id) {
+        return h('button', { key: id, type: 'button', 'aria-pressed': id === current, onClick: function () { who[1](id); } }, h(V.TierBadge, { tier: latestTier(id) }), id);
+      })) : null,
+
+      latest ? h('div', { className: 'mo-main' },
+        h('div', { className: 'col' }, h(Now, { record: latest }), h(Trust, { trust: trust[0] }), h(Problems, { record: latest })),
+        h('div', { className: 'col' },
+          h(V.Panel, { title: 'Monitored channels', meta: (latest.readings || []).length + ' readings in the latest check-in' }, h(Channels, { history: history })),
+          h('div', { className: 'mo-row' }, h(Recent, { history: history }), h(Environment, { weather: env[0].weather, radiation: env[0].radiation })))) : null);
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

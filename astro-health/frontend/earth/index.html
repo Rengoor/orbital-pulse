@@ -59,6 +59,12 @@
   .result { font: 500 13px/18px var(--font-mono); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--void); overflow-wrap: anywhere; }
   .empty { padding: var(--space-6); text-align: center; color: var(--ink-muted); font: 400 14px/20px var(--font-sans); }
   .scroll { max-height: 300px; overflow: auto; }
+  .tbl { width: 100%; border-collapse: collapse; font: 400 12px/18px var(--font-sans); }
+  .tbl th { text-align: left; padding: 4px 8px 4px 0; white-space: nowrap; }
+  .tbl td { padding: 4px 8px 4px 0; border-top: 1px solid var(--line); vertical-align: top; }
+  .tbl td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tbl-wrap { max-height: 340px; overflow: auto; }
+  .eb-h { margin: var(--space-4) 0 0; }
 </style>
 <script src="../js/vendor/react.production.min.js"></script>
 <script src="../js/vendor/react-dom.production.min.js"></script>
@@ -93,6 +99,12 @@
   function actionText(a) { return (V.ACTIONS[a] || {}).text || a || '--'; }
   function loadCheckpoint() { try { return JSON.parse(localStorage.getItem(CHECKPOINT_KEY) || 'null'); } catch (e) { return null; } }
   function saveCheckpoint(c) { try { localStorage.setItem(CHECKPOINT_KEY, JSON.stringify(c)); } catch (e) { /* kept in memory only */ } }
+
+  function integrityOf(record, readingId) {
+    var list = (record.integrity || {}).readings || [];
+    for (var i = 0; i < list.length; i++) if (list[i].reading_id === readingId) return { status: list[i].status, issues: list[i].issues || [] };
+    return { status: 'not assessed', issues: [] };
+  }
 
   function StatusChip(p) {
     var s = p.verdict.disagreement_status;
@@ -168,6 +180,22 @@
             Object.keys(pipes).filter(function (k) { return pipes[k] !== 'ok'; }).map(function (k) {
               return h('li', { key: 'st-' + k }, h('span', { className: 'mono' }, k), h('span', { className: 'chip' + (pipes[k] === 'disabled' ? '' : ' fail') }, pipes[k]));
             }))),
+
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Inputs to this decision'),
+          (r.readings || []).length
+            ? h('div', { className: 'tbl-wrap' }, h('table', { className: 'tbl' },
+                h('thead', null, h('tr', null, ['Channel', 'Value', 'Taken', 'Source', 'Integrity'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+                h('tbody', null, r.readings.map(function (x) {
+                  var st = integrityOf(r, x.id);
+                  return h('tr', { key: x.id },
+                    h('td', null, x.channel, x.analyte ? ' · ' + x.analyte : ''),
+                    h('td', { className: 'num' }, x.value + ' ' + x.unit),
+                    h('td', { className: 'num' }, clock(x.ts)),
+                    h('td', null, h(V.SourceLabel, { source: x.source, dataset: x.provenance ? x.provenance.dataset_id : undefined })),
+                    h('td', null, h('span', { className: 'chip' + (st.status === 'valid' ? '' : ' fail') }, st.status),
+                      st.issues.length ? h('div', { className: 'muted' }, st.issues.join('; ')) : null));
+                }))))
+            : h('p', { className: 'muted' }, 'This check-in carried no readings.')),
 
         h('div', null, h('h3', { className: 'vt-lbl' }, 'Reasons'),
           (v.reasons || []).length
@@ -278,6 +306,87 @@
         })) : h('p', { className: 'muted' }, 'No reviews yet. Select a decision and record one.')));
   }
 
+  /* ---------- NASA data ---------- */
+  function NasaPanel(p) {
+    var n = p.nasa;
+    if (!n.sources) return h(V.Panel, { title: 'NASA data' }, h('div', { className: 'empty' }, 'NASA data is not loaded on the backend.'));
+    var w = n.weather, rad = n.radiation;
+    return h(V.Panel, { title: 'NASA data', meta: n.sources.filter(function (x) { return x.available; }).length + ' of ' + n.sources.length + ' sources loaded' },
+      h('div', { className: 'det' },
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Sources'),
+          h('ul', { className: 'lst' }, n.sources.map(function (x) {
+            return h('li', { key: x.id },
+              h('span', { className: 'chip' + (x.available ? '' : ' fail') }, x.available ? 'loaded' : 'missing'),
+              h('b', null, x.name), h('span', { className: 'mono muted' }, x.provider + ' · ' + x.datasets.join(', ')),
+              x.detail ? h('span', null, x.detail) : null,
+              h('span', { className: 'muted' }, x.used_for + (x.fetched_at ? ' · fetched ' + x.fetched_at.slice(0, 10) : '')));
+          }))),
+        w ? h('div', null, h('h3', { className: 'vt-lbl' }, 'Space weather · ' + w.window.start + ' to ' + w.window.end),
+          h('p', null, w.summary.flares + ' flares (' + w.summary.x_class_flares + ' X-class, strongest ' + w.summary.strongest_flare + '), ' +
+            w.summary.particle_events + ' particle events, ' + w.summary.geomagnetic_storms + ' geomagnetic storms (Kp max ' + w.summary.kp_max + '), ' +
+            w.summary.coronal_mass_ejections + ' coronal mass ejections.'),
+          h('div', { className: 'tbl-wrap', style: { maxHeight: 180, marginTop: 'var(--space-2)' } }, h('table', { className: 'tbl' },
+            h('thead', null, h('tr', null, ['X-class flare', 'Peak (UTC)', 'Region'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+            h('tbody', null, w.flares.filter(function (f) { return (f['class'] || '').charAt(0) === 'X'; }).map(function (f) {
+              return h('tr', { key: f.id }, h('td', { className: 'num' }, f['class']), h('td', { className: 'num' }, (f.peak || '').replace('T', ' ').replace('Z', '')), h('td', { className: 'num' }, f.active_region || '--'));
+            }))))) : null,
+        rad ? h('div', null, h('h3', { className: 'vt-lbl' }, 'Measured radiation · ' + rad.field + ' in ' + rad.unit),
+          h('div', { className: 'tbl-wrap' }, h('table', { className: 'tbl' },
+            h('thead', null, h('tr', null, ['Where', 'Instrument', 'Mean', 'Max', 'Peak hour (UTC)', 'Samples'].map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+            h('tbody', null, rad.series.map(function (x) {
+              return h('tr', { key: x.spacecraft + x.instrument },
+                h('td', null, x.location), h('td', { className: 'num' }, x.spacecraft + ' ' + x.instrument),
+                h('td', { className: 'num' }, x.window_mean.toFixed(1)), h('td', { className: 'num' }, x.window_max.toFixed(1)),
+                h('td', { className: 'num' }, x.peak_hour.replace('T', ' ').replace(':00Z', 'h')), h('td', { className: 'num' }, String(x.samples)));
+            })))),
+          h('p', { className: 'muted', style: { fontSize: 12, marginTop: 'var(--space-2)' } }, rad.unit_note + ' Shown as context; not an input to the decision pipelines.')) : null));
+  }
+
+  /* ---------- Governance checks ---------- */
+  function GovernancePanel(p) {
+    var g = p.checks;
+    if (!g) return h(V.Panel, { title: 'Governance checks' }, h('div', { className: 'empty' }, 'No red-team run on record. Run python -m evidence.redteam.run_redteam on the backend.'));
+    return h(V.Panel, { title: 'Governance checks', meta: g.blocked + ' of ' + g.total + ' attacks blocked' },
+      h('div', { className: 'det' },
+        h('p', { className: g.unsafe_approvals ? 'bad' : 'ok' }, g.unsafe_approvals
+          ? g.unsafe_approvals + ' unsafe approval(s): an attack got a calmer answer than it should have.'
+          : 'No unsafe approvals in the last red-team run.'),
+        h('ul', { className: 'lst scroll', style: { maxHeight: 420 } }, g.results.map(function (x) {
+          return h('li', { key: x.id },
+            h('span', { className: 'chip' + (x.blocked ? '' : ' fail') }, x.blocked ? 'blocked' : 'UNSAFE'),
+            h('b', null, x.title), h('span', { className: 'chip' }, x.area),
+            h('span', { className: 'muted' }, x.description),
+            h('span', { className: 'mono' }, '→ ' + x.observed));
+        })),
+        h('p', { className: 'muted', style: { fontSize: 12 } }, 'Saved results of the last run on the backend; this page does not run the attacks.')));
+  }
+
+  /* ---------- Blood panels ---------- */
+  function BloodPanel(p) {
+    var b = p.panels, subj = React.useState(null);
+    if (!b) return h(V.Panel, { title: 'Blood panels' }, h('div', { className: 'empty' }, 'Inspiration4 blood panels are not loaded on the backend.'));
+    var ids = Object.keys(b.subjects), id = subj[0] || ids[0], s = b.subjects[id];
+    var names = Object.keys(s.analytes).sort();
+    return h(V.Panel, { title: 'Blood panels · Inspiration4', meta: b.datasets.map(function (d) { return d.dataset_id; }).join(' + ') },
+      h('div', { className: 'eb-tools' },
+        h('label', { className: 'vt-lbl', htmlFor: 'f-subj' }, 'Crew member'),
+        h('select', { id: 'f-subj', value: id, onChange: function (e) { subj[1](e.target.value); } }, ids.map(function (x) { return h('option', { key: x, value: x }, x); })),
+        h(V.SourceLabel, { source: 'nasa_osdr', dataset: 'OSD-569 / OSD-575' })),
+      h('div', { className: 'tbl-wrap', style: { maxHeight: 460 } }, h('table', { className: 'tbl' },
+        h('thead', null, h('tr', null, ['Analyte', 'Lab range', 'Unit'].concat(s.analytes[names[0]].draws.map(function (d) { return d.timepoint; })).map(function (t) { return h('th', { key: t, className: 'vt-lbl', scope: 'col' }, t); }))),
+        h('tbody', null, names.map(function (n) {
+          var a = s.analytes[n];
+          return h('tr', { key: n }, h('td', null, n),
+            h('td', { className: 'num' }, (a.range_min == null ? '' : a.range_min) + ' – ' + (a.range_max == null ? '' : a.range_max)),
+            h('td', { className: 'num muted' }, a.unit),
+            a.draws.map(function (d) {
+              var out = d.value != null && ((a.range_min != null && d.value < a.range_min) || (a.range_max != null && d.value > a.range_max));
+              return h('td', { key: d.timepoint, className: 'num' + (out ? ' warn' : ''), title: out ? 'Outside the laboratory reference range published with the dataset' : undefined }, d.value == null ? '--' : d.value);
+            }));
+        })))),
+      h('p', { className: 'muted', style: { fontSize: 12, marginTop: 'var(--space-2)' } }, b.timepoints + '. Highlighted values fall outside the laboratory reference range published with the dataset; that is the lab\u2019s range, not a project or NASA limit, and not a verdict.'));
+  }
+
   /* ---------- App ---------- */
   function App() {
     var link = React.useState({ state: 'connecting', key: null });
@@ -286,11 +395,24 @@
     var result = React.useState(null), chain = React.useState(null);
     var checkpoint = React.useState(loadCheckpoint()), checkResult = React.useState(null);
     var delay = React.useState('1.3'), received = React.useState([]);
+    var nasa = React.useState({}), checks = React.useState(null), panels = React.useState(null), loadedRef = React.useRef(false);
+
+    // Reference data changes rarely: load it once the link is up.
+    function loadReference() {
+      if (loadedRef.current) return;
+      loadedRef.current = true;
+      API.nasaSources().then(function (r) { nasa[1](function (p) { return Object.assign({}, p, { sources: r.sources }); }); }).catch(function () {});
+      API.spaceWeather().then(function (r) { nasa[1](function (p) { return Object.assign({}, p, { weather: r }); }); }).catch(function () {});
+      API.radiation(false).then(function (r) { nasa[1](function (p) { return Object.assign({}, p, { radiation: r }); }); }).catch(function () {});
+      API.governanceChecks().then(checks[1]).catch(function () {});
+      API.bloodPanels().then(panels[1]).catch(function () {});
+    }
 
     function refresh() {
       return Promise.all([API.health(), API.records(null, 1000), API.downlink(), API.reviews()]).then(function (res) {
         link[1]({ state: 'online', key: res[0].signing_key || null });
         records[1](res[1]); downlink[1](res[2]); reviews[1](res[3]);
+        loadReference();
       }).catch(function () {
         // No link: show nothing rather than stale or sample data.
         link[1](function (p) { return { state: 'offline', key: p.key }; });
@@ -365,7 +487,12 @@
         h(ChainPanel, { records: records[0], chain: chain[0], checkpoint: checkpoint[0], checkResult: checkResult[0],
           onVerifyAll: verifyAll, onSaveCheckpoint: saveCp, onCheckCheckpoint: checkCp }),
         h(DownlinkPanel, { downlink: downlink[0], delay: delay[0], onDelay: delay[1], received: received[0], onRelease: release }),
-        h(ReviewPanel, { reviews: reviews[0] })));
+        h(ReviewPanel, { reviews: reviews[0] })),
+
+      online ? h('div', { className: 'eb-main' },
+        h(NasaPanel, { nasa: nasa[0] }),
+        h(GovernancePanel, { checks: checks[0] })) : null,
+      online ? h(BloodPanel, { panels: panels[0] }) : null);
   }
   ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 </script>
