@@ -104,6 +104,16 @@ def review(body: ReviewRequest, state: AppState = Depends(get_state)) -> dict:
     )
 
 
+@router.get("/reviews")
+def reviews(record_id: str | None = None, state: AppState = Depends(get_state)) -> dict:
+    """The review log, oldest first, with whether the review chain is intact."""
+    valid, broken_at = state.store.verify_reviews()
+    return {
+        "reviews": state.store.reviews(record_id),
+        "chain": {"valid": valid, "broken_at": broken_at},
+    }
+
+
 class RuleChangeRequest(BaseModel):
     rules_override: dict[str, Any]
     astronaut_id: str | None = None

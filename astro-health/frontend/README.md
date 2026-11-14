@@ -1,6 +1,6 @@
 # vitalis-ui
 
-The Vitalis front end: design tokens, a React component library and three working screens (mission console, helmet display, station tablet). No build step: plain HTML, CSS and one JavaScript file, with React 18 loaded from jsDelivr.
+The Vitalis front end: design tokens, a React component library and three views, one directory each: the helmet HUD (`hud/`), the tablet (`tablet/`) and the Earth base display (`earth/`). No build step: plain HTML, CSS and one JavaScript file, with React 18 loaded from jsDelivr.
 
 ## Run it
 
@@ -19,9 +19,11 @@ Opening the files straight from disk (`file://`) also works in most browsers, bu
 | Path | What it is |
 |---|---|
 | `index.html` | Start page linking every screen and component |
-| `pages/mission-console.html` | Crew console: Holo body / Dashboard / AR views, crew switcher, decision card, advisor |
-| `pages/helmet-hud.html` | Helmet display prototype: your own vitals, flags after 3 confirming readings, scenario simulator |
-| `pages/station-tablet.html` | Habitat tablet: Commander, CMO and My health roles with medical-privacy gating |
+| `hud/` | **View 1, helmet HUD.** Reserved; not implemented yet |
+| `pages/helmet-hud.html` | Earlier helmet display prototype, kept for reference |
+| `tablet/index.html` | **View 2, tablet.** Advanced health monitoring: Commander, CMO and My health roles with medical-privacy gating |
+| `tablet/crew-console.html` | Tablet crew console: Holo body / Dashboard / AR views, crew switcher, decision card, advisor |
+| `earth/index.html` | **View 3, Earth base.** Every log (decisions, chain, checkpoints, downlink, reviews) with verify, replay and review |
 | `components/*.html` | One live demo per component |
 | `js/vitalis.js` | The component library. Defines `window.Vitalis` (BodyMap, VitalReadout, Sparkline, DoseGauge, DecisionCard, Advisory, TierBadge, SourceLabel, DelayDial, CrewSwitcher, SegmentedControl, Button, Panel, Icon) |
 | `css/vitalis.css` | Component styles. Every colour, space and radius is a token |
