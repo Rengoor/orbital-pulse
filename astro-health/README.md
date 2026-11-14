@@ -41,6 +41,14 @@ substitute.
 
 ## Run
 
+One command starts the backend and the crew simulator, and opens the helmet HUD, the crew health monitor and the Earth base in the browser (Ctrl+C stops everything):
+
+```bash
+backend/.venv/bin/python run_demo.py      # Windows: backend\.venv\Scripts\python run_demo.py
+```
+
+The individual commands:
+
 macOS / Linux:
 
 ```

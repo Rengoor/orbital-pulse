@@ -9,42 +9,48 @@ readings. With no link it shows NO LINK and hides the vitals.
 
 ## Run it
 
+From `astro-health/`, one command starts the backend and the crew simulator, and opens all three views:
+
 ```bash
-cd astro-health
-SIGNING_KEY=<any non-demo key> backend/.venv/bin/uvicorn backend.api.main:app --port 8000
+backend/.venv/bin/python run_demo.py          # Windows: backend\.venv\Scripts\python run_demo.py
 ```
 
-Open http://127.0.0.1:8000/ui/hud/index.html. The page accepts these query parameters:
+The HUD is at http://127.0.0.1:8000/ui/hud/index.html. The page accepts these query parameters:
 
 | Parameter | Default | Meaning |
 |---|---|---|
 | `astronaut` | `eva_02` | The wearer. The HUD reads and simulates only this id. |
+| `scenario` | none | Starts a simulator scenario on load: `nominal`, `exertion`, `heat`, `spe`, `hr_fault` or `spe_fault`. `run_demo.py` opens the HUD with `nominal`. |
 | `met_epoch` | none | ISO time of mission start. When set, an MET clock (`MET d/hh:mm:ss`) appears above UTC. |
 
 Browsers block sound until the page is clicked. Press **Enable audio cues** once.
 Until then, the HUD shows "Audio cues off".
 
-## Hand gestures (laptop camera)
+## Camera view and health sidebar
 
-Press **Start camera gestures** under the visor and allow the camera. Hand tracking
-runs on this device with the vendored MediaPipe Gesture Recognizer
+The HUD is camera-first. Your laptop camera fills the screen as the view through the
+visor, and the health status is overlaid as a sidebar on the right edge. The camera and
+hand gestures start with the page; the browser asks for camera permission once.
+Add `?camera=0` to start without them. Without a camera, a drawn scene stands in.
+Hand tracking runs on this device with the vendored MediaPipe Gesture Recognizer
 (`../js/vendor/mediapipe/`). No camera frame leaves the page, and nothing is fetched
-from the network. The camera works only on `localhost`/`127.0.0.1` or over https,
-because browsers block it on plain-http LAN addresses.
+from the network. The camera works only on `localhost`/`127.0.0.1` or over https.
 
-| Gesture | Layout |
+| Gesture | Sidebar |
 |---|---|
-| Swipe right | **Docked**: the health panels are pushed to the edges. The tier word, shape and action stay. Only nominal vitals are hidden; a flagged or unusable vital always stays. |
-| Swipe left, or hold a fist | **Normal** |
-| Hold an open palm still | **Expanded**: larger text and values, still at the edges ([V2 11022] 11.1.6.5) |
+| Swipe right | **Docked**: a narrow rail. The tier word, shape and action stay. Only nominal vitals are hidden; a flagged or unusable vital always stays. |
+| Swipe left, or hold a fist | **Normal**: status and up to four vitals |
+| Hold an open palm still | **Expanded**: wider, larger text and values, still at the edge ([V2 11022] 11.1.6.5) |
 
-The keys D, N and E and the three buttons do the same.
+The tab on the sidebar's edge, the keys D, N and E, and the buttons in **Demo controls**
+(key C) do the same. Demo controls also hold the scenario simulator and the audio switch.
 
-* Gestures change only the HUD's layout. They never touch a verdict, a reading or the backend.
-* **Any change of status (tier, NO LINK, fail-safe) restores the normal layout at once.** A docked HUD can never keep a new alert out of view (project decision).
-* Layout switches are instant. Nothing animates (BRAND.md).
+* Gestures change only the sidebar. They never touch a verdict, a reading or the backend.
+* **Any change of status (tier, NO LINK, fail-safe) reopens the normal sidebar at once.** A docked HUD can never keep a new alert out of view (project decision).
+* Switches are instant. Nothing animates (BRAND.md).
+* Vitals sit in the sidebar under the status, not bottom-left as BRAND.md describes. This is a project decision for the camera-first layout. The centre of the view stays clear.
 * Interpretation thresholds (swipe distance and time, hold time, confidence, cooldown) are in `TUNING` in `gestures.mjs`. They are project decisions tuned for a laptop webcam, not suit hardware. `GestureInterpreter` is pure and can be tested with synthetic frames.
-* The camera preview `<video>` sits outside the React root. The vendored React-compatible runtime rebuilds the DOM on every render and has no refs, which would destroy a video element inside it.
+* The camera `<video>` sits outside the React root. The vendored React-compatible runtime rebuilds the DOM on every render and has no refs, which would destroy a video element inside it.
 
 ## What it reads
 
@@ -147,7 +153,7 @@ NASA citations are to **NASA-STD-3001 Volume 2, Revision F** (approved 2026-07-1
 * **Tone mapping:** RED, GREY, NO LINK and fail-safe use the Warning pattern; YELLOW uses Caution; a return to GREEN uses Advisory. The standard has no class for "cannot verify".
 * **Night palette always**, with every element on a `--void` plate at 78% opacity (BRAND.md).
 * **Nothing moves.** The clock and verdict age change text, but nothing animates (BRAND.md).
-* **Values at 34 px.** Status top-right, time top-left, vitals bottom-left (BRAND.md).
+* **Values at 34 px** (BRAND.md). Time top-left; status and vitals in the right-edge sidebar (camera-first layout, see above).
 * **Nominal values dim; only flagged values take a tier colour and glyph** (BRAND.md).
 * **Which four vitals:** fixed slot order (heart rate, body temp, cabin CO2, dose rate, …). A flagged or unusable channel always takes a slot.
 * **Unusable readings hide their number** and show "No data" with the reason (BRAND.md: "No data is not good news").
