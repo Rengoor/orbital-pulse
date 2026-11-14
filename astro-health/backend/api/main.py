@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.api.routes.checkin import router as checkin_router
 from backend.api.routes.earth import router as earth_router
+from backend.api.routes.nasa import router as nasa_router
 from backend.api.routes.records import router as records_router
 from backend.api.routes.status import router as status_router
 from backend.api.state import AppState
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(status_router, prefix="/status")
     app.include_router(records_router, prefix="/records")
     app.include_router(earth_router, prefix="/earth")
+    app.include_router(nasa_router, prefix="/nasa")
 
     @app.get("/health")
     def health() -> dict:

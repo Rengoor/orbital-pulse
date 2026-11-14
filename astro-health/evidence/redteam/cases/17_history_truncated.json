@@ -1,0 +1,47 @@
+{
+  "id": "history_truncated",
+  "title": "History truncated",
+  "area": "records",
+  "description": "The two newest records, including a RED, are deleted. What remains still forms a valid chain.",
+  "attack": {
+    "kind": "truncate",
+    "readings": [
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 72,
+          "unit": "bpm"
+        }
+      ],
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 74,
+          "unit": "bpm"
+        }
+      ],
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 150,
+          "unit": "bpm"
+        }
+      ],
+      [
+        {
+          "id": "hr",
+          "channel": "heart_rate",
+          "value": 73,
+          "unit": "bpm"
+        }
+      ]
+    ],
+    "drop_last": 2
+  },
+  "expect": {
+    "anchor_valid": false
+  }
+}

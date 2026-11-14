@@ -1,6 +1,39 @@
 {
   "id": "checker_cannot_verify",
-  "description": "checker cannot verify",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Checker cannot load its policy",
+  "area": "governance",
+  "description": "The policy file is missing when a decision is needed.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm"
+      },
+      {
+        "id": "sleep",
+        "channel": "sleep_hours",
+        "value": 7.5,
+        "unit": "h"
+      },
+      {
+        "id": "dose",
+        "channel": "dose_rate_usv_h",
+        "value": 12.0,
+        "unit": "uSv/h"
+      }
+    ],
+    "policy_path": "/missing/policy.yaml"
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ],
+    "verdict": {
+      "failsafe": true,
+      "action": "CONTACT_GROUND_URGENT"
+    }
+  }
 }

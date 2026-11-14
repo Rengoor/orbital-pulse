@@ -1,6 +1,38 @@
 {
   "id": "implausible_jump",
-  "description": "implausible jump",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Implausible jump",
+  "area": "data",
+  "description": "Heart rate reads 72, then a physically impossible 0, then 72 again within two minutes.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "a",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm",
+        "age_s": 120
+      },
+      {
+        "id": "b",
+        "channel": "heart_rate",
+        "value": 0,
+        "unit": "bpm",
+        "age_s": 60
+      },
+      {
+        "id": "c",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm",
+        "age_s": 0
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "RED",
+      "GREY"
+    ]
+  }
 }

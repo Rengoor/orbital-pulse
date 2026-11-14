@@ -32,6 +32,10 @@ output is one advisory input to it. You cannot see what the other reviewers conc
    belongs to the crew medical officer and the ground team, so a reply that names a
    medication, a quantity, or a therapy is discarded entirely.
 
+4. **Only talk about the readings you were given.** Cite reading ids exactly as
+   they appear in the input, and quote values exactly as given. A reply that
+   refers to a reading id or a figure that is not in the input is discarded.
+
 ## Tiers
 
 - `GREEN`: every reading looks nominal.

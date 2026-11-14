@@ -11,7 +11,8 @@ Statuses:
   fault    the sensor itself reported quality="fault" (handled by the GREY escalation gate)
   stale    older than the policy allows
   invalid  cannot be used: wrong unit, bad or future timestamp, duplicate id,
-           contradicted by another reading, or real-data source with no provenance
+           contradicted by another reading, real-data source with no provenance,
+           or part of a flat line from a sensor that has stopped updating
 
 Owner: person A and person B
 """
@@ -39,6 +40,33 @@ def _parse_ts(ts) -> datetime | None:
         return None
 
 
+def _stuck_reading_ids(readings: list[dict], channel_rules: dict) -> set:
+    """Ids of readings in a run of identical values long enough to mean a stuck sensor.
+
+    Only channels with ``stuck_after`` set in the policy are checked: N or more
+    consecutive readings (in time order) with exactly the same value. A living
+    signal such as heart rate does not repeat to the last digit that many times.
+    """
+    stuck: set = set()
+    by_channel: dict[str, list[dict]] = {}
+    for r in readings:
+        by_channel.setdefault(r.get("channel"), []).append(r)
+    for channel, items in by_channel.items():
+        limit = (channel_rules.get(channel) or {}).get("stuck_after")
+        if not limit:
+            continue
+        items = sorted(items, key=lambda r: str(r.get("ts")))
+        run: list[dict] = []
+        for r in items + [None]:
+            if r is not None and run and r.get("value") == run[-1].get("value") and r.get("ts") != run[-1].get("ts"):
+                run.append(r)
+                continue
+            if len(run) >= int(limit):
+                stuck.update(x.get("id") for x in run)
+            run = [r] if r is not None else []
+    return stuck
+
+
 def evaluate(
     readings: list[dict],
     now: datetime,
@@ -60,6 +88,7 @@ def evaluate(
     # Readings on the same channel and timestamp that differ by more than the
     # policy tolerance for that channel contradict each other.
     contradicting = detect_contradictions(readings, tolerances=tolerances)
+    stuck = _stuck_reading_ids(readings, channel_rules)
 
     seen_ids: set = set()
     entries: list[dict] = []
@@ -95,6 +124,9 @@ def evaluate(
 
         if r.get("id") in contradicting:
             issues.append("contradicts_another_reading_at_the_same_time")
+
+        if r.get("id") in stuck:
+            issues.append("stuck_sensor: identical value repeated")
 
         if r.get("source") in _REAL_DATA_SOURCES and not r.get("provenance"):
             issues.append("real_data_source_without_provenance")

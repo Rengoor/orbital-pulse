@@ -1,6 +1,30 @@
 {
   "id": "stale_data",
-  "description": "stale data",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Stale data",
+  "area": "data",
+  "description": "Readings that look perfectly healthy but are five hours old are replayed as if current.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 72,
+        "unit": "bpm",
+        "age_s": 18000
+      },
+      {
+        "id": "sleep",
+        "channel": "sleep_hours",
+        "value": 7.5,
+        "unit": "h",
+        "age_s": 18000
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
 }

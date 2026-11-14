@@ -209,16 +209,63 @@ def test_pipeline_returns_parsed_proposal_when_enabled(monkeypatch):
     assert "astronaut_id" not in sent["readings"][0]
 
 
-def test_pipeline_strips_data_fault_claims_and_unknown_reading_ids(monkeypatch):
+def test_pipeline_strips_data_fault_claims(monkeypatch):
     monkeypatch.setenv("LLM_ENABLED", "1")
-    monkeypatch.setattr(
-        llm_pipeline,
-        "call_llm",
-        lambda s, u: json.dumps(_valid(data_fault=True, reading_ids=["r1", "invented"])),
-    )
+    monkeypatch.setattr(llm_pipeline, "call_llm", lambda s, u: json.dumps(_valid(data_fault=True)))
     proposal = llm_pipeline.run([_reading()], {"now": _NOW})
     assert proposal["data_fault"] is False
     assert proposal["reading_ids"] == ["r1"]
+
+
+# -- grounding: the model may only talk about data it was given ----------------
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"reading_ids": ["r1", "invented"]},                               # a reading that does not exist
+        {"reading_ids": ["r99"]},
+        {"reasons": ["heart rate reached 188 bpm"]},                       # a figure that is not in the data
+        {"reasons": ["heart rate 72 and oxygen saturation 81.5 percent"]},  # one real figure, one invented
+        {"reasons": ["glucose was 40.5"]},
+    ],
+)
+def test_hallucinated_evidence_is_discarded(monkeypatch, overrides):
+    monkeypatch.setenv("LLM_ENABLED", "1")
+    monkeypatch.setattr(llm_pipeline, "call_llm", lambda s, u: json.dumps(_valid(tier="RED", **overrides)))
+    assert llm_pipeline.run([_reading(value=72.0)], {"now": _NOW}) is None
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "heart rate is 72 bpm",                      # exactly the reading
+        "heart rate of 72.0 is steady",
+        "all 3 readings look steady",                # single digits may be used to count
+        "heart rate trending upward across the window",
+    ],
+)
+def test_grounded_reasons_are_kept(monkeypatch, reason):
+    monkeypatch.setenv("LLM_ENABLED", "1")
+    monkeypatch.setattr(llm_pipeline, "call_llm", lambda s, u: json.dumps(_valid(reasons=[reason])))
+    assert llm_pipeline.run([_reading(value=72.0)], {"now": _NOW}) is not None
+
+
+def test_ungrounded_reports_what_was_invented():
+    readings = [_reading("r1", value=72.0)]
+    assert llm_pipeline.ungrounded(_valid(), readings) is None
+    assert "not given" in llm_pipeline.ungrounded(_valid(reading_ids=["ghost"]), readings)
+    assert "188" in llm_pipeline.ungrounded(_valid(reasons=["peaked at 188"]), readings)
+
+
+def test_hallucinated_proposal_cannot_reach_the_verdict(monkeypatch):
+    monkeypatch.setenv("LLM_ENABLED", "1")
+    monkeypatch.setattr(
+        llm_pipeline, "call_llm", lambda s, u: json.dumps(_valid(tier="GREEN", reasons=["heart rate a healthy 61.5"]))
+    )
+    record = decide([_reading(value=150.0)], {}, {}, _NOW)
+    assert all(p["pipeline_id"] != "d_llm" for p in record["proposals"])
+    assert record["verdict"]["tier"] == "RED"
+    assert record["execution_manifest"]["pipelines"]["d_llm"] == "no_output"
 
 
 @pytest.mark.parametrize(

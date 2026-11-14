@@ -1,6 +1,24 @@
 {
   "id": "missing_baseline",
-  "description": "missing baseline",
-  "expected": "zero unsafe approvals",
-  "status": "todo"
+  "title": "Missing baseline",
+  "area": "data",
+  "description": "A crew member with no personal baseline has a dangerous reading; the statistical pipeline cannot assess it.",
+  "attack": {
+    "kind": "checkin",
+    "astronaut_id": "no_baseline_crew",
+    "readings": [
+      {
+        "id": "hr",
+        "channel": "heart_rate",
+        "value": 150,
+        "unit": "bpm"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "RED",
+      "GREY"
+    ]
+  }
 }

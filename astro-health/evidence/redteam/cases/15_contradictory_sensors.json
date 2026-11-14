@@ -1,0 +1,28 @@
+{
+  "id": "contradictory_sensors",
+  "title": "Contradictory sensors",
+  "area": "data",
+  "description": "Two heart-rate sensors report 60 and 140 at the same instant.",
+  "attack": {
+    "kind": "checkin",
+    "readings": [
+      {
+        "id": "a",
+        "channel": "heart_rate",
+        "value": 60,
+        "unit": "bpm"
+      },
+      {
+        "id": "b",
+        "channel": "heart_rate",
+        "value": 140,
+        "unit": "bpm"
+      }
+    ]
+  },
+  "expect": {
+    "tiers": [
+      "GREY"
+    ]
+  }
+}

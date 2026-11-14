@@ -1,0 +1,55 @@
+{
+  "source": "NASA OSDR, SpaceX Inspiration4",
+  "built_at": "2026-11-14T20:37:17Z",
+  "note": "Baselines are real Inspiration4 pre-flight draws. Subject ids are the dataset's own (C001-C004).",
+  "baselines": {
+    "C001": {
+      "glucose": {
+        "dataset_id": "OSD-575",
+        "field": "GLUCOSE",
+        "unit": "mg/dL",
+        "timepoints": [
+          "L-92",
+          "L-44",
+          "L-3"
+        ]
+      }
+    },
+    "C002": {
+      "glucose": {
+        "dataset_id": "OSD-575",
+        "field": "GLUCOSE",
+        "unit": "mg/dL",
+        "timepoints": [
+          "L-92",
+          "L-44",
+          "L-3"
+        ]
+      }
+    },
+    "C003": {
+      "glucose": {
+        "dataset_id": "OSD-575",
+        "field": "GLUCOSE",
+        "unit": "mg/dL",
+        "timepoints": [
+          "L-92",
+          "L-44",
+          "L-3"
+        ]
+      }
+    },
+    "C004": {
+      "glucose": {
+        "dataset_id": "OSD-575",
+        "field": "GLUCOSE",
+        "unit": "mg/dL",
+        "timepoints": [
+          "L-92",
+          "L-44",
+          "L-3"
+        ]
+      }
+    }
+  }
+}

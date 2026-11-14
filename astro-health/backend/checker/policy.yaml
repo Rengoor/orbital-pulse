@@ -49,10 +49,13 @@ data_requirements:
   max_future_skew_s: 300     # further ahead of the decision time than this is invalid
   required_channels: []      # channels every check-in must contain (none yet)
   default_critical: true     # an unusable reading on a critical channel makes the verdict GREY
-  channels:                  # per-channel overrides: unit, max_reading_age_s, critical
+  # Per-channel overrides: unit, max_reading_age_s, critical, stuck_after.
+  # stuck_after: this many consecutive identical values means the sensor has
+  # stopped updating (project-defined; set only where the signal always varies).
+  channels:
     bp_systolic: {unit: mmHg}
     bp_diastolic: {unit: mmHg}
-    heart_rate: {unit: bpm}
+    heart_rate: {unit: bpm, stuck_after: 8}
     glucose: {unit: mg/dL}
     temperature: {unit: C}
     sleep_hours: {unit: h}
