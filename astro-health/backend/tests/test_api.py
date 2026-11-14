@@ -57,6 +57,9 @@ _STORM_READINGS = [
 ]
 
 
+_CHECKIN_TIME = "2026-11-14T08:00:30Z"
+
+
 class Api:
     """Synchronous wrapper around httpx.AsyncClient against the in-process app."""
 
@@ -79,8 +82,11 @@ class Api:
     def post(self, url, **kwargs):
         return self.request("POST", url, **kwargs)
 
-    def checkin(self, astronaut_id="crew_1", readings=None) -> dict:
-        resp = self.post("/checkin", json={"astronaut_id": astronaut_id, "readings": readings or []})
+    def checkin(self, astronaut_id="crew_1", readings=None, now=_CHECKIN_TIME) -> dict:
+        body = {"astronaut_id": astronaut_id, "readings": readings or []}
+        if now is not None:
+            body["now"] = now  # the test readings are stamped 08:00, so decide them then
+        resp = self.post("/checkin", json=body)
         assert resp.status_code == 200, resp.text
         return resp.json()
 
@@ -100,7 +106,11 @@ def api(monkeypatch):
 def test_health_endpoint(api):
     resp = api.get("/health")
     assert resp.status_code == 200
-    assert resp.json() == {"ok": True}
+    body = resp.json()
+    assert body["ok"] is True
+    # The key in use is identified, and the demo key is called out as such.
+    assert body["signing_key"]["key_id"].startswith("k-")
+    assert body["signing_key"]["demo_key"] is True
 
 
 def test_all_seven_routes_are_registered(api):
@@ -208,7 +218,7 @@ def test_unexpected_fault_returns_structured_500(api, monkeypatch):
     def boom(*args, **kwargs):
         raise RuntimeError("disk on fire")
 
-    monkeypatch.setattr("backend.api.routes.checkin.decide", boom)
+    monkeypatch.setattr(api.store, "append_with", boom)
     resp = api.post("/checkin", json={"astronaut_id": "crew_1", "readings": []})
     assert resp.status_code == 500
     assert resp.json() == {"error": "internal_error", "detail": "RuntimeError"}
@@ -231,7 +241,11 @@ def test_status_returns_latest_verdict_for_that_astronaut_only(api):
     resp = api.get("/status/crew_1")
     assert resp.status_code == 200
     body = resp.json()
-    assert set(body) == {"tier", "action", "reasons", "record_id"}  # no raw readings
+    assert set(body) == {
+        "tier", "action", "additional_actions", "known_severity",
+        "disagreement_status", "reasons", "record_id", "ts",
+    }  # no raw readings
+    assert body["disagreement_status"] == "DISAGREEMENT"  # A said GREEN, B said RED
     assert body["record_id"] == latest["record_id"]
     assert (body["tier"], body["action"]) == ("RED", "ALERT_CMO")
     assert body["reasons"] == latest["verdict"]["reasons"]
@@ -382,8 +396,12 @@ def test_replay_404_and_422(api):
     assert api.post("/earth/replay", json={"record_id": "nope"}).status_code == 404
     assert api.post("/earth/replay", json={}).status_code == 422
     record_id = api.checkin("crew_1", [])["record_id"]
+    # A replay whose policy cannot be loaded fails safe instead of erroring.
     bad = {"record_id": record_id, "rules_override": {"policy_path": "/no/such/policy.yaml"}}
-    assert api.post("/earth/replay", json=bad).status_code == 422
+    resp = api.post("/earth/replay", json=bad)
+    assert resp.status_code == 200
+    assert resp.json()["verdict"]["failsafe"] is True
+    assert resp.json()["verdict"]["tier"] == "GREY"
 
 
 # ---------------------------------------------------------------------------

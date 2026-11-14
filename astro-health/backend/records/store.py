@@ -72,7 +72,13 @@ class RecordStore:
         concurrent check-ins can never link to the same previous record.
         """
         with self._lock:
-            record = build(self._head_hash("records"))
+            head = self._head_hash("records")
+            record = build(head)
+            if record.get("prev_hash") != head:
+                raise ValueError(
+                    f"record {record.get('id')!r} does not link to the chain head: "
+                    f"prev_hash={record.get('prev_hash')!r}, head={head!r}"
+                )
             with self._conn:
                 self._conn.execute(
                     "INSERT INTO records (id, astronaut_id, body) VALUES (?, ?, ?)",

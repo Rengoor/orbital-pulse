@@ -3,7 +3,12 @@
 LIMIT: one shared secret (SIGNING_KEY) both signs and verifies, so anyone who
 can verify a record can also forge one. Good enough to demonstrate tamper
 evidence; a flight system would sign on board with a private key and verify on
-the ground with the public key.
+the ground with the public key. This is demonstration key handling, not
+flight-ready key management.
+
+Every signed object names the key that signed it by ``key_id``, a fingerprint
+that identifies the key without revealing it. The built-in demo key is
+recognised and labelled wherever it is used.
 
 Owner: person B
 """
@@ -19,6 +24,20 @@ _DEMO_SIGNING_KEY = "demo-only-change-me"
 
 def default_signing_key() -> str:
     return os.environ.get("SIGNING_KEY", _DEMO_SIGNING_KEY)
+
+
+def key_id(signing_key: str | None = None) -> str:
+    """Public fingerprint of a signing key: safe to store and display."""
+    key = signing_key if signing_key is not None else default_signing_key()
+    return "k-" + hashlib.sha256(b"astrohealth-key-id:" + key.encode("utf-8")).hexdigest()[:16]
+
+
+DEMO_KEY_ID = key_id(_DEMO_SIGNING_KEY)
+
+
+def is_demo_key(signing_key: str | None = None) -> bool:
+    """True when the key in use is the publicly known demonstration key."""
+    return key_id(signing_key) == DEMO_KEY_ID
 
 
 def sign(message: str, signing_key: str | None = None) -> str:

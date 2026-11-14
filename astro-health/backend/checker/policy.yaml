@@ -1,5 +1,7 @@
 # Checker policy (action whitelist, tier rules). Versioned; its hash goes into every record.
-version: "0.1.0"
+version: "0.2.0"
+
+# Whitelisted actions, weakest first. This order is also what "stronger action" means.
 actions:
   - NO_ACTION
   - RECHECK_IN_1H
@@ -7,8 +9,42 @@ actions:
   - USE_PROTOCOL_CARD
   - ALERT_CMO
   - CONTACT_GROUND_URGENT
+
+# Tier-to-action policy: the one action the Checker authorizes for each tier.
 default_actions:
   GREEN: NO_ACTION
   YELLOW: REST_AND_HYDRATE
   RED: ALERT_CMO
   GREY: CONTACT_GROUND_URGENT
+
+# Medical severity, mildest first. GREY is deliberately not on this scale: it
+# means "cannot be verified", which is a statement about the evidence, not
+# about the astronaut. A GREY verdict keeps the worst severity that is still
+# known (verdict.known_severity) and its action (verdict.additional_actions).
+severity_order: [GREEN, YELLOW, RED]
+
+# Pipeline availability. A required pipeline that is missing, crashes, times
+# out or returns a malformed proposal makes the verdict GREY. An optional one
+# is disclosed in the decision trace and otherwise ignored.
+pipelines:
+  required: [a_statistical, b_limits]
+  optional: [d_llm]
+  timeout_s: 30
+
+# What data a verdict needs. This is what gives GREY a precise meaning: the
+# verdict is GREY when these requirements are not met.
+data_requirements:
+  min_valid_readings: 1      # a check-in with nothing usable cannot be GREEN
+  max_reading_age_s: 3600    # older than this, relative to the decision time, is stale
+  max_future_skew_s: 300     # further ahead of the decision time than this is invalid
+  required_channels: []      # channels every check-in must contain (none yet)
+  default_critical: true     # an unusable reading on a critical channel makes the verdict GREY
+  channels:                  # per-channel overrides: unit, max_reading_age_s, critical
+    bp_systolic: {unit: mmHg}
+    bp_diastolic: {unit: mmHg}
+    heart_rate: {unit: bpm}
+    glucose: {unit: mg/dL}
+    temperature: {unit: C}
+    sleep_hours: {unit: h}
+    co2_ppm: {unit: ppm}
+    dose_rate_usv_h: {unit: uSv/h}

@@ -73,7 +73,8 @@ def storm_run(env):
             responses, records = [], []
             for event in EVENTS:
                 resp = await client.post(
-                    "/checkin", json={"astronaut_id": "crew_1", "readings": event["readings"]}
+                    "/checkin",
+                    json={"astronaut_id": "crew_1", "readings": event["readings"], "now": event["ts"]},
                 )
                 assert resp.status_code == 200, resp.text
                 responses.append(resp.json())
@@ -199,8 +200,8 @@ def test_decide_is_deterministic(env):
     rules = load_rules()
     for event in EVENTS:
         now = datetime.fromisoformat(event["ts"].replace("Z", "+00:00"))
-        first = decide(event["readings"], {}, rules, now, prev_hash="abc")
-        second = decide(event["readings"], {}, rules, now, prev_hash="abc")
+        first = decide(event["readings"], {}, rules, now)
+        second = decide(event["readings"], {}, rules, now)
         assert first["verdict"] == second["verdict"]
         assert first == second  # the whole Record, id, hash and signature included
 

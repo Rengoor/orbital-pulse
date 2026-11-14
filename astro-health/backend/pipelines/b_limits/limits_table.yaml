@@ -7,13 +7,22 @@
 # NASA source yet, which is what `source: PLACEHOLDER` records. Replace the
 # value and the source together.
 #
+# Per row:
+#   basis       project_defined = chosen by this project; nasa_direct = taken as-is from a NASA document
+#   source      the document, or PLACEHOLDER while unsourced
+#   reference   page / table / section in that document
+#   applies_to  population or mission context the limit was written for
+# A row counts as an official limit only when basis is nasa_direct AND it has a
+# real source and reference. Anything else is reported to the crew as a
+# project-defined limit, never as a NASA medical limit.
+#
 # A value exactly on a limit is inside it. Readings must use the listed unit.
 channels:
-  bp_systolic: {unit: mmHg, yellow_low: 90, yellow_high: 140, red_low: 80, red_high: 180, source: PLACEHOLDER}
-  bp_diastolic: {unit: mmHg, yellow_low: 60, yellow_high: 90, red_low: 50, red_high: 120, source: PLACEHOLDER}
-  heart_rate: {unit: bpm, yellow_low: 50, yellow_high: 100, red_low: 40, red_high: 130, source: PLACEHOLDER}
-  glucose: {unit: mg/dL, yellow_low: 70, yellow_high: 180, red_low: 54, red_high: 250, source: PLACEHOLDER}
-  temperature: {unit: C, yellow_low: 36.0, yellow_high: 37.5, red_low: 35.0, red_high: 38.5, source: PLACEHOLDER}
-  sleep_hours: {unit: h, yellow_low: 6.0, yellow_high: null, red_low: 4.0, red_high: null, source: PLACEHOLDER}
-  co2_ppm: {unit: ppm, yellow_low: null, yellow_high: 4000, red_low: null, red_high: 7000, source: PLACEHOLDER}
-  dose_rate_usv_h: {unit: uSv/h, yellow_low: null, yellow_high: 50, red_low: null, red_high: 200, source: PLACEHOLDER}
+  bp_systolic: {unit: mmHg, yellow_low: 90, yellow_high: 140, red_low: 80, red_high: 180, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  bp_diastolic: {unit: mmHg, yellow_low: 60, yellow_high: 90, red_low: 50, red_high: 120, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  heart_rate: {unit: bpm, yellow_low: 50, yellow_high: 100, red_low: 40, red_high: 130, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  glucose: {unit: mg/dL, yellow_low: 70, yellow_high: 180, red_low: 54, red_high: 250, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  temperature: {unit: C, yellow_low: 36.0, yellow_high: 37.5, red_low: 35.0, red_high: 38.5, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  sleep_hours: {unit: h, yellow_low: 6.0, yellow_high: null, red_low: 4.0, red_high: null, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  co2_ppm: {unit: ppm, yellow_low: null, yellow_high: 4000, red_low: null, red_high: 7000, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}
+  dose_rate_usv_h: {unit: uSv/h, yellow_low: null, yellow_high: 50, red_low: null, red_high: 200, basis: project_defined, source: PLACEHOLDER, reference: null, applies_to: null}

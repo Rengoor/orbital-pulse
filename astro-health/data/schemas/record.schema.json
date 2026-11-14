@@ -21,7 +21,9 @@
       "type": "string"
     },
     "prev_hash": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^(GENESIS|[0-9a-f]{64})$",
+      "description": "Hash of the previous Record, or GENESIS for the first."
     },
     "ts": {
       "type": "string"
@@ -80,6 +82,18 @@
     },
     "signature": {
       "type": "string"
+    },
+    "key_id": {
+      "type": "string",
+      "description": "Fingerprint of the key that signed this Record."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "Input integrity gate report: status and issues per reading."
+    },
+    "execution_manifest": {
+      "type": "object",
+      "description": "Everything besides the inputs that could change the verdict: versions, hashes, pipeline status."
     }
   }
 }

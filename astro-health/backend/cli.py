@@ -3,6 +3,8 @@
     python -m backend.cli run-scenario <scenario_file> [--limits-file P] [--config P] [--out DIR] [--seed N]
     python -m backend.cli replay <record_id_or_file> [--rules P] [--limits-file P] [--out DIR]
     python -m backend.cli dump-records [--astronaut ID] [--format json|csv]
+    python -m backend.cli anchor [--out FILE]
+    python -m backend.cli verify-anchor <anchor_file>
 
 Records persist only when a store is named, with --store or RECORDS_PATH (a
 SQLite file, the same one the API uses). ``replay <record_id>`` and
@@ -19,7 +21,7 @@ import json
 import os
 import random
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -28,6 +30,7 @@ from backend.api.state import load_all_baselines
 from backend.earth.replay import divergence
 from backend.earth.replay import replay as replay_decision
 from backend.orchestrator import decide, load_rules
+from backend.records.anchor import build_anchor, check_against_anchor
 from backend.records.chain import GENESIS
 from backend.records.store import RecordStore
 
@@ -170,6 +173,7 @@ def run_scenario(
                 now=now,
                 prev_hash=prev_hash,
                 astronaut_id=event.get("astronaut_id"),
+                clock_source="scenario",
             )
 
         try:
@@ -256,6 +260,29 @@ def dump_records(
         sys.stdout.write("\n")
 
 
+def anchor(out_file: str | None = None, store_path: str | None = None) -> dict:
+    """Write a signed checkpoint of the chain head, to be stored away from the records."""
+    store = _open_store(store_path, required=True)
+    checkpoint = build_anchor(store.all(), datetime.now(timezone.utc))
+    text = json.dumps(checkpoint, indent=2) + "\n"
+    if out_file:
+        Path(out_file).write_text(text, encoding="utf-8")
+        count = checkpoint["record_count"]
+        print(f"wrote checkpoint of {count} record(s) to {out_file}", file=sys.stderr)
+    else:
+        sys.stdout.write(text)
+    return checkpoint
+
+
+def verify_anchor(anchor_file: str, store_path: str | None = None) -> dict:
+    """Check the stored chain against a checkpoint file taken earlier."""
+    store = _open_store(store_path, required=True)
+    result = check_against_anchor(store.all(), _load_structured(anchor_file))
+    json.dump(result, sys.stdout, indent=2)
+    sys.stdout.write("\n")
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
@@ -289,6 +316,14 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--format", choices=["json", "csv"], default="json")
     p.add_argument("--store", help=store_help)
 
+    p = sub.add_parser("anchor", help="export a signed checkpoint of the chain head")
+    p.add_argument("--out", help="file to write (default: stdout)")
+    p.add_argument("--store", help=store_help)
+
+    p = sub.add_parser("verify-anchor", help="check the chain against a checkpoint taken earlier")
+    p.add_argument("anchor_file")
+    p.add_argument("--store", help=store_help)
+
     return parser
 
 
@@ -314,6 +349,10 @@ def main(argv: list[str] | None = None) -> int:
                 store_path=args.store,
                 baselines_path=args.baselines,
             )
+        elif args.command == "anchor":
+            anchor(out_file=args.out, store_path=args.store)
+        elif args.command == "verify-anchor":
+            return 0 if verify_anchor(args.anchor_file, store_path=args.store)["valid"] else 1
         else:
             dump_records(astronaut_id=args.astronaut, fmt=args.format, store_path=args.store)
     except CliError as exc:

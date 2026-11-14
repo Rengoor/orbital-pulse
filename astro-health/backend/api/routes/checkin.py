@@ -3,6 +3,7 @@
 Owner: person A
 """
 
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -11,6 +12,9 @@ from pydantic import BaseModel
 
 from backend.api.state import AppState, get_state
 from backend.orchestrator import _READING_VALIDATOR, decide
+from backend.orchestrator import decide as _failsafe
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -18,6 +22,10 @@ router = APIRouter()
 class CheckinRequest(BaseModel):
     astronaut_id: str
     readings: list[dict[str, Any]] = []
+    # Decision time. Normally omitted (the server clock is used). Scenario
+    # playback sets it so recorded events are judged at their own time; the
+    # Record's execution manifest says which clock was used.
+    now: datetime | None = None
 
 
 @router.post("")
@@ -50,20 +58,29 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
     if errors:
         raise HTTPException(status_code=422, detail=errors)
 
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    if body.now is not None:
+        now, clock_source = body.now, "request"
+    else:
+        now, clock_source = datetime.now(timezone.utc), "server"
+    now = now.astimezone(timezone.utc).replace(tzinfo=None) if now.tzinfo else now
+
+    def build(prev_hash: str) -> dict:
+        common = dict(now=now, prev_hash=prev_hash, astronaut_id=body.astronaut_id, clock_source=clock_source)
+        try:
+            return decide(readings=readings, baselines=state.baselines, rules=state.rules, **common)
+        except Exception as exc:  # noqa: BLE001 - last line of defence
+            # decide() already fails safe for anything it can catch. If it
+            # still raised, record the fail-safe verdict rather than leave the
+            # crew looking at the previous verdict as if it were current.
+            logger.exception("decide() raised; recording a fail-safe verdict")
+            return _failsafe(
+                readings=readings, baselines={}, rules={},
+                force_failsafe=f"decision call failed: {type(exc).__name__}", **common,
+            )
 
     # Log first, display second: the signed Record is in the store before the
     # verdict leaves this function.
-    record = state.store.append_with(
-        lambda prev_hash: decide(
-            readings=readings,
-            baselines=state.baselines,
-            rules=state.rules,
-            now=now,
-            prev_hash=prev_hash,
-            astronaut_id=body.astronaut_id,
-        )
-    )
+    record = state.store.append_with(build)
 
     # Verdict summary only, never the full Record: keeps the downlink payload small.
     return {"record_id": record["id"], "verdict": record["verdict"]}

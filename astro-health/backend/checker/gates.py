@@ -125,3 +125,68 @@ def gate_grey_escalation(
         return "GREY"
 
     return current_tier
+
+
+# Pipeline outcomes that count as "this pipeline did its job".
+PIPELINE_OK = "ok"
+# Outcomes that are not failures: the pipeline is switched off by configuration.
+PIPELINE_NOT_RUNNING = ("disabled",)
+
+
+def gate_data_requirements(integrity: dict, requirements: dict) -> list[str]:
+    """Return the reasons the available data cannot support a verdict.
+
+    An empty list means the data requirements in policy.yaml are met. Any
+    reason makes the verdict unverifiable (GREY). The requirements:
+
+    * at least ``min_valid_readings`` valid readings;
+    * a valid reading for every channel in ``required_channels``;
+    * no stale or invalid reading on a critical channel (channels are critical
+      unless ``channels.<name>.critical`` or ``default_critical`` says otherwise).
+
+    Pure - does not mutate inputs.
+    """
+    reasons: list[str] = []
+    entries = integrity.get("readings", [])
+    valid = [e for e in entries if e["status"] == "valid"]
+
+    minimum = int(requirements.get("min_valid_readings") or 0)
+    if len(valid) < minimum:
+        reasons.append(
+            f"data requirement not met: {len(valid)} valid reading(s), policy requires at least {minimum}"
+        )
+
+    valid_channels = {e["channel"] for e in valid}
+    for channel in requirements.get("required_channels") or []:
+        if channel not in valid_channels:
+            reasons.append(f"data requirement not met: no valid {channel} reading")
+
+    channel_rules = requirements.get("channels") or {}
+    default_critical = requirements.get("default_critical", True)
+    for e in entries:
+        if e["status"] not in ("stale", "invalid"):
+            continue
+        critical = (channel_rules.get(e["channel"]) or {}).get("critical", default_critical)
+        if critical:
+            reasons.append(
+                f"{e['channel']} reading {e['reading_id']!r} is {e['status']} ({'; '.join(e['issues'])})"
+            )
+
+    return reasons
+
+
+def gate_pipeline_availability(pipeline_status: dict[str, str], required: list[str]) -> list[str]:
+    """Return a reason for every required pipeline that did not deliver.
+
+    A required pipeline must be present with status "ok". Missing, crashed,
+    timed out and malformed all count the same: its judgment is absent, so a
+    reassuring verdict from the others cannot stand. Optional pipelines are
+    never a reason here.
+
+    Pure - does not mutate inputs.
+    """
+    return [
+        f"required pipeline {name!r} unavailable ({pipeline_status.get(name, 'missing')})"
+        for name in required
+        if pipeline_status.get(name, "missing") != PIPELINE_OK
+    ]

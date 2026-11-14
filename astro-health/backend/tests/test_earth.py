@@ -148,6 +148,14 @@ def test_replay_under_different_rules_reports_the_divergence(history, rules):
         "old_action": "ALERT_CMO",
         "new_action": "NO_ACTION",
         "rules_changed": True,
+        # ...and the manifest pins the change on the limits table, nothing else.
+        "environment_changed": {
+            "limits_hash": [
+                history[2]["execution_manifest"]["limits_hash"],
+                replayed["execution_manifest"]["limits_hash"],
+            ]
+        },
+        "unexplained": False,
     }
 
 
@@ -167,6 +175,9 @@ def test_replay_of_a_tampered_record_exposes_the_real_decision(history, rules):
     report = divergence(tampered, replay(tampered, {}, rules))
     assert report["decision_changed"] is True
     assert (report["old_tier"], report["new_tier"]) == ("GREEN", "RED")
+    # Nothing in the decision environment differs, so the stored record is what changed.
+    assert report["environment_changed"] == {}
+    assert report["unexplained"] is True
 
 
 # ---------------------------------------------------------------------------

@@ -42,6 +42,20 @@ def _load_default_limits() -> dict:
     return _default_limits
 
 
+def _limit_label(limits: dict) -> str:
+    """Whose limit this is, as the crew will read it.
+
+    Only a row taken directly from a NASA document, with that document and the
+    place in it recorded, may be called a NASA limit. Everything else, however
+    sensible the number, is the project's own and is labelled that way.
+    """
+    source = limits.get("source")
+    sourced = bool(source) and source not in ("PLACEHOLDER", "TODO") and bool(limits.get("reference"))
+    if limits.get("basis") == "nasa_direct" and sourced:
+        return f"NASA ({source}, {limits['reference']})"
+    return "project-defined"
+
+
 def _breach(value: float, limits: dict) -> tuple[str, str, float] | None:
     """Return (tier, bound name, bound value) for the most severe limit crossed."""
     for bound, tier, direction in _CHECKS:
@@ -109,7 +123,7 @@ def run(readings: list[dict], context: dict) -> dict:
                 reading,
                 breach_tier,
                 f"{channel}={value:g} {expected_unit or reading['unit']} is {side} the"
-                f" {bound.split('_')[0]} limit of {threshold:g}",
+                f" {_limit_label(limits)} {bound.split('_')[0]} limit of {threshold:g}",
                 f"{channel}.{bound}",
             )
 

@@ -297,8 +297,13 @@ def test_none_from_llm_has_no_effect_on_the_verdict(monkeypatch):
     monkeypatch.setattr(llm_pipeline, "call_llm", lambda s, u: "no json here")
     with_failed_llm = decide(readings, {}, {}, _NOW)
 
-    assert with_failed_llm["verdict"] == baseline["verdict"]
+    for field in ("tier", "action", "reasons", "overruled_pipelines"):
+        assert with_failed_llm["verdict"][field] == baseline["verdict"][field]
     assert with_failed_llm["proposals"] == baseline["proposals"]
+    # The failure is disclosed, not hidden: it just cannot change the decision.
+    assert baseline["execution_manifest"]["pipelines"]["d_llm"] == "disabled"
+    assert with_failed_llm["execution_manifest"]["pipelines"]["d_llm"] == "no_output"
+    assert with_failed_llm["verdict"]["disagreement_status"] == "PARTIAL_ASSESSMENT"
     assert all(p["pipeline_id"] != "d_llm" for p in with_failed_llm["proposals"])
 
 

@@ -6,7 +6,8 @@ Owner: person A
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from backend.api.state import AppState, get_state
-from backend.records.cards import build_card
+from backend.earth.verify import verify_chain
+from backend.records.cards import build_card, build_trust_summary
 
 router = APIRouter()
 
@@ -37,3 +38,13 @@ def get_card(record_id: str, state: AppState = Depends(get_state)) -> dict:
     if record is None:
         raise HTTPException(status_code=404, detail=f"no record {record_id!r}")
     return build_card(record)
+
+
+@router.get("/{record_id}/trust")
+def get_trust(record_id: str, state: AppState = Depends(get_state)) -> dict:
+    """Data for the "Why should I trust this decision?" panel."""
+    record = state.store.get(record_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"no record {record_id!r}")
+    chain = verify_chain(state.store.all(), upto_record_id=record_id)
+    return build_trust_summary(record, chain["valid"], state.store.reviews(record_id))

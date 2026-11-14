@@ -13,6 +13,7 @@ from backend.api.routes.earth import router as earth_router
 from backend.api.routes.records import router as records_router
 from backend.api.routes.status import router as status_router
 from backend.api.state import AppState
+from backend.records.signing import is_demo_key, key_id
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,12 @@ def create_app() -> FastAPI:
     # Loaded once, at startup: rules, baselines, policy whitelist, record store.
     # (Schema validators are compiled when backend.orchestrator is imported.)
     app.state.ctx = AppState.load()
+    if is_demo_key():
+        logger.warning(
+            "Signing with the built-in DEMO key (%s). Records are tamper-evident only against "
+            "someone who does not know it. Set SIGNING_KEY for anything but a demonstration.",
+            key_id(),
+        )
 
     app.include_router(checkin_router, prefix="/checkin")
     app.include_router(status_router, prefix="/status")
@@ -31,7 +38,7 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health() -> dict:
-        return {"ok": True}
+        return {"ok": True, "signing_key": {"key_id": key_id(), "demo_key": is_demo_key()}}
 
     @app.exception_handler(Exception)
     async def unexpected_fault(request: Request, exc: Exception) -> JSONResponse:

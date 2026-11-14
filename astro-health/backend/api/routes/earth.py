@@ -5,6 +5,7 @@ Thin handlers: each one looks up its inputs and delegates to backend/earth/.
 Owner: person A
 """
 
+from datetime import datetime, timezone
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,6 +16,7 @@ from backend.earth.replay import replay
 from backend.earth.review import build_review
 from backend.earth.rulechange import rulechange
 from backend.earth.verify import verify_chain
+from backend.records.anchor import build_anchor, check_against_anchor
 
 router = APIRouter()
 
@@ -37,6 +39,22 @@ def verify(record_id: str, state: AppState = Depends(get_state)) -> dict:
     """Walk the hash chain from genesis to this record."""
     _require_record(state, record_id)
     return verify_chain(state.store.all(), upto_record_id=record_id)
+
+
+@router.get("/anchor")
+def anchor(state: AppState = Depends(get_state)) -> dict:
+    """A signed checkpoint of the chain head, to be kept somewhere else.
+
+    Whoever holds it can later prove that records were removed or history was
+    rewritten, even by someone with the signing key.
+    """
+    return build_anchor(state.store.all(), datetime.now(timezone.utc))
+
+
+@router.post("/anchor/verify")
+def anchor_verify(checkpoint: dict[str, Any], state: AppState = Depends(get_state)) -> dict:
+    """Check the current chain against a checkpoint taken earlier."""
+    return check_against_anchor(state.store.all(), checkpoint)
 
 
 class ReplayRequest(BaseModel):

@@ -47,6 +47,44 @@
     },
     "ruleset_hash": {
       "type": "string"
+    },
+    "known_severity": {
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED"
+      ],
+      "description": "Worst medical severity still known when the tier is GREY."
+    },
+    "additional_actions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "NO_ACTION",
+          "RECHECK_IN_1H",
+          "REST_AND_HYDRATE",
+          "USE_PROTOCOL_CARD",
+          "ALERT_CMO",
+          "CONTACT_GROUND_URGENT"
+        ]
+      },
+      "description": "Actions the known severity calls for in addition to the main action."
+    },
+    "disagreement_status": {
+      "enum": [
+        "AGREEMENT",
+        "DISAGREEMENT",
+        "PARTIAL_ASSESSMENT",
+        "UNVERIFIABLE"
+      ]
+    },
+    "decision_trace": {
+      "type": "object",
+      "description": "Machine-readable explanation of how the Checker reached this verdict."
+    },
+    "failsafe": {
+      "type": "boolean",
+      "description": "True when the Checker itself failed and the built-in fail-safe verdict was issued."
     }
   }
 }

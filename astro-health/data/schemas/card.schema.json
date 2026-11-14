@@ -72,6 +72,37 @@
       "items": {
         "type": "string"
       }
+    },
+    "disagreement_status": {
+      "enum": [
+        "AGREEMENT",
+        "DISAGREEMENT",
+        "PARTIAL_ASSESSMENT",
+        "UNVERIFIABLE"
+      ]
+    },
+    "known_severity": {
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED"
+      ]
+    },
+    "additional_actions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "NO_ACTION",
+          "RECHECK_IN_1H",
+          "REST_AND_HYDRATE",
+          "USE_PROTOCOL_CARD",
+          "ALERT_CMO",
+          "CONTACT_GROUND_URGENT"
+        ]
+      }
+    },
+    "explanation": {
+      "type": "string"
     }
   }
 }
