@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital Pulse · Helmet HUD</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/orbitalpulse.css">
+<style>
+  /* Citations below use NASA-STD-3001 Volume 2, Revision F (approved 2026-07-14).
+     "Project decision" marks a choice that standard does not make. See README.md. */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--void); color: var(--ink); }
+
+  /* The view through the visor is the live laptop camera (#cam-video, outside the React
+     root, full screen behind everything). Without a camera, a drawn scene stands in. */
+  #cam-video { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; transform: scaleX(-1); background: var(--void); z-index: 0; }
+  #cam-video[hidden] { display: none; }
+  #root { position: relative; z-index: 1; }
+  /* Tracked hand, fingertip cursor and pinch hint, drawn over everything. It never takes
+     clicks. It moves with your hand: a control aid, not health information (project
+     decision; key H hides it). */
+  #hand-overlay { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 3; }
+  /* The button a pinch would press. */
+  .g-hover { outline: 3px solid var(--holo) !important; outline-offset: 2px; }
+  .ack-btn { justify-self: start; min-height: 48px; }
+  .ackd svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+  .visor { position: fixed; inset: 0; overflow: hidden; }
+  .visor svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* Every HUD element sits on a void plate at 78% opacity (BRAND.md, helmet display).
+     Words are always --ink: 8.8:1 against that plate even over a white background,
+     meeting the 6:1 character contrast of App. F.5.10 f. Tier colours go on shapes,
+     borders and arrows only, because tier-red text on that plate drops to 3.2:1. */
+  .p { position: absolute; box-sizing: border-box; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 14px; }
+  /* Text no smaller than 16px: 12-point labels, [V2 10066] 10.4.3.3 Label Font Height.
+     Mixed case for words that are not acronyms, App. F.5.1 h. Sans serif, App. F.5.1 b. */
+  .txt { font: 500 16px/22px var(--font-sans); color: var(--ink); }
+  .lbl { font: 600 16px/20px var(--font-sans); color: var(--ink); }
+  /* Fixed-width font for numbers, App. F.5.1 d. */
+  .mono { font: 500 16px/22px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+  /* Nominal values sit dim (BRAND.md) but stay at 6.5:1 on the plate over white. */
+  .dim { color: color-mix(in srgb, var(--ink) 60%, var(--ink-muted)); }
+
+  /* Key information in one dedicated, always-visible area: time and link status,
+     App. F.4.2 f. Mission time top-left (BRAND.md). */
+  .tl { left: 16px; top: 16px; max-width: 320px; display: grid; gap: 2px; }
+  .tl .bad { display: flex; align-items: center; gap: 6px; }
+  .tl svg { width: 18px; height: 18px; flex: none; }
+  .tl .bad svg { color: var(--tier-grey); }
+  /* Simulation mode must look different from mission mode, App. F.4.2 j. */
+  .sim { display: inline-block; justify-self: start; padding: 0 6px; border: 1px solid var(--sim); border-radius: var(--radius-xs); font: 600 16px/22px var(--font-sans); color: var(--ink); }
+
+  /* Health sidebar on the right edge: status on top, vitals below. The centre of the view
+     stays clear, [V2 11022] 11.1.6.5 Suit Helmet Displays. Status, action and any extra
+     action are shown together, never paged: [V2 10037] 10.4.2.1. Placing vitals in the
+     sidebar rather than bottom-left is a project decision (camera-first HUD). */
+  .side { position: absolute; right: 16px; top: 16px; max-height: calc(100vh - 32px); width: 340px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+  .side .p { position: static; }
+  .vcol { display: flex; flex-direction: column; gap: 10px; }
+  /* Tab on the sidebar's left edge: collapse to the rail or open it again. */
+  .tab { position: absolute; top: 16px; width: 48px; height: 48px; display: grid; place-items: center; cursor: pointer; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line-strong); border-radius: var(--radius-md) 0 0 var(--radius-md); color: var(--ink); font: 600 22px/1 var(--font-sans); }
+  .tab:focus-visible { outline: 2px solid var(--holo); outline-offset: 2px; }
+  .tr { display: grid; gap: 8px; }
+  .tier { display: flex; align-items: center; gap: 10px; font: 600 26px/30px var(--font-sans); color: var(--ink); }
+  /* Colour never stands alone: shape and word go with it, [V2 10045] 10.4.2.2 and
+     App. F.5.10 e. Red for warning, yellow for caution: Table 10.4-3, App. F.6.4 a-b. */
+  .tier svg { width: 34px; height: 34px; flex: none; }
+  .tr.t-GREEN { border-color: var(--line); }
+  .tr.t-YELLOW { border: 2px solid var(--tier-yellow); }
+  .tr.t-RED { border: 3px solid var(--tier-red); }
+  /* GREY ranks above RED (project decision): heaviest border, dashed like the GREY ring. */
+  .tr.t-GREY { border: 4px dashed var(--tier-grey); }
+  .c-GREEN { color: var(--tier-green); } .c-YELLOW { color: var(--tier-yellow); }
+  .c-RED { color: var(--tier-red); } .c-GREY { color: var(--tier-grey); }
+  .act { display: flex; align-items: flex-start; gap: 10px; font: 600 19px/24px var(--font-sans); color: var(--ink); }
+  .act svg { width: 22px; height: 22px; flex: none; margin-top: 1px; color: var(--ink); }
+  .act.also { font-weight: 500; font-size: 17px; }
+  .marks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mark { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border: 1px solid var(--line-strong); border-radius: var(--radius-xs); font: 500 16px/22px var(--font-sans); color: var(--ink); }
+  .mark svg { width: 16px; height: 16px; flex: none; }
+  .mark.fail { border: 2px solid var(--tier-red); }
+  .mark.fail svg { color: var(--tier-red); }
+  .marks.col { flex-direction: column; align-items: flex-start; }
+  .mark { white-space: normal; }
+  /* Onboard authority: Earth cannot answer in time (delay-aware autonomy). */
+  .mark.onboard { border: 2px solid var(--holo); align-items: flex-start; }
+  .mark.onboard svg { color: var(--holo); margin-top: 3px; }
+
+  .vital { position: relative; white-space: nowrap; box-sizing: border-box; display: grid; gap: 4px; background: color-mix(in srgb, var(--void) 78%, transparent); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 12px; }
+  .vital .top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .vital .top svg { width: 22px; height: 22px; flex: none; }
+  /* Units with every value, [V2 10046] 10.4.2.3 and App. F.5.6 b. */
+  .num { font: 400 34px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+  .unit { font: 400 16px/1 var(--font-mono); margin-left: 4px; }
+  /* A coloured up or down arrow after an out-of-limit value, App. F.4.3.1 d. */
+  .arrow { font: 600 22px/1 var(--font-mono); margin-left: 4px; }
+  .vital.f-YELLOW { border: 2px solid var(--tier-yellow); }
+  .vital.f-RED { border: 3px solid var(--tier-red); }
+  .vital.f-GREY { border: 3px dashed var(--tier-grey); }
+  .vital.flag .num { color: var(--ink); font-weight: 600; }
+  .vital .src { font: 500 16px/20px var(--font-sans); }
+  .vital .src.s-sim { color: var(--ink); border-left: 3px solid var(--sim); padding-left: 6px; }
+
+  /* Sidebar states, chosen by hand gesture (gestures.mjs), the tab, or keys D/N/E.
+     Switches are instant: nothing animates.
+     Docked: a narrow rail. The tier word, shape and action stay; only nominal vitals
+     are hidden. Any change of status restores the normal sidebar.
+     Expanded: wider, with larger text and values, still at the edge ([V2 11022] 11.1.6.5). */
+  .visor[data-layout="docked"] .side { width: 236px; }
+  .visor[data-layout="docked"] .tr { gap: 4px; padding: 8px 12px; }
+  .visor[data-layout="docked"] .tier { font-size: 20px; line-height: 24px; }
+  .visor[data-layout="docked"] .tier svg { width: 26px; height: 26px; }
+  .visor[data-layout="docked"] .act { font-size: 16px; line-height: 20px; }
+  .visor[data-layout="expanded"] .side { width: 460px; }
+  .visor[data-layout="expanded"] .tier { font-size: 34px; line-height: 40px; }
+  .visor[data-layout="expanded"] .tier svg { width: 44px; height: 44px; }
+  .visor[data-layout="expanded"] .act { font-size: 24px; line-height: 30px; }
+  .visor[data-layout="expanded"] .act svg { width: 28px; height: 28px; }
+  .visor[data-layout="expanded"] .txt, .visor[data-layout="expanded"] .vital .src { font-size: 19px; line-height: 24px; }
+  .visor[data-layout="expanded"] .lbl { font-size: 20px; line-height: 24px; }
+  .visor[data-layout="expanded"] .num { font-size: 46px; }
+  .visor[data-layout="expanded"] .unit { font-size: 19px; }
+
+  /* Demo controls: a collapsible panel bottom-left, off the HUD's own plates.
+     48px targets for gloved hands (BRAND.md). Key C opens and closes it. */
+  .ctl { position: absolute; left: 16px; bottom: 16px; max-width: min(680px, calc(100vw - 400px)); max-height: 62vh; overflow-y: auto; box-sizing: border-box; display: grid; gap: var(--space-3); padding: var(--space-3) var(--space-4); background: color-mix(in srgb, var(--hull) 92%, transparent); border: 1px solid var(--line-strong); border-radius: var(--radius-md); }
+  .ctl-row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+  .ctl .vt-btn { min-height: 48px; }
+  .note { margin: 0; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); max-width: 640px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .err { color: var(--ink); border-left: 3px solid var(--tier-red); padding-left: 8px; }
+</style>
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/orbitalpulse.js"></script>
+<script src="../js/api.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<video id="cam-video" hidden muted playsinline aria-label="Camera view, processed on this device only"></video>
+<canvas id="hand-overlay" aria-hidden="true"></canvas>
+<script>
+  /* Helmet HUD. This page decides nothing. Every tier, action and flag on it is
+     read from the backend's verdict (GET /status, GET /records/{id}). It holds no
+     thresholds, no medical rules and no sample readings; with no link it shows
+     NO LINK and no values. The scenario simulator under the visor only POSTs
+     readings to /checkin; the HUD shows whatever the backend then decides. */
+  var V = window.OrbitalPulse, API = window.OrbitalPulseAPI, h = React.createElement, I = V.Icon;
+  var params = new URLSearchParams(location.search);
+  var WEARER = params.get('astronaut') || 'eva_02';
+  var MET_EPOCH = params.get('met_epoch');            // optional ISO time, for an MET clock
+  var POLL_MS = 3000, SIM_MS = 5000;
+
+  // Display vocabulary only. Tier words come from OrbitalPulse.TIERS, action wording from OrbitalPulse.ACTIONS.
+  var LABELS = { heart_rate: 'Heart rate', temperature: 'Body temp', co2_ppm: 'Cabin CO2', dose_rate_usv_h: 'Dose rate',
+    bp_systolic: 'BP systolic', bp_diastolic: 'BP diastolic', glucose: 'Glucose', sleep_hours: 'Sleep', mood: 'Mood',
+    exercise_minutes: 'Exercise', blood_analyte: 'Blood analyte' };
+  var ORDER = Object.keys(LABELS);                    // fixed slots, App. F.4.2 b
+  var UNITS = { C: '°C', 'uSv/h': 'µSv/h' };          // how a recorded unit is printed
+  // Minimum decimals to print, App. F.5.6 c. Values are padded, never rounded:
+  // rounding could move a value across a limit the backend applied to the exact number.
+  var MIN_DP = { temperature: 1, dose_rate_usv_h: 1 };
+  function fmt(r) {
+    var s = String(r.value), have = (s.split('.')[1] || '').length, want = MIN_DP[r.channel] || 0;
+    return have >= want ? s : Number(r.value).toFixed(want);
+  }
+  var SPLIT = { DISAGREEMENT: 'Assessments split', PARTIAL_ASSESSMENT: 'Partial assessment', UNVERIFIABLE: 'Unverifiable' };
+  var INTEGRITY = { fault: 'Sensor fault', stale: 'Stale reading', invalid: 'Invalid reading', not_assessed: 'Not assessed' };
+  // The backend's rule ids are "<channel>.<bound>", e.g. "heart_rate.red_high".
+  // These read the backend's own names for its bounds; they hold no limits.
+  var BOUND_TIER = { red: 'RED', yellow: 'YELLOW' };
+  var BOUND_SIDE = { high: '▲', low: '▼' };
+  // Order for presenting labels the backend already assigned. GREY ranks above RED
+  // because it means the data cannot be verified (project decision, policy.yaml).
+  var URGENCY = ['GREEN', 'YELLOW', 'RED', 'GREY'];
+
+  /* ---------- reading the verdict ---------- */
+
+  function worse(a, b) { return URGENCY.indexOf(b) > URGENCY.indexOf(a) ? b : a; }
+
+  // Channel -> { tier, arrow } for each channel the verdict's triggered_rules name.
+  function flaggedChannels(record) {
+    var trace = (record && record.verdict && record.verdict.decision_trace) || {};
+    var out = {};
+    (trace.triggered_rules || []).forEach(function (rule) {
+      var dot = rule.indexOf('.');
+      if (dot < 1) return;
+      var channel = rule.slice(0, dot), bound = rule.slice(dot + 1).split('_');
+      var tier = BOUND_TIER[bound[0]];
+      if (!tier) {
+        // Not a red/yellow bound (e.g. "heart_rate.unit"): take the tier of the
+        // pipeline that raised this rule, as recorded in the decision trace.
+        (trace.contributing_proposals || []).forEach(function (p) {
+          if ((p.rule_ids || []).indexOf(rule) >= 0) tier = tier ? worse(tier, p.tier) : p.tier;
+        });
+      }
+      tier = V.TIERS[tier] ? tier : 'GREY';
+      var prev = out[channel];
+      out[channel] = { tier: prev ? worse(prev.tier, tier) : tier, arrow: BOUND_SIDE[bound[1]] || (prev && prev.arrow) || '' };
+    });
+    return out;
+  }
+
+  // Up to four of the wearer's own readings from the record. Flagged or unusable
+  // channels are always included; the rest fill fixed slots in ORDER.
+  function vitalsFrom(record) {
+    if (!record || record.astronaut_id !== WEARER) return [];
+    var flags = flaggedChannels(record), status = {}, latest = {};
+    ((record.integrity || {}).readings || []).forEach(function (e) { status[e.reading_id] = e.status; });
+    (record.readings || []).forEach(function (r) { if (r.astronaut_id === WEARER) latest[r.channel] = r; });
+    // A fail-safe verdict assessed nothing: no reading may sit dim as if it were nominal.
+    var assessed = !(record.verdict && record.verdict.failsafe);
+    var rows = Object.keys(latest).map(function (ch) {
+      var r = latest[ch], st = assessed ? (status[r.id] || 'valid') : 'not_assessed';
+      return { reading: r, flag: flags[ch] || null, integrity: st === 'valid' ? null : st };
+    });
+    function rank(x) { var i = ORDER.indexOf(x.reading.channel); return i < 0 ? ORDER.length : i; }
+    rows.sort(function (a, b) { return rank(a) - rank(b); });
+    var must = rows.filter(function (x) { return x.flag || x.integrity; });
+    var rest = rows.filter(function (x) { return !(x.flag || x.integrity); });
+    return must.concat(rest).slice(0, 4).sort(function (a, b) { return rank(a) - rank(b); });
+  }
+
+  /* ---------- time ---------- */
+
+  function parseTs(ts) { return ts ? Date.parse(String(ts).slice(0, 19) + 'Z') : NaN; }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  // 24-hour clock, labelled with its time system, App. F.6.1 e-f.
+  function utc(ms) { var d = new Date(ms); return 'UTC ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()); }
+  function met(ms) {
+    var s = Math.floor((ms - parseTs(MET_EPOCH)) / 1000);
+    if (!isFinite(s) || s < 0) return null;
+    return 'MET ' + Math.floor(s / 86400) + '/' + pad(Math.floor(s / 3600) % 24) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60);
+  }
+  function dur(sec) {
+    if (sec == null || !isFinite(sec)) return '--';
+    if (sec < 60) return (sec < 10 ? sec.toFixed(1) : Math.round(sec)) + ' s';
+    if (sec < 3600) return Math.round(sec / 60) + ' min';
+    return (sec / 3600).toFixed(1) + ' h';
+  }
+  function age(ms, now) {
+    var s = Math.max(0, Math.round((now - ms) / 1000));
+    return s < 60 ? s + ' s old' : s < 3600 ? Math.floor(s / 60) + ' min old' : Math.floor(s / 3600) + ' h old';
+  }
+
+  /* ---------- audio cue on every change of status ---------- */
+  /* Distinct visual and audio annunciation for warning and caution,
+     [V2 10114] 10.3.1. Patterns follow Table 10.3-1 (Alert Type and Annunciation):
+       Warning: alternating square wave 400 Hz / 1,024 Hz, 0.4 s each, two pairs
+                (1.6 s), then 1 s silence, sequence twice.
+       Caution: 512 Hz triangle wave, 1 s tone, 1 s silence, repeated.
+       Advisory: 900 Hz sine, 106 ms on, 106 ms off, 106 ms on, once.
+     All within 200 Hz to 4 kHz, [V2 10058] 10.3.11. The first sequence plays 10 dB
+     lower than the second, [V2 10176] 10.3.3. Mapping tiers to patterns is a project
+     decision: RED -> Warning; GREY, NO LINK and fail-safe -> Warning (they rank above
+     RED); YELLOW -> Caution; GREEN -> Advisory. The cue plays once per change; the
+     standard's "repeat until terminated" and silencing ([V2 10116] 10.3.9) need an
+     acknowledgement, which needs a backend endpoint (out of scope). A browser
+     cannot be calibrated to [V2 10056] 10.3.12 sound levels. */
+  var audio = { ctx: null };
+  function tone(ctx, type, freq, at, dur, gain) {
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(gain, at + 0.005);
+    g.gain.setValueAtTime(gain, at + dur - 0.005); g.gain.linearRampToValueAtTime(0, at + dur);
+    o.connect(g); g.connect(ctx.destination); o.start(at); o.stop(at + dur + 0.01);
+  }
+  var FULL = 0.25, PRE = FULL * 0.316;                // -10 dB pre-alert
+  function playCue(kind) {
+    var ctx = audio.ctx; if (!ctx) return;
+    var t = ctx.currentTime + 0.05, rep, k;
+    if (kind === 'warning') {
+      for (rep = 0; rep < 2; rep++) for (k = 0; k < 4; k++) tone(ctx, 'square', k % 2 ? 1024 : 400, t + rep * 2.6 + k * 0.4, 0.4, rep ? FULL : PRE);
+    } else if (kind === 'caution') {
+      tone(ctx, 'triangle', 512, t, 1, PRE); tone(ctx, 'triangle', 512, t + 2, 1, FULL);
+    } else {
+      tone(ctx, 'sine', 900, t, 0.106, FULL); tone(ctx, 'sine', 900, t + 0.212, 0.106, FULL);
+    }
+  }
+  var CUE = { GREEN: 'advisory', YELLOW: 'caution', RED: 'warning', GREY: 'warning', NOLINK: 'warning' };
+
+  /* ---------- scenario simulator (demo input only) ---------- */
+  /* Honest simulated readings: real units from backend/checker/policy.yaml, source
+     "simulated", the current timestamp. Each scenario is a physiological situation;
+     the backend decides what it means. Small sensor noise keeps the values moving,
+     as a live sensor does (the backend treats a heart rate repeated 8 times as stuck).
+     A fault is reported as the sensor's last held value with quality "fault";
+     values are never changed to force a result. Cabin CO2 (co2_ppm) is the habitat
+     channel; the backend has no suit CO2 or oxygen channel. */
+  var CHANNELS = {
+    heart_rate: { unit: 'bpm', dp: 0, noise: 2 },
+    temperature: { unit: 'C', dp: 1, noise: 0.05 },
+    co2_ppm: { unit: 'ppm', dp: 0, noise: 40 },
+    dose_rate_usv_h: { unit: 'uSv/h', dp: 2, noise: 0.03 }
+  };
+  var RESTING = { heart_rate: 92, temperature: 37.0, co2_ppm: 2600, dose_rate_usv_h: 0.6 };
+  var SCENARIOS = [
+    { id: 'nominal', label: 'Steady work', set: {} },
+    { id: 'exertion', label: 'Heavy exertion', set: { heart_rate: 118, temperature: 37.4 } },
+    { id: 'heat', label: 'Heat stress', set: { heart_rate: 136, temperature: 38.7 } },
+    { id: 'spe', label: 'Solar particle event', set: { dose_rate_usv_h: 240 } },
+    { id: 'hr_fault', label: 'Heart rate sensor fault', set: {}, fault: ['heart_rate'] },
+    { id: 'spe_fault', label: 'Particle event + sensor fault', set: { dose_rate_usv_h: 240 }, fault: ['heart_rate'] }
+  ];
+  var lastHeld = {};
+  function simReadings(sc, seq) {
+    var ts = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+    return Object.keys(CHANNELS).map(function (ch) {
+      var c = CHANNELS[ch], faulted = (sc.fault || []).indexOf(ch) >= 0, value;
+      if (faulted && lastHeld[ch] !== undefined) value = lastHeld[ch];
+      else {
+        var base = sc.set[ch] !== undefined ? sc.set[ch] : RESTING[ch];
+        var scale = ch === 'dose_rate_usv_h' ? Math.max(1, base / 10) : 1;   // noise proportional for dose
+        value = Number((base + (Math.random() * 2 - 1) * c.noise * scale).toFixed(c.dp));
+        lastHeld[ch] = value;
+      }
+      return { id: 'hud-sim-' + seq + '-' + ch, ts: ts, channel: ch, value: value, unit: c.unit, source: 'simulated', quality: faulted ? 'fault' : 'ok' };
+    });
+  }
+
+  /* ---------- the HUD ---------- */
+
+  function Scene(p) {
+    var sun = p.light === 'sun';
+    return h('svg', { className: 'scene', viewBox: '0 0 960 540', preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': true },
+      h('rect', { width: 960, height: 540, fill: '#020305' }),
+      [[80, 60], [210, 120], [400, 40], [620, 90], [880, 150], [300, 200], [720, 30]].map(function (s, i) { return h('circle', { key: i, cx: s[0], cy: s[1], r: 1.2, fill: '#cfd6dd', opacity: sun ? .25 : .8 }); }),
+      sun ? h('circle', { cx: 840, cy: 70, r: 120, fill: '#fffdf2', opacity: .16 }) : null,
+      sun ? h('circle', { cx: 840, cy: 70, r: 34, fill: '#fffdf2', opacity: .9 }) : null,
+      h('path', { d: 'M0 300 Q140 270 300 292 T620 280 T960 300 V540 H0Z', fill: sun ? '#a8a49c' : '#26282b' }),
+      h('path', { d: 'M0 360 Q200 330 420 356 T960 350 V540 H0Z', fill: sun ? '#c9c5bc' : '#1b1c1f' }),
+      h('ellipse', { cx: 520, cy: 430, rx: 150, ry: 26, fill: sun ? '#8d8981' : '#121315' }),
+      h('ellipse', { cx: 180, cy: 470, rx: 60, ry: 14, fill: sun ? '#7c7870' : '#101113' }),
+      h('path', { d: 'M640 400l30-34 40 10 14 28z', fill: sun ? '#7a766e' : '#141517' }));
+  }
+
+  function ActionLine(p) {
+    var a = V.ACTIONS[p.code];
+    // An action code the UI has no wording for is shown as the code itself, never dropped.
+    return h('div', { className: 'act' + (p.also ? ' also' : '') }, h(I, { name: a ? a.icon : 'antenna' }), (p.also ? 'Also: ' : '') + (a ? a.text : p.code));
+  }
+
+  function StatusPlate(p) {
+    var s = p.status, rec = p.record, now = p.now;
+    if (p.link === 'down' || p.link === 'connecting') {
+      // No verdict is current. Nothing here may read as an all-clear.
+      return h('div', { className: 'p tr t-GREY', role: 'alert' },
+        h('div', { className: 'tier' }, h(I, { name: 'tier-GREY', className: 'c-GREY', strokeWidth: 2.2 }), p.link === 'down' ? 'NO LINK' : 'Connecting'),
+        h('div', { className: 'txt' }, p.lastTs ? 'Last verdict ' + utc(p.lastTs).slice(4) + ' UTC, ' + age(p.lastTs, now) : 'No verdict received yet'),
+        h('div', { className: 'txt' }, 'No current status.'));
+    }
+    if (!s) {
+      return h('div', { className: 'p tr t-GREY', role: 'status' },
+        h('div', { className: 'tier' }, h(I, { name: 'tier-GREY', className: 'c-GREY', strokeWidth: 2.2 }), V.TIERS.GREY.word),
+        h('div', { className: 'txt' }, 'No verdict recorded for ' + WEARER + ' yet.'));
+    }
+    var tier = V.TIERS[s.tier] ? s.tier : 'GREY';
+    var failsafe = !!(rec && rec.id === s.record_id && rec.verdict && rec.verdict.failsafe);
+    var ts = parseTs(s.ts);
+    return h('div', { className: 'p tr t-' + tier, role: tier === 'GREEN' ? 'status' : 'alert' },
+      h('div', { className: 'tier' }, h(I, { name: 'tier-' + tier, className: 'c-' + tier, strokeWidth: 2.2 }), V.TIERS[tier].word),
+      h(ActionLine, { code: s.action }),
+      (s.additional_actions || []).map(function (a) { return h(ActionLine, { key: a, code: a, also: true }); }),
+      h(AutonomyLines, { autonomy: s.autonomy, ground: s.ground_review }),
+      (failsafe || (s.disagreement_status && s.disagreement_status !== 'AGREEMENT')) ? h('div', { className: 'marks' },
+        failsafe ? h('span', { className: 'mark fail' }, h(I, { name: 'tier-RED' }), 'Decision system failed') : null,
+        s.disagreement_status && s.disagreement_status !== 'AGREEMENT' ? h('span', { className: 'mark' }, h(I, { name: 'tier-YELLOW' }), SPLIT[s.disagreement_status] || s.disagreement_status) : null) : null,
+      // Verdict age is always shown, so an old verdict is never taken for a live one (App. F.4.3.1 c).
+      h('div', { className: 'txt dim' }, 'Verdict ' + (isFinite(ts) ? utc(ts).slice(4) + ' UTC, ' + age(ts, now) : 'time unknown')),
+      // Acknowledge ("dismiss"): logs in the backend's signed acknowledgement chain that the
+      // wearer saw this verdict. It never hides or changes the tier or the action.
+      tier === 'GREEN' || !p.ack ? null
+        : p.ack.key && p.ack.key === p.ack.current
+          ? h('div', { className: 'txt ackd' }, h(I, { name: 'check', className: 'c-GREEN' }),
+              'Acknowledged ' + utc(parseTs(p.ack.ts)).slice(4) + ' UTC')
+          : h(V.Button, { size: 'sm', variant: 'secondary', icon: 'check', className: 'ack-btn', 'aria-label': 'Acknowledge this alert',
+              disabled: p.ack.sending, onClick: p.ack.onAck }, p.ack.sending ? 'Acknowledging' : 'Acknowledge'),
+      p.ack && p.ack.err ? h('div', { className: 'txt' }, 'Not acknowledged: ' + p.ack.err) : null);
+  }
+
+  /* Delay-aware autonomy, from the backend's signed handoff (GET /status -> autonomy):
+     can Earth answer before this action has to start? And the latest ground review,
+     which only shows as received once the light delay has passed. */
+  var REVIEW_WORD = { AGREE: 'agreed with', DISAGREE: 'disagreed with', FOLLOW_UP: 'asked for follow-up on' };
+  function AutonomyLines(p) {
+    var a = p.autonomy, g = p.ground, out = [];
+    if (a && a.mode === 'ONBOARD_AUTHORITY') {
+      out.push(h('div', { key: 'a', className: 'mark onboard' }, h(I, { name: 'antenna' }),
+        'Earth answers in ~' + dur(a.earth_answer_s) + ': too late for this action. Act on the onboard verdict.'));
+    } else if (a && a.mode === 'GROUND_IN_LOOP') {
+      out.push(h('div', { key: 'a', className: 'txt dim' }, 'Earth can answer in ~' + dur(a.earth_answer_s) + '.'));
+    }
+    if (g) {
+      out.push(g.arrived
+        ? h('div', { key: 'g', className: 'mark' + (g.outcome === 'DISAGREE' ? ' fail' : '') }, h(I, { name: g.outcome === 'AGREE' ? 'check' : 'antenna' }),
+            'Ground (simulated) ' + (REVIEW_WORD[g.outcome] || g.outcome) + ' your ' + utc(parseTs(g.record_ts)).slice(4, 9) + ' verdict')
+        : h('div', { key: 'g', className: 'txt dim' }, 'Ground review on its way, arrives ' + utc(parseTs(g.arrives_at)).slice(4) + ' UTC'));
+    }
+    return out.length ? h('div', { className: 'marks col' }, out) : null;
+  }
+
+  function Vital(p) {
+    var r = p.row.reading, f = p.row.flag, bad = p.row.integrity;
+    var cls = 'vital' + (bad ? ' flag f-GREY' : f ? ' flag f-' + f.tier : '');
+    var label = LABELS[r.channel] || r.channel;
+    return h('div', { className: cls, role: 'group', 'aria-label': label + (bad ? ', ' + INTEGRITY[bad] : f ? ', ' + V.TIERS[f.tier].word : '') },
+      h('div', { className: 'top' }, h('span', { className: 'lbl' }, label),
+        bad ? h(I, { name: 'tier-GREY', className: 'c-GREY' }) : f ? h(I, { name: 'tier-' + f.tier, className: 'c-' + f.tier }) : null),
+      bad === 'not_assessed'
+        // Shown at full ink with a dashed GREY plate, never dim, since nothing judged it.
+        ? h('div', null, h('span', { className: 'num' }, fmt(r)), h('span', { className: 'unit' }, UNITS[r.unit] || r.unit))
+        : bad
+        // An unusable reading never shows its number, which could read as normal (BRAND.md).
+        ? h('div', null, h('span', { className: 'num', style: { fontSize: 24 } }, V.TIERS.GREY.word))
+        : h('div', null,
+            h('span', { className: 'num' + (f ? '' : ' dim') }, fmt(r)),
+            h('span', { className: 'unit' + (f ? '' : ' dim') }, UNITS[r.unit] || r.unit),
+            f && f.arrow ? h('span', { className: 'arrow c-' + f.tier, 'aria-hidden': true }, f.arrow) : null),
+      h('div', { className: 'src' + (r.source === 'simulated' ? ' s-sim' : ' dim') },
+        bad ? INTEGRITY[bad] || bad : r.source === 'simulated' ? 'Simulated' : 'NASA data'));
+  }
+
+  function App() {
+    var st = React.useState({ link: 'connecting', status: null, record: null, lastTs: null });
+    var state = st[0], setState = st[1];
+    var nowS = React.useState(Date.now()), now = nowS[0];
+    // ?scenario=<id> starts that simulator scenario on load (run_demo.py opens the HUD with "nominal").
+    var startScenario = SCENARIOS.some(function (x) { return x.id === params.get('scenario'); }) ? params.get('scenario') : null;
+    var sim = React.useState(startScenario), simErr = React.useState(null), ctlOpen = React.useState(false);
+    var audioOn = React.useState(false);
+    var recordRef = React.useRef(null), cueKey = React.useRef(null), seq = React.useRef(0);
+    // Panel layout, set by hand gesture, the D/N/E keys or the buttons below the visor.
+    var layout = React.useState('normal');
+    var gest = React.useState({ on: false, starting: false, hand: false, last: null, err: null });
+    // The camera <video> lives outside the React root (#cam-video): the vendored
+    // runtime rebuilds the DOM on every render and has no refs, which would destroy it.
+    var gestRef = React.useRef(null);
+    var camVideo = document.getElementById('cam-video'), handCanvas = document.getElementById('hand-overlay');
+    // Gesture callbacks outlive renders, so they read current values through refs.
+    var layoutRef = React.useRef('normal'); layoutRef.current = layout[0];
+    var showHand = React.useState(true), showHandRef = React.useRef(true); showHandRef.current = showHand[0];
+    var acks = React.useState({ key: null, ts: null, sending: false, err: null });
+    var LAYOUT_OF = { dock: 'docked', normal: 'normal', expand: 'expanded' };
+    var LAYOUT_WORD = { docked: 'Docked', normal: 'Normal', expanded: 'Expanded' };
+
+    // Poll the backend. Any failure is NO LINK at once: no fallback, no local rules.
+    React.useEffect(function () {
+      var alive = true;
+      function poll() {
+        API.status(WEARER).then(function (s) {
+          var have = recordRef.current;
+          var rec = have && have.id === s.record_id ? Promise.resolve(have) : API.record(s.record_id);
+          return rec.then(function (r) {
+            recordRef.current = r;
+            if (alive) setState({ link: 'up', status: s, record: r, lastTs: parseTs(s.ts) });
+          });
+        }).catch(function (e) {
+          if (!alive) return;
+          if (/^HTTP 404/.test(e && e.message)) { recordRef.current = null; setState({ link: 'up', status: null, record: null, lastTs: null }); return; }
+          setState(function (p) { return { link: 'down', status: null, record: null, lastTs: p.lastTs }; });
+        });
+      }
+      poll();
+      var id = setInterval(poll, POLL_MS);
+      return function () { alive = false; clearInterval(id); };
+    }, []);
+
+    // The clock and verdict age change text once a second; nothing on the HUD animates.
+    React.useEffect(function () { var id = setInterval(function () { nowS[1](Date.now()); }, 1000); return function () { clearInterval(id); }; }, []);
+
+    // Simulator: POST the chosen scenario now, then every SIM_MS until stopped.
+    React.useEffect(function () {
+      if (!sim[0]) return;
+      var sc = SCENARIOS.filter(function (x) { return x.id === sim[0]; })[0];
+      function send() {
+        seq.current += 1;
+        API.checkin(WEARER, simReadings(sc, Date.now() + '-' + seq.current))
+          .then(function () { simErr[1](null); })
+          .catch(function (e) { simErr[1](e.message); });
+      }
+      send();
+      var id = setInterval(send, SIM_MS);
+      return function () { clearInterval(id); };
+    }, [sim[0]]);
+
+    // Audio cue whenever the displayed status changes.
+    var key = state.link === 'down' ? 'NOLINK' : state.link !== 'up' ? null : state.status ? state.status.tier + (state.record && state.record.verdict && state.record.verdict.failsafe ? ':failsafe' : '') : 'NONE';
+    React.useEffect(function () {
+      if (key === null || key === cueKey.current) return;
+      var first = cueKey.current === null;
+      cueKey.current = key;
+      if (first) return;
+      // A change of status always restores the normal layout, so a docked HUD can
+      // never keep a new status or a newly flagged vital out of view.
+      layout[1]('normal');
+      if (key === 'NONE') return;
+      playCue(CUE[key.split(':')[0]] || 'warning');
+    }, [key]);
+
+    // Keyboard fallback for the same three layouts.
+    React.useEffect(function () {
+      function onKey(e) {
+        if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        var k = String(e.key).toLowerCase();
+        if (k === 'c') { ctlOpen[1](function (o) { return !o; }); return; }
+        if (k === 'h') { showHand[1](function (o) { return !o; }); return; }
+        var cmd = { d: 'dock', n: 'normal', e: 'expand' }[k];
+        if (cmd) layout[1](LAYOUT_OF[cmd]);
+      }
+      window.addEventListener('keydown', onKey);
+      return function () { window.removeEventListener('keydown', onKey); };
+    }, []);
+    // The camera and gestures start with the page (the browser asks for permission
+    // once). ?camera=0 starts without them.
+    React.useEffect(function () {
+      if (params.get('camera') !== '0') startCamera();
+      return function () { if (gestRef.current) gestRef.current.stop(); };
+    }, []);
+
+    // Acknowledgements of the current verdict, read from the backend (never kept locally).
+    var recId = state.record ? state.record.id : null;
+    var recIdRef = React.useRef(null); recIdRef.current = recId;
+    // An acknowledgement covers the status it was made on (same tier, action, extra
+    // actions and the same triggered rules, i.e. the same cause) for as long as that
+    // status lasts, since each check-in is a new record. A different status or a new
+    // cause needs its own. The backend stores each acknowledgement against the exact
+    // record it was made on (project decision).
+    var s0 = state.status, trace0 = state.record && state.record.verdict && state.record.verdict.decision_trace;
+    var statusKey = s0 ? [s0.tier, s0.action].concat(s0.additional_actions || [], ['#'], ((trace0 && trace0.triggered_rules) || []).slice().sort()).join('|') : null;
+    var statusKeyRef = React.useRef(null); statusKeyRef.current = statusKey;
+    function loadAcks(id, key) {
+      API.acks(id).then(function (r) {
+        var list = r.acks || [];
+        if (!list.length || statusKeyRef.current !== key) return;
+        acks[1](function (p) { return Object.assign({}, p, { key: key, ts: list[list.length - 1].ts, sending: false, err: null }); });
+      }).catch(function () { /* the next poll shows NO LINK if the backend is gone */ });
+    }
+    React.useEffect(function () { if (recId) loadAcks(recId, statusKey); }, [recId]);
+    function acknowledge() {
+      if (!recId) return;
+      var id = recId, key = statusKey;
+      acks[1](function (p) { return Object.assign({}, p, { sending: true, err: null }); });
+      API.ack(id, WEARER, 'Acknowledged on the helmet HUD').then(function () { loadAcks(id, key); })
+        .catch(function (e) { acks[1](function (p) { return Object.assign({}, p, { sending: false, err: e.message }); }); });
+    }
+
+    // What a pinch at screen point (x, y) would press: the button under the fingertip,
+    // or nothing (then a pinch collapses or opens the sidebar).
+    var hovered = { el: null };
+    function buttonAt(x, y) {
+      var el = document.elementFromPoint(x, y), b = el && el.closest ? el.closest('button') : null;
+      return b && !b.disabled ? b : null;
+    }
+    function buttonName(b) { return (b.getAttribute('aria-label') || b.textContent || '').trim(); }
+    function describe(x, y) {
+      var b = buttonAt(x, y);
+      if (hovered.el && hovered.el !== b) hovered.el.classList.remove('g-hover');
+      if (b) b.classList.add('g-hover');
+      hovered.el = b;
+      return b ? 'Pinch: ' + buttonName(b) : 'Pinch: ' + (layoutRef.current === 'docked' ? 'open sidebar' : 'collapse sidebar');
+    }
+    function onGesture(c) {
+      var label;
+      if (c.command === 'pinch') {
+        var b = buttonAt(c.x, c.y);
+        if (b) { label = 'Pinch → ' + buttonName(b); b.click(); }
+        else {
+          var next = layoutRef.current === 'docked' ? 'normal' : 'docked';
+          layout[1](next);
+          label = 'Pinch → ' + LAYOUT_WORD[next];
+        }
+      } else {
+        layout[1](LAYOUT_OF[c.command]);
+        label = c.gesture + ' → ' + LAYOUT_WORD[LAYOUT_OF[c.command]];
+      }
+      gest[1](function (p) { return Object.assign({}, p, { last: label }); });
+    }
+
+    // Test hook (only with ?gesture_test=1): lets a headless browser drive the same
+    // pinch and hover handlers a real hand does.
+    if (params.get('gesture_test') === '1') window.HUDGestureTest = { describe: describe, onGesture: onGesture };
+
+    function startCamera() {
+      gest[1]({ on: false, starting: true, hand: false, last: null, err: null });
+      import('./gestures.mjs').then(function (m) {
+        return m.startGestures(camVideo, {
+          canvas: handCanvas,
+          describe: describe,
+          showHand: function () { return showHandRef.current; },
+          onCommand: onGesture,
+          onHand: function (seen) {
+            if (!seen && hovered.el) { hovered.el.classList.remove('g-hover'); hovered.el = null; }
+            gest[1](function (p) { return Object.assign({}, p, { hand: seen }); });
+          }
+        });
+      }).then(function (ctl) {
+        gestRef.current = ctl;
+        camVideo.hidden = false;
+        gest[1]({ on: true, starting: false, hand: false, last: null, err: null });
+      }).catch(function (e) {
+        gest[1]({ on: false, starting: false, hand: false, last: null, err: (e && (e.message || e.name)) || String(e) });
+      });
+    }
+    function stopCamera() {
+      if (gestRef.current) gestRef.current.stop();
+      gestRef.current = null;
+      camVideo.hidden = true;
+      gest[1]({ on: false, starting: false, hand: false, last: null, err: null });
+    }
+
+    function enableAudio() {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      audio.ctx = audio.ctx || new Ctx();
+      audio.ctx.resume();
+      audioOn[1](true);
+      playCue('advisory');   // confirms the speaker works
+    }
+
+    var mt = MET_EPOCH ? met(now) : null;
+    var simulated = !!sim[0] || (state.record && (state.record.readings || []).some(function (r) { return r.source === 'simulated'; }));
+    var vitals = state.link === 'up' ? vitalsFrom(state.record) : [];
+    // Docked hides only nominal vitals; a flagged or unusable one always stays.
+    if (layout[0] === 'docked') vitals = vitals.filter(function (row) { return row.flag || row.integrity; });
+
+    var docked = layout[0] === 'docked';
+    var noVitals = state.link === 'down'
+      ? h('div', { className: 'p txt' }, 'Vitals hidden: with no link they would not be current.')
+      : null;
+
+    return h('div', { className: 'visor', 'data-theme': 'night', 'data-layout': layout[0] },
+        // Without a camera, a drawn scene stands in so the overlay can still be judged.
+        gest[0].on ? null : h(Scene, { light: 'sun' }),
+        h('div', { className: 'p tl', role: 'group', 'aria-label': 'Time and link' },
+          mt ? h('span', { className: 'mono' }, mt) : null,
+          h('span', { className: 'mono' }, utc(now)),
+          h('span', { className: 'lbl' }, WEARER),
+          state.link === 'down' ? h('span', { className: 'lbl bad' }, h(I, { name: 'antenna' }), 'NO LINK') :
+            state.link === 'up' ? h('span', { className: 'txt' }, 'Habitat link up') : h('span', { className: 'txt' }, 'Connecting'),
+          state.link === 'up' && state.status && state.status.autonomy
+            ? h('span', { className: 'txt' }, 'Earth: ' + state.status.autonomy.link.label + ', ' + dur(state.status.autonomy.link.one_way_delay_s) + ' one way') : null,
+          audioOn[0] ? null : h('span', { className: 'txt' }, 'Audio cues off'),
+          layout[0] !== 'normal' ? h('span', { className: 'txt' }, LAYOUT_WORD[layout[0]] + ' view') : null,
+          gest[0].on ? h('span', { className: 'txt' }, gest[0].hand ? 'Gestures: hand seen' : 'Gestures on') :
+            gest[0].starting ? h('span', { className: 'txt' }, 'Starting camera') :
+            gest[0].err ? h('span', { className: 'txt' }, 'Camera off: ' + gest[0].err) : null,
+          gest[0].last ? h('span', { className: 'txt' }, gest[0].last) : null,
+          simulated ? h('span', { className: 'sim' }, 'Simulated input') : null),
+
+        // The health sidebar (right edge) and its tab.
+        h('div', { className: 'side', role: 'region', 'aria-label': 'Health status' },
+          h(StatusPlate, { link: state.link, status: state.status, record: state.record, lastTs: state.lastTs, now: now,
+            ack: Object.assign({}, acks[0], { current: statusKey, onAck: acknowledge }) }),
+          noVitals || (vitals.length ? h('div', { className: 'vcol' }, vitals.map(function (row) { return h(Vital, { key: row.reading.channel, row: row }); })) : null)),
+        h('button', {
+          type: 'button', className: 'tab', style: { right: 16 + ({ docked: 236, normal: 340, expanded: 460 })[layout[0]] + 'px' },
+          'aria-label': docked ? 'Open the health sidebar' : 'Collapse the health sidebar',
+          onClick: function () { layout[1](docked ? 'normal' : 'docked'); }
+        }, docked ? '‹' : '›'),
+
+        // Demo controls, collapsed by default so the camera view stays clear.
+        ctlOpen[0] ? h('div', { className: 'ctl', role: 'region', 'aria-label': 'Demo controls' },
+          h('div', { className: 'ctl-row' },
+            h(V.Button, { size: 'sm', variant: 'secondary', onClick: function () { ctlOpen[1](false); } }, 'Hide controls'),
+            h(V.Button, { size: 'sm', variant: 'secondary', icon: 'check', disabled: audioOn[0], onClick: enableAudio }, audioOn[0] ? 'Audio cues on' : 'Enable audio cues'),
+            gest[0].on
+              ? h(V.Button, { size: 'sm', variant: 'secondary', onClick: stopCamera }, 'Stop camera')
+              : h(V.Button, { size: 'sm', variant: 'secondary', disabled: gest[0].starting, onClick: startCamera }, gest[0].starting ? 'Starting camera' : 'Start camera')),
+          h('span', { className: 'vt-lbl' }, 'Sidebar'),
+          h('div', { className: 'ctl-row' }, ['dock', 'normal', 'expand'].map(function (c) {
+            var l = LAYOUT_OF[c];
+            return h(V.Button, { key: c, size: 'sm', variant: layout[0] === l ? 'primary' : 'secondary', onClick: function () { layout[1](l); } }, LAYOUT_WORD[l]);
+          })),
+          h('span', { className: 'vt-lbl' }, 'Earth delay (applies to new verdicts)'),
+          h('div', { className: 'ctl-row' },
+            [['leo', null, 'Low Earth orbit'], ['moon', null, 'Moon'], ['mars_near', null, 'Mars closest'], ['mars_far', null, 'Mars farthest'], [null, 30, 'Demo: 30 s']].map(function (o) {
+              var cur = state.status && state.status.autonomy ? state.status.autonomy.link : null;
+              var on = cur && (o[0] ? cur.preset === o[0] : cur.preset == null && cur.one_way_delay_s === o[1]);
+              return h(V.Button, { key: o[2], size: 'sm', variant: on ? 'primary' : 'secondary',
+                onClick: function () { API.setLink(o[0], o[1], o[0] ? null : 'Demo Mars (30 s)').catch(function (e) { simErr[1](e.message); }); } }, o[2]);
+            })),
+          h('span', { className: 'vt-lbl' }, 'Scenario simulator (posts simulated readings for ' + WEARER + ')'),
+          h('div', { className: 'ctl-row' },
+            SCENARIOS.map(function (x) {
+              return h(V.Button, { key: x.id, size: 'sm', variant: x.id === sim[0] ? 'primary' : 'secondary', onClick: function () { sim[1](x.id); } }, x.label);
+            }),
+            h(V.Button, { size: 'sm', variant: 'secondary', disabled: !sim[0], onClick: function () { sim[1](null); } }, 'Stop sending')),
+          simErr[0] ? h('p', { className: 'note err' }, 'Check-in not accepted: ' + simErr[0]) : null,
+          gest[0].err ? h('p', { className: 'note err' }, 'Camera could not start: ' + gest[0].err) : null,
+          h('p', { className: 'note' }, h('b', null, 'Gestures: '), 'point with your index finger to move the ring; pinch (thumb to index) to press the button under it, or pinch on empty space to collapse or open the sidebar. ',
+            'Flat-hand swipe right or left also collapses or opens it; hold an open palm to expand, a fist for normal. Keys D, N, E do the same; C opens these controls; H hides the hand outline. ',
+            'A change of status always reopens the sidebar. The camera is processed on this device only.'),
+          h('div', { className: 'ctl-row' },
+            h(V.Button, { size: 'sm', variant: 'secondary', onClick: function () { showHand[1](!showHand[0]); } }, showHand[0] ? 'Hide hand outline' : 'Show hand outline')),
+          h('p', { className: 'note' }, h('b', null, 'The HUD decides nothing. '),
+            'Tier, action and flags all come from the backend verdict.'))
+        : h('div', { className: 'ctl', style: { padding: 'var(--space-2)' } },
+            h(V.Button, { size: 'sm', variant: 'secondary', onClick: function () { ctlOpen[1](true); } }, 'Demo controls')));
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>

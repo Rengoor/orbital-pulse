@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital Pulse · VitalReadout</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/orbitalpulse.css">
+
+<script src="../js/vendor/react.production.min.js"></script>
+<script src="../js/vendor/react-dom.production.min.js"></script>
+<script src="../js/orbitalpulse.js"></script>
+</head>
+<body>
+<div id="root" class="vt-stage"></div>
+<script>
+  var V = window.OrbitalPulse, h = React.createElement;
+
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
+    h(V.VitalReadout, { label: 'Heart rate', value: 96, unit: 'bpm', tier: 'YELLOW', delta: '+18 vs base', trend: [68,70,71,69,74,80,86,91,96], band: [55, 85], source: 'simulated', updated: '09:12Z', width: 248 }),
+    h(V.VitalReadout, { label: 'Skin temp', value: '36.8', unit: '°C', tier: 'GREEN', delta: '±0.1', trend: [36.7,36.8,36.8,36.9,36.8,36.8], band: [36.1, 37.4], source: 'nasa_osdr', updated: '09:10Z', width: 248 }),
+    h(V.VitalReadout, { label: 'Glucose', value: null, unit: 'mmol/L', tier: 'GREY', trend: [5.1, 5.3], source: 'manual', updated: 'sensor fault', width: 248 })
+  ));
+</script>
+</body>
+</html>

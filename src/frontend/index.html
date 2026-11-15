@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbital Pulse UI</title>
+<script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/orbitalpulse.css">
+<style>
+  main { max-width: 920px; margin: 0 auto; padding: var(--space-12) var(--space-6); display: grid; gap: var(--space-8); }
+  h1 { margin: 0; } h1 i { font-style: normal; color: var(--signal); }
+  p { margin: var(--space-2) 0 0; color: var(--ink-muted); }
+  ul { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: grid; gap: 2px; }
+  li { display: grid; grid-template-columns: 200px 1fr; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--line); }
+  li span { color: var(--ink-muted); font-size: 14px; line-height: 20px; }
+  a { color: var(--holo); font-weight: 600; }
+  .theme a { margin-right: var(--space-4); }
+</style>
+</head>
+<body>
+<main>
+  <header><h1 class="display">Orbital Pulse<i>.</i></h1><p class="body">Astronaut health monitoring UI. Every page below runs on the same tokens and component library.</p>
+  <p class="theme body-sm">Theme: <a href="?theme=night">Night</a><a href="?theme=day">Day</a> (add <code>?theme=day</code> to any page)</p></header>
+  <section><h2 class="vt-lbl">The three views</h2><ul><li><a href="hud/index.html">Helmet HUD</a><span>What one astronaut sees through the visor: their own tier, the one authorized action and up to four vitals, all from the backend verdict. Shows NO LINK when the backend is unreachable. In <code>hud/</code>.</span></li><li><a href="tablet/monitor.html">Tablet · crew health monitor</a><span>Live from the backend: every monitored channel for a crew member, the current verdict, and why it can be trusted. No sample data. In <code>tablet/</code>.</span></li><li><a href="earth/index.html">Earth base</a><span>Ground oversight with every log: decisions, chain integrity and checkpoints, downlink and reviews. Lives in <code>earth/</code>.</span></li></ul></section><section><h2 class="vt-lbl">Component library</h2><ul><li><a href="components/VitalReadout.html">VitalReadout</a><span>One channel's live value: label, tier badge, big mono number, unit, change from baseline, trend with its normal band, and source.</span></li><li><a href="components/SourceLabel.html">SourceLabel</a><span>Says where a value came from: `REAL · NASA OSDR`, RadLab or DONKI, a hatched `SIMULATED`, or `MANUAL ENTRY`.</span></li><li><a href="components/TierBadge.html">TierBadge</a><span>The tier as icon plus word on its wash: Nominal, Watch, Act now, No data.</span></li><li><a href="components/Button.html">Button</a><span>Actions. `primary` (suit orange) appears at most once per view, for the action the tier demands. `secondary` (holo outline) is the default. `ghost` is for low-weight actions such as Details.</span></li><li><a href="components/Panel.html">Panel</a><span>The instrument housing for everything on a dashboard: hull surface, hairline border, two holo corner brackets.</span></li></ul></section>
+</main>
+<script>
+  var th = new URLSearchParams(location.search).get('theme');
+  if (th) document.querySelectorAll('ul a').forEach(function (a) { a.href += '?theme=' + th; });
+</script>
+</body>
+</html>

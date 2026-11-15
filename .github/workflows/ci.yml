@@ -1,11 +1,11 @@
 name: ci
 on: [push, pull_request]
 
-# The project lives under astro-health/; this file must sit at the repository
+# The project lives under src/; this file must sit at the repository
 # root (.github/) or GitHub never runs it, which is where it used to sit.
 defaults:
   run:
-    working-directory: astro-health
+    working-directory: src
 
 jobs:
   tests:
