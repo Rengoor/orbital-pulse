@@ -1,4 +1,4 @@
-/* VitalisAPI — Local-only client connecting Vitalis UI to the AstroHealth FastAPI backend.
+/* AstroHealthAPI — Local-only client connecting AstroHealth UI to the AstroHealth FastAPI backend.
  * Every value shown in a view comes from this client's live responses. There is no
  * demo or fixture fallback: when the backend is unreachable, requests reject and the
  * views show their explicit no-link state (with ?mock=1 every request rejects, so a
@@ -66,7 +66,7 @@
     });
   }
 
-  global.VitalisAPI = {
+  global.AstroHealthAPI = {
     baseUrl: BASE_URL,
     isMockForced: isMockForced,
     health: function () { return request('GET', '/health'); },

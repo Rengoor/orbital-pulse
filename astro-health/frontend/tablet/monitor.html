@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitalis · Crew health monitor</title>
+<title>AstroHealth · Crew health monitor</title>
 <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
 <link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/vitalis.css">
+<link rel="stylesheet" href="../css/astrohealth.css">
 <style>
   body { margin: 0; }
   .mo { padding: var(--space-6); display: grid; gap: var(--space-4); max-width: 1360px; margin: 0 auto; box-sizing: border-box; }
@@ -50,7 +50,7 @@
 </style>
 <script src="../js/vendor/react.production.min.js"></script>
 <script src="../js/vendor/react-dom.production.min.js"></script>
-<script src="../js/vitalis.js"></script>
+<script src="../js/astrohealth.js"></script>
 <script src="../js/api.js"></script>
 </head>
 <body>
@@ -60,7 +60,7 @@
      with the Checker's current verdict and why it can be trusted. This page
      only displays. Each tier, action and explanation is the Checker's own; the
      page has no thresholds and no sample data. With no link it shows nothing. */
-  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+  var V = window.AstroHealth, API = window.AstroHealthAPI, h = React.createElement, I = V.Icon;
   var REFRESH_MS = 4000, HISTORY = 24;
   var RANK = { GREEN: 0, YELLOW: 1, RED: 2, GREY: 3 };
   var LABELS = {
@@ -207,7 +207,7 @@
 
     return h('div', { className: 'mo' },
       h('div', { className: 'mo-top' },
-        h('div', { className: 'mo-brand' }, h('b', null, 'Vitalis', h('i', null, '.'), ' Crew health monitor'),
+        h('div', { className: 'mo-brand' }, h('b', null, 'AstroHealth', h('i', null, '.'), ' Crew health monitor'),
           h('span', { className: 'mo-sub' }, 'Every monitored channel, the current verdict, and why it can be trusted')),
         h('div', { className: 'mo-stat' }, h('span', { className: 'vt-lbl' }, 'Link to the decision system'),
           h('span', { className: 'v ' + (link[0] === 'online' ? 'ok' : link[0] === 'offline' ? 'bad' : 'muted') }, link[0] === 'online' ? 'Connected' : link[0] === 'offline' ? 'No link' : 'Connecting'))),

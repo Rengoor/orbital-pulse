@@ -58,7 +58,7 @@ def create_app() -> FastAPI:
         return RedirectResponse(url="/ui/index.html")
 
     if (_FRONTEND_DIR / "index.html").exists():
-        app.mount("/ui", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="vitalis_ui")
+        app.mount("/ui", StaticFiles(directory=str(_FRONTEND_DIR), html=True), name="astrohealth_ui")
 
     @app.exception_handler(Exception)
     async def unexpected_fault(request: Request, exc: Exception) -> JSONResponse:

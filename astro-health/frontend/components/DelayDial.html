@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitalis · DelayDial</title>
+<title>AstroHealth · DelayDial</title>
 <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
 <link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/vitalis.css">
+<link rel="stylesheet" href="../css/astrohealth.css">
 
 <script src="../js/vendor/react.production.min.js"></script>
 <script src="../js/vendor/react-dom.production.min.js"></script>
-<script src="../js/vitalis.js"></script>
+<script src="../js/astrohealth.js"></script>
 </head>
 <body>
 <div id="root" class="vt-stage"></div>
 <script>
-  var V = window.Vitalis, h = React.createElement;
+  var V = window.AstroHealth, h = React.createElement;
 
   ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null,
     h(V.DelayDial, { oneWaySeconds: 1.3, vehicle: 'Gateway' }),

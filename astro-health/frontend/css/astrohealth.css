@@ -1,6 +1,6 @@
 /* Local-only stylesheet: no external network font imports; falls back cleanly to system fonts in tokens.css */
 
-/* Vitalis component styles. Every colour, space and radius is a token from tokens.json. */
+/* AstroHealth component styles. Every colour, space and radius is a token from tokens.json. */
 
 body { margin: 0; background: var(--void); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 .vt-stage { padding: var(--space-6); display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-start; }

@@ -104,8 +104,8 @@ pointing finger across the screen never triggers one.
 
 | On screen | Source |
 |---|---|
-| Tier word, shape, colour | `GET /status/{id}` → `tier`. Words from `Vitalis.TIERS`. |
-| Action | `action`, worded by `Vitalis.ACTIONS`. Free text is never used. |
+| Tier word, shape, colour | `GET /status/{id}` → `tier`. Words from `AstroHealth.TIERS`. |
+| Action | `action`, worded by `AstroHealth.ACTIONS`. Free text is never used. |
 | "Also: …" line | `additional_actions` (a GREY verdict that hides a known RED). |
 | Split marker | `disagreement_status` when it is not `AGREEMENT`. |
 | "Decision system failed" | `GET /records/{record_id}` → `verdict.failsafe`. |

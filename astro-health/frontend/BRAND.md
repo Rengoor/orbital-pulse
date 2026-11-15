@@ -1,6 +1,6 @@
-Vitalis is the interface for the astronaut health monitor: decision support, not diagnosis. Crew see one body, holographic and drifting as if weightless, with hotspots that show what's wrong and one thing to do about it. An onboard LLM advisor suggests actions, and a deterministic Checker can only *raise* the advisor's verdict, never lower it. The UI must never talk itself into reassuring anyone.
+AstroHealth is the interface for the astronaut health monitor: decision support, not diagnosis. Crew see one body, holographic and drifting as if weightless, with hotspots that show what's wrong and one thing to do about it. An onboard LLM advisor suggests actions, and a deterministic Checker can only *raise* the advisor's verdict, never lower it. The UI must never talk itself into reassuring anyone.
 
-Load `tokens.css`, then `components/bundle.css`, then React 18 and `components/bundle.js`. Components live on `window.Vitalis`. The three type families come from Google Fonts; `bundle.css` imports them.
+Load `tokens.css`, then `components/bundle.css`, then React 18 and `components/bundle.js`. Components live on `window.AstroHealth`. The three type families come from Google Fonts; `bundle.css` imports them.
 
 ## Content fundamentals
 
@@ -40,7 +40,7 @@ One data model (`zones`, a `card`, an `advice` string) drives three views of the
 - **Dashboard:** a three-column grid of `VitalReadout`s, a `DoseGauge` and an `Advisory` summary. Use it for the CMO's review, or whenever a glance at everything matters more than location.
 - **AR:** in a WebXR `immersive-ar` session, the same `BodyMap` zone ids anchor to a surface. Keep hotspot hit areas at 18px radius in SVG space (about 48px at arm's length), keep `void` behind text panels, and use the same callout. Where WebXR AR isn't supported, fall back to the in-cabin preview: the body over a perspective floor grid.
 
-Body zones (`Vitalis.ZONES`) map to reading channels: `neuro` (sleep_hours, mood), `resp` (co2_ppm), `cardio` (heart_rate, bp_*), `radiation` (dose_rate_usv_h), `metabolic` (glucose, blood_analyte), `thermal` (temperature), `msk` (exercise_minutes).
+Body zones (`AstroHealth.ZONES`) map to reading channels: `neuro` (sleep_hours, mood), `resp` (co2_ppm), `cardio` (heart_rate, bp_*), `radiation` (dose_rate_usv_h), `metabolic` (glucose, blood_analyte), `thermal` (temperature), `msk` (exercise_minutes).
 
 ## The advisor and the Checker
 
@@ -66,4 +66,4 @@ The same Checker verdicts feed two more surfaces, each with its own rules.
 
 ## Iconography
 
-Icons come from the system's own 24px stroke set (`Vitalis.Icon`, stroke 2, round caps and joins, `currentColor`). Tier shapes, actions (`clock`, `drop`, `card`, `medic`, `antenna`, `check`), views (`body`, `grid`, `cube`) and `shield`, `flare`, `sun`, `arrow` are included. Icons always sit beside a word, except the hotspot glyphs, which carry an `aria-label`. No emoji. There's no logo file yet: the wordmark is "Vitalis" set in `display` with a `signal` full stop.
+Icons come from the system's own 24px stroke set (`AstroHealth.Icon`, stroke 2, round caps and joins, `currentColor`). Tier shapes, actions (`clock`, `drop`, `card`, `medic`, `antenna`, `check`), views (`body`, `grid`, `cube`) and `shield`, `flare`, `sun`, `arrow` are included. Icons always sit beside a word, except the hotspot glyphs, which carry an `aria-label`. No emoji. There's no logo file yet: the wordmark is "AstroHealth" set in `display` with a `signal` full stop.

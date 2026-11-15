@@ -1,4 +1,4 @@
-// Vitalis: types as documentation. Global: window.Vitalis
+// AstroHealth: types as documentation. Global: window.AstroHealth
 export type Tier = 'GREEN' | 'YELLOW' | 'RED' | 'GREY';
 export type Action = 'NO_ACTION' | 'RECHECK_IN_1H' | 'REST_AND_HYDRATE' | 'USE_PROTOCOL_CARD' | 'ALERT_CMO' | 'CONTACT_GROUND_URGENT';
 export type Source = 'simulated' | 'nasa_osdr' | 'nasa_radlab' | 'nasa_donki' | 'manual';

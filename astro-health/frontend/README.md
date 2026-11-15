@@ -1,6 +1,6 @@
-# vitalis-ui
+# astrohealth-ui
 
-The Vitalis front end: design tokens, a React component library and three views, one directory each: the helmet HUD (`hud/`), the tablet (`tablet/`) and the Earth base display (`earth/`). No build step: plain HTML, CSS and one JavaScript file, with React 18 loaded from jsDelivr.
+The AstroHealth front end: design tokens, a React component library and three views, one directory each: the helmet HUD (`hud/`), the tablet (`tablet/`) and the Earth base display (`earth/`). No build step: plain HTML, CSS and one JavaScript file, with React 18 loaded from jsDelivr.
 
 ## Run it
 
@@ -23,8 +23,8 @@ Opening the files straight from disk (`file://`) also works in most browsers, bu
 | `tablet/monitor.html` | **View 2, tablet.** Crew health monitor, live from the backend only; shows nothing when there is no link. See `tablet/README.md` |
 | `earth/index.html` | **View 3, Earth base.** Every log (decisions, chain, checkpoints, downlink, reviews) with verify, replay and review |
 | `components/*.html` | One live demo per component |
-| `js/vitalis.js` | The component library. Defines `window.Vitalis` (BodyMap, VitalReadout, Sparkline, DoseGauge, DecisionCard, Advisory, TierBadge, SourceLabel, DelayDial, CrewSwitcher, SegmentedControl, Button, Panel, Icon) |
-| `css/vitalis.css` | Component styles. Every colour, space and radius is a token |
+| `js/astrohealth.js` | The component library. Defines `window.AstroHealth` (BodyMap, VitalReadout, Sparkline, DoseGauge, DecisionCard, Advisory, TierBadge, SourceLabel, DelayDial, CrewSwitcher, SegmentedControl, Button, Panel, Icon) |
+| `css/astrohealth.css` | Component styles. Every colour, space and radius is a token |
 | `css/tokens.css` | CSS custom properties for both themes, generated from `tokens/tokens.json` |
 | `tokens/tokens.json` | Source of truth for colours, type, spacing, radii and shadows |
 | `types/index.d.ts` | Prop types for every component (documentation) |
@@ -34,13 +34,13 @@ Opening the files straight from disk (`file://`) also works in most browsers, bu
 
 ```html
 <link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/vitalis.css">
+<link rel="stylesheet" href="css/astrohealth.css">
 <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-<script src="js/vitalis.js"></script>
+<script src="js/astrohealth.js"></script>
 <div id="root"></div>
 <script>
-  var V = window.Vitalis, h = React.createElement;
+  var V = window.AstroHealth, h = React.createElement;
   ReactDOM.createRoot(document.getElementById('root')).render(
     h(V.VitalReadout, { label: 'Heart rate', value: 96, unit: 'bpm', tier: 'YELLOW', source: 'simulated' }));
 </script>

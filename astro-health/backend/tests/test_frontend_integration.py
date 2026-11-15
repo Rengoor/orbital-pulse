@@ -1,4 +1,4 @@
-"""End-to-end tests for the integrated Vitalis UI frontend and AstroHealth backend."""
+"""End-to-end tests for the integrated AstroHealth UI frontend and AstroHealth backend."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ _FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setenv("SIGNING_KEY", "test-vitalis-ui-signing-key")
+    monkeypatch.setenv("SIGNING_KEY", "test-astrohealth-ui-signing-key")
     for var in ("RECORDS_PATH", "BASELINES_PATH", "LLM_ENABLED"):
         monkeypatch.delenv(var, raising=False)
     app = create_app()
@@ -31,7 +31,7 @@ def client(monkeypatch):
     return request
 
 
-def test_vitalis_ui_static_pages_served_by_backend(client):
+def test_astrohealth_ui_static_pages_served_by_backend(client):
     root_resp = client("GET", "/")
     assert root_resp.status_code in (302, 307)
     assert root_resp.headers["location"] == "/ui/index.html"
@@ -41,11 +41,11 @@ def test_vitalis_ui_static_pages_served_by_backend(client):
         "/ui/hud/index.html",
         "/ui/tablet/monitor.html",
         "/ui/earth/index.html",
-        "/ui/js/vitalis.js",
+        "/ui/js/astrohealth.js",
         "/ui/js/api.js",
         "/ui/js/vendor/react.production.min.js",
         "/ui/css/tokens.css",
-        "/ui/css/vitalis.css",
+        "/ui/css/astrohealth.css",
     ):
         resp = client("GET", path)
         assert resp.status_code == 200, f"{path} returned {resp.status_code}"
@@ -68,7 +68,7 @@ def test_hud_is_display_only():
     assert "source: 'simulated'" in script
     for forbidden in ("nasa_osdr", "nasa_radlab", "nasa_donki", "NASA-" + "compliant", "localStorage"):
         assert forbidden not in script, forbidden
-    # Action wording comes from Vitalis.ACTIONS, not free text in the page.
+    # Action wording comes from AstroHealth.ACTIONS, not free text in the page.
     assert "V.ACTIONS[" in script
     assert (_FRONTEND_DIR / "hud" / "README.md").is_file()
 
@@ -165,7 +165,7 @@ def test_api_js_ships_no_demo_data():
         assert forbidden not in api_js, f"api.js still contains {forbidden}"
 
 
-def test_vitalis_ui_has_no_external_cdn_or_font_urls():
+def test_astrohealth_ui_has_no_external_cdn_or_font_urls():
     """Verify every HTML, CSS, and JS asset runs 100% locally without external CDN calls."""
     for ext in ("*.html", "*.css", "*.js"):
         for file_path in _FRONTEND_DIR.rglob(ext):
@@ -174,7 +174,7 @@ def test_vitalis_ui_has_no_external_cdn_or_font_urls():
             assert "fonts.googleapis.com" not in content, f"External Google Fonts left in {file_path}"
 
 
-def test_vitalis_crew_checkins_produce_expected_tiers_and_cards(client):
+def test_astrohealth_crew_checkins_produce_expected_tiers_and_cards(client):
     ts = "2026-11-14T09:12:00Z"
     crew_payloads = {
         "ml": (

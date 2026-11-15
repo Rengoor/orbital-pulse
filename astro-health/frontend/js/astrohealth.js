@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"Vitalis","components":[{"name":"BodyMap"},{"name":"VitalReadout"},{"name":"Sparkline"},{"name":"DoseGauge"},{"name":"DecisionCard"},{"name":"Advisory"},{"name":"TierBadge"},{"name":"SourceLabel"},{"name":"DelayDial"},{"name":"CrewSwitcher"},{"name":"SegmentedControl"},{"name":"Button"},{"name":"Panel"}]} */
+/* @ds-bundle: {"format":4,"namespace":"AstroHealth","components":[{"name":"BodyMap"},{"name":"VitalReadout"},{"name":"Sparkline"},{"name":"DoseGauge"},{"name":"DecisionCard"},{"name":"Advisory"},{"name":"TierBadge"},{"name":"SourceLabel"},{"name":"DelayDial"},{"name":"CrewSwitcher"},{"name":"SegmentedControl"},{"name":"Button"},{"name":"Panel"}]} */
 (function () {
   var R = window.React;
   var h = R.createElement;
@@ -416,7 +416,7 @@
       p.children);
   }
 
-  window.Vitalis = {
+  window.AstroHealth = {
     BodyMap: BodyMap, VitalReadout: VitalReadout, Sparkline: Sparkline, DoseGauge: DoseGauge,
     DecisionCard: DecisionCard, Advisory: Advisory, TierBadge: TierBadge, SourceLabel: SourceLabel,
     DelayDial: DelayDial, CrewSwitcher: CrewSwitcher, SegmentedControl: SegmentedControl, Button: Button, Panel: Panel,

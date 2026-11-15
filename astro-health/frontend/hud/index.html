@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitalis · Helmet HUD</title>
+<title>AstroHealth · Helmet HUD</title>
 <link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/vitalis.css">
+<link rel="stylesheet" href="../css/astrohealth.css">
 <style>
   /* Citations below use NASA-STD-3001 Volume 2, Revision F (approved 2026-07-14).
      "Project decision" marks a choice that standard does not make. See README.md. */
@@ -132,7 +132,7 @@
 </style>
 <script src="../js/vendor/react.production.min.js"></script>
 <script src="../js/vendor/react-dom.production.min.js"></script>
-<script src="../js/vitalis.js"></script>
+<script src="../js/astrohealth.js"></script>
 <script src="../js/api.js"></script>
 </head>
 <body>
@@ -145,13 +145,13 @@
      thresholds, no medical rules and no sample readings; with no link it shows
      NO LINK and no values. The scenario simulator under the visor only POSTs
      readings to /checkin; the HUD shows whatever the backend then decides. */
-  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+  var V = window.AstroHealth, API = window.AstroHealthAPI, h = React.createElement, I = V.Icon;
   var params = new URLSearchParams(location.search);
   var WEARER = params.get('astronaut') || 'eva_02';
   var MET_EPOCH = params.get('met_epoch');            // optional ISO time, for an MET clock
   var POLL_MS = 3000, SIM_MS = 5000;
 
-  // Display vocabulary only. Tier words come from Vitalis.TIERS, action wording from Vitalis.ACTIONS.
+  // Display vocabulary only. Tier words come from AstroHealth.TIERS, action wording from AstroHealth.ACTIONS.
   var LABELS = { heart_rate: 'Heart rate', temperature: 'Body temp', co2_ppm: 'Cabin CO2', dose_rate_usv_h: 'Dose rate',
     bp_systolic: 'BP systolic', bp_diastolic: 'BP diastolic', glucose: 'Glucose', sleep_hours: 'Sleep', mood: 'Mood',
     exercise_minutes: 'Exercise', blood_analyte: 'Blood analyte' };

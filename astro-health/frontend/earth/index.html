@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vitalis · Earth base</title>
+<title>AstroHealth · Earth base</title>
 <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'night';</script>
 <link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/vitalis.css">
+<link rel="stylesheet" href="../css/astrohealth.css">
 <style>
   body { margin: 0; }
   .eb { padding: var(--space-6); display: grid; gap: var(--space-4); max-width: 1480px; margin: 0 auto; box-sizing: border-box; }
@@ -68,7 +68,7 @@
 </style>
 <script src="../js/vendor/react.production.min.js"></script>
 <script src="../js/vendor/react-dom.production.min.js"></script>
-<script src="../js/vitalis.js"></script>
+<script src="../js/astrohealth.js"></script>
 <script src="../js/api.js"></script>
 </head>
 <body>
@@ -79,10 +79,10 @@
      is shown exactly as the Checker recorded it; verification, replay and
      review are calls to the backend, never logic in this page. When the
      backend cannot be reached the page says so and shows no data at all. */
-  var V = window.Vitalis, API = window.VitalisAPI, h = React.createElement, I = V.Icon;
+  var V = window.AstroHealth, API = window.AstroHealthAPI, h = React.createElement, I = V.Icon;
 
   var REFRESH_MS = 4000;
-  var CHECKPOINT_KEY = 'vitalis.earth.checkpoint';
+  var CHECKPOINT_KEY = 'astrohealth.earth.checkpoint';
   var LINKS = [
     { value: '0.001', label: 'Low Earth orbit · live' },
     { value: '1.3', label: 'Moon · 1.3 s' },
@@ -501,7 +501,7 @@
 
     return h('div', { className: 'eb' },
       h('div', { className: 'eb-top' },
-        h('div', { className: 'eb-brand' }, h('b', null, 'Vitalis', h('i', null, '.'), ' Earth base'),
+        h('div', { className: 'eb-brand' }, h('b', null, 'AstroHealth', h('i', null, '.'), ' Earth base'),
           h('span', { className: 'eb-sub' }, 'Every decision the vehicle has recorded, and the tools to check it')),
         h('div', { className: 'eb-stat' }, h('span', { className: 'vt-lbl' }, 'Link'),
           h('span', { className: 'v ' + (online ? 'ok' : link[0].state === 'offline' ? 'bad' : 'muted') }, online ? 'Connected' : link[0].state === 'offline' ? 'No link' : 'Connecting')),

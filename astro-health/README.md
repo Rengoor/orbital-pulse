@@ -1,7 +1,7 @@
 # AstroHealth
 
 *An astronaut health tool that can never talk itself into reassuring you.*
-Decision support, not diagnosis. NASA Space Apps Challenge 2026, Heilbronn: Create Health Monitoring Software for Astronauts on Space Missions. The UI is branded **Vitalis**.
+Decision support, not diagnosis. NASA Space Apps Challenge 2026, Heilbronn: Create Health Monitoring Software for Astronauts on Space Missions. The judge-facing overview is the [repository README](../README.md); this file is the technical index.
 
 Readings go through independent pipelines that cannot see each other; a small
 deterministic Checker turns their proposals into one verdict; every decision is
@@ -35,7 +35,7 @@ substitute.
 | Folder | What it holds |
 |---|---|
 | `backend/` | Pipelines, Checker, signed records, downlink queue, Earth verifier and replay, API |
-| `frontend/` | Vitalis UI, served by the backend at `/ui/`: helmet HUD (`hud/`), crew health monitor (`tablet/monitor.html`), Earth base (`earth/`), plus the token/component library |
+| `frontend/` | AstroHealth UI, served by the backend at `/ui/`: helmet HUD (`hud/`), crew health monitor (`tablet/monitor.html`), Earth base (`earth/`), plus the token/component library |
 | `data/` | Schemas (the contract), real NASA ingestion, simulator, scenarios, fixtures |
 | `evidence/` | One-command reproducible results, red-team suite, usability notes, docs and slides |
 
@@ -86,7 +86,10 @@ survive restarts).
 
 ## AI use
 
-We used Claude (Anthropic) for help while building this project.
+AI tools (Claude by Anthropic, via Claude Code) helped write code, tests and
+documentation; AI-assisted commits carry `Co-Authored-By: Claude ...` trailers
+in the git history as the metadata record. Full declaration:
+`evidence/docs/ai_declaration.md`.
 
 ## Limits
 
