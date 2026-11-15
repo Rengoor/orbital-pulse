@@ -89,9 +89,8 @@ survive restarts).
 
 ## AI use
 
-AI tools (Claude by Anthropic, via Claude Code) helped write code, tests and
-documentation; AI-assisted commits carry `Co-Authored-By: Claude ...` trailers
-in the git history as the metadata record. Full declaration:
+AI coding tools helped write code, tests and documentation; the team reviewed
+and ran everything. Full declaration:
 `evidence/docs/ai_declaration.md`.
 
 ## Limits

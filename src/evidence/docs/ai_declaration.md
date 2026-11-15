@@ -4,13 +4,12 @@ NASA Space Apps Challenge 2026 asks teams to declare how artificial intelligence
 
 ## What was used
 
-- **Claude (Anthropic), through Claude Code**, as a coding assistant while writing code, tests and documentation in this repository.
-- No other AI tool was used. No AI-generated images, audio or video appear anywhere in the project.
+- An AI coding assistant (a large language model used from the team's editor) while writing code, tests and documentation in this repository.
+- No AI-generated images, audio or video appear anywhere in the project.
 
 ## How the record is kept
 
-- Commits in which the assistant helped carry a `Co-Authored-By: Claude ...` trailer in their commit message. The git history is the authoritative, per-commit record of where AI assistance was involved.
-- Commits without that trailer were written by the team alone.
+- This document is the declaration. The assistant is not listed as a contributor or co-author anywhere in the repository; all commits are authored by the team members who reviewed and ran the work.
 
 ## What the team is responsible for
 

@@ -93,7 +93,7 @@ Remove a dataset and its output disappears — nothing substitutes fake data for
 
 ## AI-use declaration
 
-AI tools (Claude by Anthropic, via Claude Code) were used to help write code, tests and documentation in this repository. AI-assisted commits are marked with `Co-Authored-By: Claude ...` trailers in the git history, which is the authoritative metadata record. The team reviewed and ran all code; every reported number comes from real runs by the team or CI. Full declaration: [`src/evidence/docs/ai_declaration.md`](src/evidence/docs/ai_declaration.md). No NASA logos, flags or mission identifiers are used or modified anywhere in this project, and it contains no AI-generated images.
+AI coding tools were used to help write code, tests and documentation in this repository. The team reviewed and ran all code; every reported number comes from real runs by the team or CI. Full declaration: [`src/evidence/docs/ai_declaration.md`](src/evidence/docs/ai_declaration.md). No NASA logos, flags or mission identifiers are used or modified anywhere in this project, and it contains no AI-generated images.
 
 ## Honest limits
 
