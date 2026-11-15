@@ -2,7 +2,7 @@
   "seed": 42,
   "records": 10,
   "ground_turnaround_s": 120,
-  "autonomy_policy_hash": "a9171c398ddfb68dfc32d5e8f13b6b39450a7c4390a0a58c9efe88ab77231e7c",
+  "autonomy_policy_hash": "f3c820ea2478705fb8ce3d21b36363adb8c9514e6d40a6287074cd0c85208890",
   "links": [
     {
       "location": "leo",

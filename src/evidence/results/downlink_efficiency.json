@@ -8,7 +8,7 @@
       "sent_immediately": 10,
       "held_for_digest": 0,
       "summary_and_anchor_bytes": 5942,
-      "full_record_bytes": 44248,
+      "full_record_bytes": 44408,
       "bytes_ratio": 0.134
     },
     {
@@ -17,7 +17,7 @@
       "sent_immediately": 10,
       "held_for_digest": 0,
       "summary_and_anchor_bytes": 5942,
-      "full_record_bytes": 44248,
+      "full_record_bytes": 44408,
       "bytes_ratio": 0.134
     },
     {
@@ -26,7 +26,7 @@
       "sent_immediately": 3,
       "held_for_digest": 7,
       "summary_and_anchor_bytes": 5942,
-      "full_record_bytes": 44248,
+      "full_record_bytes": 44408,
       "bytes_ratio": 0.134
     },
     {
@@ -35,7 +35,7 @@
       "sent_immediately": 3,
       "held_for_digest": 7,
       "summary_and_anchor_bytes": 5942,
-      "full_record_bytes": 44248,
+      "full_record_bytes": 44408,
       "bytes_ratio": 0.134
     }
   ],
@@ -47,8 +47,8 @@
   },
   "checkin_timing": {
     "events": 10,
-    "median_s": 0.0063,
-    "max_s": 0.0065
+    "median_s": 0.0454,
+    "max_s": 0.0505
   },
   "alerts_per_scenario_day": {
     "storm_day": 3,

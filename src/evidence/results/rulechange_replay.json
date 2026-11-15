@@ -25,7 +25,7 @@
           "unsafe": false
         },
         {
-          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "record_id": "74ff76a2-0a36-5433-9e9d-7cec5eaa001f",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T10:00:00Z",
           "old_tier": "GREEN",
@@ -36,7 +36,7 @@
           "unsafe": false
         },
         {
-          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "record_id": "548feff9-8f41-5457-951c-ea0b91162053",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T14:00:00Z",
           "old_tier": "YELLOW",
@@ -47,7 +47,7 @@
           "unsafe": false
         },
         {
-          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "record_id": "f3c5e83d-bb99-53c7-8bff-d0c9134973a8",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T18:00:00Z",
           "old_tier": "RED",
@@ -58,7 +58,7 @@
           "unsafe": false
         },
         {
-          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "record_id": "12b0f840-7c55-536e-8c89-44d8b936f0a9",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T22:00:00Z",
           "old_tier": "YELLOW",
@@ -69,7 +69,7 @@
           "unsafe": false
         },
         {
-          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "record_id": "a4584fbd-4234-562c-8402-6a5883be75e4",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T06:00:00Z",
           "old_tier": "GREEN",
@@ -80,7 +80,7 @@
           "unsafe": false
         },
         {
-          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "record_id": "147b712f-105b-5f84-9835-df5b548caf8c",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T10:00:00Z",
           "old_tier": "GREEN",
@@ -91,7 +91,7 @@
           "unsafe": false
         },
         {
-          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "record_id": "39430081-b87c-543a-967e-33f6d4ea0501",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T14:00:00Z",
           "old_tier": "GREEN",
@@ -102,7 +102,7 @@
           "unsafe": false
         },
         {
-          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "record_id": "0fb8dc42-c522-5abe-be4c-0cec63a6ef05",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T18:00:00Z",
           "old_tier": "GREEN",
@@ -113,7 +113,7 @@
           "unsafe": false
         },
         {
-          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "record_id": "c7d71bb1-6698-554f-a54f-6f76429922af",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T22:00:00Z",
           "old_tier": "GREEN",
@@ -148,7 +148,7 @@
           "unsafe": false
         },
         {
-          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "record_id": "74ff76a2-0a36-5433-9e9d-7cec5eaa001f",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T10:00:00Z",
           "old_tier": "GREEN",
@@ -159,7 +159,7 @@
           "unsafe": false
         },
         {
-          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "record_id": "548feff9-8f41-5457-951c-ea0b91162053",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T14:00:00Z",
           "old_tier": "YELLOW",
@@ -170,7 +170,7 @@
           "unsafe": false
         },
         {
-          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "record_id": "f3c5e83d-bb99-53c7-8bff-d0c9134973a8",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T18:00:00Z",
           "old_tier": "RED",
@@ -181,7 +181,7 @@
           "unsafe": true
         },
         {
-          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "record_id": "12b0f840-7c55-536e-8c89-44d8b936f0a9",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T22:00:00Z",
           "old_tier": "YELLOW",
@@ -192,7 +192,7 @@
           "unsafe": false
         },
         {
-          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "record_id": "a4584fbd-4234-562c-8402-6a5883be75e4",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T06:00:00Z",
           "old_tier": "GREEN",
@@ -203,7 +203,7 @@
           "unsafe": false
         },
         {
-          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "record_id": "147b712f-105b-5f84-9835-df5b548caf8c",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T10:00:00Z",
           "old_tier": "GREEN",
@@ -214,7 +214,7 @@
           "unsafe": false
         },
         {
-          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "record_id": "39430081-b87c-543a-967e-33f6d4ea0501",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T14:00:00Z",
           "old_tier": "GREEN",
@@ -225,7 +225,7 @@
           "unsafe": false
         },
         {
-          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "record_id": "0fb8dc42-c522-5abe-be4c-0cec63a6ef05",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T18:00:00Z",
           "old_tier": "GREEN",
@@ -236,7 +236,7 @@
           "unsafe": false
         },
         {
-          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "record_id": "c7d71bb1-6698-554f-a54f-6f76429922af",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T22:00:00Z",
           "old_tier": "GREEN",
@@ -270,7 +270,7 @@
           "unsafe": false
         },
         {
-          "record_id": "63b829b9-16de-5e78-b754-2a13ede837b2",
+          "record_id": "74ff76a2-0a36-5433-9e9d-7cec5eaa001f",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T10:00:00Z",
           "old_tier": "GREEN",
@@ -281,7 +281,7 @@
           "unsafe": false
         },
         {
-          "record_id": "5ff9f1f2-fa1a-55d1-81c5-542fbcdf9a7e",
+          "record_id": "548feff9-8f41-5457-951c-ea0b91162053",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T14:00:00Z",
           "old_tier": "YELLOW",
@@ -292,7 +292,7 @@
           "unsafe": false
         },
         {
-          "record_id": "0d14ff76-3e74-5147-93b2-0ba4ccc1000c",
+          "record_id": "f3c5e83d-bb99-53c7-8bff-d0c9134973a8",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T18:00:00Z",
           "old_tier": "RED",
@@ -303,7 +303,7 @@
           "unsafe": false
         },
         {
-          "record_id": "c68d5ccd-8607-5478-b376-ab3751a7d2c0",
+          "record_id": "12b0f840-7c55-536e-8c89-44d8b936f0a9",
           "astronaut_id": "crew_1",
           "ts": "2026-11-14T22:00:00Z",
           "old_tier": "YELLOW",
@@ -314,7 +314,7 @@
           "unsafe": false
         },
         {
-          "record_id": "1b3cf7a2-b8f8-59d4-9616-1fed0794d747",
+          "record_id": "a4584fbd-4234-562c-8402-6a5883be75e4",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T06:00:00Z",
           "old_tier": "GREEN",
@@ -325,7 +325,7 @@
           "unsafe": false
         },
         {
-          "record_id": "aada349f-8d00-5ec8-a2b7-2773f581d652",
+          "record_id": "147b712f-105b-5f84-9835-df5b548caf8c",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T10:00:00Z",
           "old_tier": "GREEN",
@@ -336,7 +336,7 @@
           "unsafe": false
         },
         {
-          "record_id": "19c771d2-8631-5e90-9bc3-dac9f8894dcb",
+          "record_id": "39430081-b87c-543a-967e-33f6d4ea0501",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T14:00:00Z",
           "old_tier": "GREEN",
@@ -347,7 +347,7 @@
           "unsafe": false
         },
         {
-          "record_id": "f26afcf6-685f-5e48-ae03-00f1a4ee2dbd",
+          "record_id": "0fb8dc42-c522-5abe-be4c-0cec63a6ef05",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T18:00:00Z",
           "old_tier": "GREEN",
@@ -358,7 +358,7 @@
           "unsafe": false
         },
         {
-          "record_id": "6fd07308-7fb9-5845-85c4-b4265c9be6fa",
+          "record_id": "c7d71bb1-6698-554f-a54f-6f76429922af",
           "astronaut_id": "crew_1",
           "ts": "2026-11-15T22:00:00Z",
           "old_tier": "GREEN",

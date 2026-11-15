@@ -8,11 +8,11 @@ for the digest only when the one-way delay exceeds 60 s.
 
 | Link | One-way delay | Sent at once | Held for digest | Summary+anchor bytes | Full-record bytes | Ratio |
 |---|---|---|---|---|---|---|
-| leo | 0.0 s | 10 | 0 | 5942 | 44248 | 0.134 |
-| moon | 1.28 s | 10 | 0 | 5942 | 44248 | 0.134 |
-| mars_near | 182.13 s | 3 | 7 | 5942 | 44248 | 0.134 |
-| mars_far | 1337.59 s | 3 | 7 | 5942 | 44248 | 0.134 |
+| leo | 0.0 s | 10 | 0 | 5942 | 44408 | 0.134 |
+| moon | 1.28 s | 10 | 0 | 5942 | 44408 | 0.134 |
+| mars_near | 182.13 s | 3 | 7 | 5942 | 44408 | 0.134 |
+| mars_far | 1337.59 s | 3 | 7 | 5942 | 44408 | 0.134 |
 
-decide() per check-in on this machine, this run: median 0.0063 s, worst 0.0065 s over 10 events (LLM disabled).
+decide() per check-in on this machine, this run: median 0.0454 s, worst 0.0505 s over 10 events (LLM disabled).
 
 Alerts (non-GREEN verdicts) per scenario day: storm_day 3, normal_day 0.
