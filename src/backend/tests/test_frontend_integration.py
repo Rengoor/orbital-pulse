@@ -104,6 +104,44 @@ def test_hud_gestures_are_local_and_layout_only():
     assert "params.get('gesture_test') === '1'" in page
 
 
+_PAGES = ("index.html", "hud/index.html", "tablet/monitor.html", "earth/index.html",
+          "components/Button.html", "components/Panel.html", "components/SourceLabel.html",
+          "components/TierBadge.html", "components/VitalReadout.html")
+
+
+def test_every_page_is_offline_by_construction():
+    """Each view carries a CSP that only allows connections to its own origin.
+
+    The vendored MediaPipe bundle contains a usage-logging client that posts
+    to odml.pa.googleapis.com; connect-src 'self' is what stops it. Nothing
+    outside the vendored bundles may reference a non-loopback host at all.
+    """
+    import re
+
+    for name in _PAGES:
+        page = (_FRONTEND_DIR / name).read_text(encoding="utf-8")
+        m = re.search(r'http-equiv="Content-Security-Policy" content="([^"]+)"', page)
+        assert m, f"{name} has no Content-Security-Policy"
+        directives = {d.split()[0]: d.split()[1:] for d in m.group(1).split(";") if d.strip()}
+        assert directives["connect-src"] == ["'self'"], name
+        assert directives["default-src"] == ["'self'"], name
+        assert directives["object-src"] == ["'none'"], name
+        assert "'self'" in directives["script-src"] and "'unsafe-eval'" not in directives["script-src"], name
+        for src in ("script-src", "style-src", "font-src", "img-src", "media-src", "worker-src"):
+            assert not any(v.startswith("http") for v in directives.get(src, [])), (name, src)
+
+    bundle = (_FRONTEND_DIR / "js" / "vendor" / "mediapipe" / "vision_bundle.mjs").read_text(encoding="utf-8")
+    assert "odml.pa.googleapis.com" in bundle, "the telemetry endpoint this policy exists to block has moved; re-check"
+
+    loopback = re.compile(r"https?://(127\.0\.0\.1|localhost|\[::1\]|::1)(:\d+)?")
+    for path in _FRONTEND_DIR.rglob("*"):
+        if not path.is_file() or "vendor" in path.parts or path.suffix not in (".html", ".js", ".mjs", ".css"):
+            continue
+        text = path.read_text(encoding="utf-8")
+        for url in re.findall(r"https?://[^\s'\"<>)]+", text):
+            assert loopback.match(url) or "w3.org" in url or "nasa.gov" in url or "developer.mozilla.org" in url, (path.name, url)
+
+
 def test_hud_gesture_files_served(client):
     for path in ("/ui/hud/gestures.mjs", "/ui/js/vendor/mediapipe/vision_bundle.mjs",
                  "/ui/js/vendor/mediapipe/wasm/vision_wasm_internal.wasm"):

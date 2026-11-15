@@ -1,6 +1,6 @@
 Orbital Pulse is the interface for the astronaut health monitor: decision support, not diagnosis. Crew see one body, holographic and drifting as if weightless, with hotspots that show what's wrong and one thing to do about it. Every verdict on screen comes from the backend's deterministic Checker; the views display, they never decide. The UI must never talk itself into reassuring anyone.
 
-Load `css/tokens.css`, then `css/orbitalpulse.css`, then React 18 (vendored in `js/vendor/`) and `js/orbitalpulse.js`. Components live on `window.OrbitalPulse`. The three type families come from Google Fonts; `orbitalpulse.css` imports them.
+Load `css/tokens.css`, then `css/orbitalpulse.css`, then React 18 (vendored in `js/vendor/`) and `js/orbitalpulse.js`. Components live on `window.OrbitalPulse`. Nothing is loaded from the network: the three type families (Unbounded, Instrument Sans, IBM Plex Mono) are used when installed on the machine and fall back to system fonts otherwise, and every page carries a Content Security Policy that only allows connections to the server it was loaded from.
 
 ## Content fundamentals
 

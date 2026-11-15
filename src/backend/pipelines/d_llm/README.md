@@ -36,6 +36,21 @@ Every value in `feedback.yaml` is project-defined and hashed into each record's 
 * **Worked examples (now).** `examples_from_nasa` turns the real Inspiration4 glucose draws (`validation/data/inspiration4_glucose.json`, OSDR OSD-575) into prompt examples. The label is the **laboratory reference range** published with the dataset (in range GREEN, out of range YELLOW). It is labelled as such on every example: not a flight surgeon, not a NASA medical limit. Examples are shown to the model and **never scored**, so they cannot move trust.
 * **Scored validation (next).** `validation/run.py` already runs real ALTEA dose-equivalent and Inspiration4 glucose through the decision system. With a real local model enabled, the same runs give the advisor's tier per real measurement, and the reference range gives a confirmed tier, so accuracy can be measured on real data before any flight-surgeon review exists.
 
+## Offline by construction
+
+The whole system, advisor included, runs with no internet connection. What enforces that:
+
+| Path | Guard | Where |
+|---|---|---|
+| Advisor → model | `OLLAMA_HOST` must be an `http://` URL on `localhost`, `127.0.0.1` or `::1`; anything else raises before any request is made. The client ignores proxy environment variables (`trust_env=False`). | `pipeline.py` → `_require_loopback_host`, `call_llm`; pinned by `tests/test_d_llm.py` |
+| What the model sees | Readings as channel, value, unit, time and quality. No astronaut identifier, no record ids, no free text from outside the readings. | `pipeline.py` → `_READING_FIELDS`, `feedback.py` → `summarise_readings` |
+| Views → backend | The browser client only ever calls the origin the page was served from, or a `?api=` override that must be loopback. | `frontend/js/api.js` |
+| Views → anywhere else | Every page carries a Content Security Policy with `connect-src 'self'`. This blocks the usage-logging call built into the vendored MediaPipe gesture bundle, which would otherwise post to a Google endpoint every 60 seconds. | `<meta http-equiv="Content-Security-Policy">` in each page; pinned by `backend/tests/test_frontend_integration.py` |
+| Scripts, fonts, models | React, MediaPipe and the gesture model are vendored and hash-pinned. Fonts are system fonts; nothing is fetched from a CDN. | `frontend/js/vendor/`, `frontend/css/tokens.css` |
+| NASA data | Fetched once by explicit scripts (`data/nasa/*/fetch.py`, `validation/fetch.py`) and committed as small processed files. The running backend reads only those files. | `data/nasa/README.md` |
+
+Before an offline run, pull the model while still online (`ollama pull llama3.2`); Ollama serves it from local disk after that. The Ollama server itself is outside this repository; run it with network access removed if the deployment requires proof rather than configuration.
+
 ## Limits
 
 * Ground truth is a simulated reviewer; no clinician has confirmed a tier.

@@ -21,6 +21,11 @@ Current as of 2026-11-14.
   with the thresholds.
 - **The on-board LLM has only been tested with canned replies**, never a real
   local model. It stays disabled (`LLM_ENABLED` unset) until that test is run.
+  Its feedback loop (`backend/pipelines/d_llm/README.md`) is in-context
+  correction scored against a simulated reviewer; whether it improves a given
+  model is unmeasured. The Ollama server is outside this repository: the code
+  only talks to loopback, but proving the host itself is offline is a
+  deployment matter.
 - **RadLab values are absorbed dose** (uGy/h, confirmed against the RadLab
   Data API documentation 2026-11-14), not dose equivalent, so they are
   context only and never fed to the decision pipelines; nothing converts
