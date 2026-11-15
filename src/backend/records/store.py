@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS handoffs (
     body      TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS handoffs_by_astronaut ON handoffs (astronaut_id, seq);
+CREATE TABLE IF NOT EXISTS llm_feedback (
+    seq       INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind      TEXT NOT NULL,
+    record_id TEXT,
+    body      TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS downlink_pending (
     arrival   INTEGER PRIMARY KEY,
     record_id TEXT NOT NULL,
@@ -225,6 +231,35 @@ class RecordStore:
         """(valid, position of the first broken handoff) for the handoff chain."""
         prev_hash = GENESIS
         for position, entry in enumerate(self.handoffs()):
+            if entry.get("prev_hash") != prev_hash or not verify_entry(entry):
+                return False, position
+            prev_hash = entry["hash"]
+        return True, None
+
+    # -- advisor feedback ledger (pipeline D) ----------------------------------
+
+    def add_llm_lesson(self, lesson: dict, signing_key: str | None = None) -> dict:
+        """Seal *lesson* into the advisor feedback chain and store it."""
+        with self._lock:
+            sealed = seal(lesson, self._head_hash("llm_feedback"), signing_key=signing_key)
+            with self._conn:
+                self._conn.execute(
+                    "INSERT INTO llm_feedback (kind, record_id, body) VALUES (?, ?, ?)",
+                    (sealed.get("kind", "correction"), sealed.get("record_id"),
+                     json.dumps(sealed, sort_keys=True)),
+                )
+            return sealed
+
+    def llm_lessons(self, record_id: str | None = None) -> list[dict]:
+        """Lessons, oldest first, optionally for one Record."""
+        if record_id is None:
+            return self._rows("SELECT body FROM llm_feedback ORDER BY seq")
+        return self._rows("SELECT body FROM llm_feedback WHERE record_id = ? ORDER BY seq", (record_id,))
+
+    def verify_llm_lessons(self) -> tuple[bool, int | None]:
+        """(valid, position of the first broken lesson) for the feedback chain."""
+        prev_hash = GENESIS
+        for position, entry in enumerate(self.llm_lessons()):
             if entry.get("prev_hash") != prev_hash or not verify_entry(entry):
                 return False, position
             prev_hash = entry["hash"]

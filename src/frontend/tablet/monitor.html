@@ -144,7 +144,14 @@
         d.simulated_inputs.length ? row(false, 'Simulated inputs: ' + d.simulated_inputs.join(', ') + '.') : null,
         row(t.record.chain_intact, t.record.chain_intact ? 'Recorded, signed, and the record chain is intact.' : 'The record chain is BROKEN: this record may have been altered.'),
         row(t.human_review.status === 'reviewed', t.human_review.status === 'reviewed'
-          ? 'Reviewed on the ground (' + t.human_review.outcomes.join(', ') + ', simulated reviewer).' : 'Ground review is pending.')));
+          ? 'Reviewed on the ground (' + t.human_review.outcomes.join(', ') + ', simulated reviewer).' : 'Ground review is pending.'),
+        // Onboard advisor (local LLM): advisory only. It can raise a tier, never lower one, never a vote.
+        t.advisor && t.advisor.enabled
+          ? row(t.advisor.feedback ? t.advisor.feedback.state !== 'untrusted' : true,
+              'Onboard advisor ' + (t.advisor.said ? 'said ' + t.advisor.said : 'gave no usable output') +
+              (t.advisor.feedback ? ' at trust ' + t.advisor.feedback.trust.toFixed(2) + ' (' + t.advisor.feedback.state + ', ' + t.advisor.feedback.scored + ' ground-scored lessons)' : '') +
+              '. Advisory only: it can raise a tier, never lower one.')
+          : row(true, 'Onboard advisor (local LLM) is off. The verdict comes from the statistical and limits assessments alone.')));
   }
 
   function Problems(p) {

@@ -362,6 +362,7 @@
       h(ActionLine, { code: s.action }),
       (s.additional_actions || []).map(function (a) { return h(ActionLine, { key: a, code: a, also: true }); }),
       h(AutonomyLines, { autonomy: s.autonomy, ground: s.ground_review }),
+      h(AdvisorLine, { advisor: s.advisor }),
       (failsafe || (s.disagreement_status && s.disagreement_status !== 'AGREEMENT')) ? h('div', { className: 'marks' },
         failsafe ? h('span', { className: 'mark fail' }, h(I, { name: 'tier-RED' }), 'Decision system failed') : null,
         s.disagreement_status && s.disagreement_status !== 'AGREEMENT' ? h('span', { className: 'mark' }, h(I, { name: 'tier-YELLOW' }), SPLIT[s.disagreement_status] || s.disagreement_status) : null) : null,
@@ -397,6 +398,19 @@
         : h('div', { key: 'g', className: 'txt dim' }, 'Ground review on its way, arrives ' + utc(parseTs(g.arrives_at)).slice(4) + ' UTC'));
     }
     return out.length ? h('div', { className: 'marks col' }, out) : null;
+  }
+
+  /* Onboard advisor (local LLM), from GET /status -> advisor. One dim line, never a
+     tier: the tier above is the Checker's. The advisor can only have raised it, never
+     lowered it. Trust comes from the control centre's corrections (signed ledger on
+     the backend); when the advisor is untrusted its proposals are withheld entirely. */
+  function AdvisorLine(p) {
+    var a = p.advisor;
+    if (!a || !a.enabled) return null;
+    var t = a.trust || {};
+    var said = a.said ? 'said ' + (V.TIERS[a.said] ? V.TIERS[a.said].word : a.said) : (t.state === 'untrusted' ? 'withheld' : 'no usable output');
+    return h('div', { className: 'txt dim', 'aria-label': 'Onboard advisor status' },
+      'Advisor ' + said + ' · trust ' + (t.trust != null ? t.trust.toFixed(2) : '--') + (t.state ? ' ' + t.state : '') + ' · advisory only');
   }
 
   function Vital(p) {

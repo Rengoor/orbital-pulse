@@ -32,6 +32,15 @@
     "note": {
       "type": "string"
     },
+    "confirmed_tier": {
+      "description": "Additive (v0.2): the tier the control centre confirms. Feeds the onboard advisor's lesson ledger; never changes the Record.",
+      "enum": [
+        "GREEN",
+        "YELLOW",
+        "RED",
+        "GREY"
+      ]
+    },
     "ts": {
       "type": "string"
     },

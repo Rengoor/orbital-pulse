@@ -259,6 +259,7 @@ def test_status_returns_latest_verdict_for_that_astronaut_only(api):
         "tier", "action", "additional_actions", "known_severity",
         "disagreement_status", "reasons", "record_id", "ts",
         "autonomy", "ground_review",  # delay-aware handoff and latest ground review
+        "advisor",                    # onboard LLM: on/off, what it said, live trust
     }  # no raw readings
     assert body["disagreement_status"] == "DISAGREEMENT"  # A said GREEN, B said RED
     assert body["record_id"] == latest["record_id"]

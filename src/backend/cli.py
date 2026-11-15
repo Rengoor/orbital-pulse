@@ -164,26 +164,32 @@ def run_scenario(
 
     records: list[dict] = []
     timed = [(_parse_ts(e.get("ts")), i, e) for i, e in enumerate(events)]
-    for now, i, event in sorted(timed, key=lambda t: (t[0], t[1])):
-        def build(prev_hash: str, event=event, now=now) -> dict:
-            return decide(
-                readings=event.get("readings", []),
-                baselines=baselines,
-                rules=rules,
-                now=now,
-                prev_hash=prev_hash,
-                astronaut_id=event.get("astronaut_id"),
-                clock_source="scenario",
-            )
+    try:
+        for now, i, event in sorted(timed, key=lambda t: (t[0], t[1])):
+            def build(prev_hash: str, event=event, now=now) -> dict:
+                return decide(
+                    readings=event.get("readings", []),
+                    baselines=baselines,
+                    rules=rules,
+                    now=now,
+                    prev_hash=prev_hash,
+                    astronaut_id=event.get("astronaut_id"),
+                    clock_source="scenario",
+                )
 
-        try:
-            if store is not None:
-                record = store.append_with(build)
-            else:
-                record = build(records[-1]["hash"] if records else GENESIS)
-        except ValueError as exc:
-            raise CliError(f"event {i} ({event.get('ts')}): {exc}") from exc
-        records.append(record)
+            try:
+                if store is not None:
+                    record = store.append_with(build)
+                else:
+                    record = build(records[-1]["hash"] if records else GENESIS)
+            except ValueError as exc:
+                raise CliError(f"event {i} ({event.get('ts')}): {exc}") from exc
+            records.append(record)
+    finally:
+        # Release the SQLite file so a caller's temporary directory can be
+        # removed (Windows refuses to delete an open database file).
+        if store is not None:
+            store.close()
 
     _emit(records, out_dir)
     return records

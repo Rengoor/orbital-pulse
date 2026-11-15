@@ -1,6 +1,6 @@
-Orbital Pulse is the interface for the astronaut health monitor: decision support, not diagnosis. Crew see one body, holographic and drifting as if weightless, with hotspots that show what's wrong and one thing to do about it. An onboard LLM advisor suggests actions, and a deterministic Checker can only *raise* the advisor's verdict, never lower it. The UI must never talk itself into reassuring anyone.
+Orbital Pulse is the interface for the astronaut health monitor: decision support, not diagnosis. Crew see one body, holographic and drifting as if weightless, with hotspots that show what's wrong and one thing to do about it. Every verdict on screen comes from the backend's deterministic Checker; the views display, they never decide. The UI must never talk itself into reassuring anyone.
 
-Load `tokens.css`, then `components/bundle.css`, then React 18 and `components/bundle.js`. Components live on `window.OrbitalPulse`. The three type families come from Google Fonts; `bundle.css` imports them.
+Load `css/tokens.css`, then `css/orbitalpulse.css`, then React 18 (vendored in `js/vendor/`) and `js/orbitalpulse.js`. Components live on `window.OrbitalPulse`. The three type families come from Google Fonts; `orbitalpulse.css` imports them.
 
 ## Content fundamentals
 

@@ -575,7 +575,7 @@ def test_manifest_identifies_the_decision_environment():
         "limits_hash", "baselines_hash", "pipelines", "llm", "clock_source", "random_seed", "signing", "failsafe",
     }
     assert all(len(manifest[k]) == 64 for k in ("policy_hash", "config_hash", "limits_hash", "baselines_hash"))
-    assert manifest["llm"] == {"enabled": False, "model": None}
+    assert manifest["llm"] == {"enabled": False, "model": None, "feedback": None}
 
 
 def test_manifest_is_part_of_what_is_hashed_and_signed():
@@ -886,6 +886,8 @@ def test_trust_summary_for_a_disputed_red(api):
     api("POST", "/earth/review", json={"record_id": record_id, "cmo_note": "seen", "outcome": "AGREE"})
     reviewed = api("GET", f"/records/{record_id}/trust").json()["human_review"]
     assert reviewed == {"status": "reviewed", "outcomes": ["AGREE"], "simulated": True}
+    advisor = api("GET", f"/records/{record_id}/trust").json()["advisor"]
+    assert advisor == {"enabled": False, "said": None, "feedback": None}
 
 
 def test_trust_summary_reflects_tampering_and_missing_records(api):

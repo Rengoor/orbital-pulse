@@ -5,7 +5,6 @@ __pycache__/
 .env
 *.db
 .DS_Store
-.streamlit/secrets.toml
 data/nasa/raw/*
 !data/nasa/raw/.gitkeep
 .hypothesis/

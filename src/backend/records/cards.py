@@ -135,4 +135,12 @@ def build_trust_summary(record: dict, chain_valid: bool, reviews: list[dict]) ->
             "outcomes": [r["outcome"] for r in reviews],
             "simulated": True,
         },
+        # The onboard advisor (LLM) as it stood when this decision was made.
+        # Advisory only: it can raise a tier, never lower one, never a vote.
+        "advisor": {
+            "enabled": bool((manifest.get("llm") or {}).get("enabled")),
+            "said": next((p["tier"] for p in record.get("proposals") or []
+                          if p.get("pipeline_id") == "d_llm"), None),
+            "feedback": (manifest.get("llm") or {}).get("feedback"),
+        },
     }

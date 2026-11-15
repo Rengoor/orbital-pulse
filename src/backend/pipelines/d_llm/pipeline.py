@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+from backend.pipelines.d_llm import feedback as fb
 from backend.pipelines.d_llm.parser import parse_llm_response
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,11 @@ def _build_user_message(readings: list[dict], context: dict) -> str:
         },
         default=str,
     )
+
+
+def build_system_prompt(feedback: dict | None) -> str:
+    """prompt.md plus the control centre's feedback section (feedback.py)."""
+    return _PROMPT_PATH.read_text(encoding="utf-8") + fb.prompt_section(feedback)
 
 
 def call_llm(system_prompt: str, user_message: str) -> str | None:
@@ -143,9 +149,22 @@ def run(readings: list[dict], context: dict) -> dict | None:
     if os.environ.get("LLM_ENABLED", "0") != "1":
         return None
 
+    # Ground-truth feedback (feedback.py): the control centre's corrections of
+    # earlier advisories and the trust they add up to. Passed in through the
+    # rules so decide() stays pure; nothing here reads a database.
+    feedback = (context.get("rules") or {}).get("llm_feedback")
+    summary = (feedback or {}).get("summary") or {}
+    if summary.get("state") == "untrusted":
+        # Punishment with teeth: the advisor has been wrong often enough that
+        # its proposal is withheld from the Checker until the ground corrects
+        # it back above the threshold. The HUD and Earth views show this state.
+        logger.warning("d_llm withheld: trust %.2f is below the untrusted threshold",
+                       summary.get("trust", 0.0))
+        return None
+
     try:
         raw = call_llm(
-            _PROMPT_PATH.read_text(encoding="utf-8"),
+            build_system_prompt(feedback),
             _build_user_message(readings, context),
         )
     except Exception as exc:  # noqa: BLE001 - a failed LLM call is not an error

@@ -94,14 +94,19 @@
     replay: function (recordId, rulesOverride) {
       return request('POST', '/earth/replay', { record_id: recordId, rules_override: rulesOverride || null });
     },
-    review: function (recordId, outcome, cmoNote, reviewer) {
+    review: function (recordId, outcome, cmoNote, reviewer, confirmedTier) {
+      // confirmedTier: the tier the control centre says it should have been.
+      // Feeds the onboard advisor's lesson ledger; never changes the record.
       return request('POST', '/earth/review', {
         record_id: recordId,
         outcome: outcome || 'AGREE',
         cmo_note: cmoNote || '',
-        reviewer: reviewer || 'cmo_station_tablet'
+        reviewer: reviewer || 'cmo_station_tablet',
+        confirmed_tier: confirmedTier || null
       });
     },
+    llmFeedback: function () { return request('GET', '/earth/llm-feedback'); },
+    llmNasaExamples: function () { return request('POST', '/earth/llm-feedback/nasa-examples'); },
     rulechange: function (rulesOverride, astronautId) {
       return request('POST', '/earth/rulechange', {
         rules_override: rulesOverride || {},

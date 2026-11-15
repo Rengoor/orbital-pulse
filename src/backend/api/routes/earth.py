@@ -6,6 +6,8 @@ Owner: person A
 """
 
 import json
+import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal
@@ -18,7 +20,10 @@ from backend.earth.replay import replay
 from backend.earth.review import build_review
 from backend.earth.rulechange import rulechange
 from backend.earth.verify import verify_chain
+from backend.pipelines.d_llm.feedback import current_feedback, record_review_lesson, seed_nasa_examples
 from backend.records.anchor import build_anchor, check_against_anchor
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -88,22 +93,66 @@ class ReviewRequest(BaseModel):
     cmo_note: str = ""
     outcome: Literal["AGREE", "DISAGREE", "FOLLOW_UP"] = "FOLLOW_UP"
     reviewer: str = "simulated_flight_surgeon"
+    # What the control centre says the tier should have been. Needed for a
+    # DISAGREE to teach the onboard advisor anything; ignored for FOLLOW_UP.
+    confirmed_tier: Literal["GREEN", "YELLOW", "RED", "GREY"] | None = None
 
 
 @router.post("/review")
 def review(body: ReviewRequest, state: AppState = Depends(get_state)) -> dict:
-    """Attach a signed, simulated ground review to a Record (in the review chain)."""
-    _require_record(state, body.record_id)
-    return state.store.add_review(
+    """Attach a signed, simulated ground review to a Record (in the review chain).
+
+    The review is also fed back to the onboard advisor (pipeline D): if it
+    confirms a tier, a scored lesson is appended to the advisor's own signed
+    ledger (``GET /earth/llm-feedback``). Neither touches the Record.
+    """
+    record = _require_record(state, body.record_id)
+    sealed = state.store.add_review(
         build_review(
             body.record_id,
             body.outcome,
             note=body.cmo_note,
             reviewer=body.reviewer,
             signing_key=state.signing_key,
+            confirmed_tier=body.confirmed_tier,
         ),
         signing_key=state.signing_key,
     )
+    try:
+        record_review_lesson(state.store, record, sealed, state.signing_key)
+    except Exception:  # noqa: BLE001 - the review stands without the lesson
+        logger.exception("could not record the advisor lesson for %s", body.record_id)
+    return sealed
+
+
+@router.get("/llm-feedback")
+def llm_feedback(state: AppState = Depends(get_state)) -> dict:
+    """The onboard advisor's feedback ledger: trust, every lesson, chain state.
+
+    Lessons are the control centre's confirmed tiers compared with what the
+    advisor said. The advisor is never a vote; this only governs whether its
+    proposal reaches the Checker (see backend/pipelines/d_llm/README.md).
+    """
+    valid, broken_at = state.store.verify_llm_lessons()
+    lessons = state.store.llm_lessons()
+    return {
+        "enabled": os.environ.get("LLM_ENABLED", "0") == "1",
+        "model": os.environ.get("LLM_MODEL") or None,
+        **current_feedback(state.store),
+        "lessons": lessons,
+        "chain": {"valid": valid, "broken_at": broken_at},
+    }
+
+
+@router.post("/llm-feedback/nasa-examples")
+def llm_nasa_examples(state: AppState = Depends(get_state)) -> dict:
+    """Load worked examples from real NASA data (Inspiration4 glucose, OSD-575)
+    into the advisor's ledger. Labelled by laboratory reference range; unscored."""
+    try:
+        added = seed_nasa_examples(state.store, state.signing_key)
+    except (OSError, KeyError, ValueError) as exc:
+        raise HTTPException(status_code=404, detail=f"NASA validation data not available: {exc}") from exc
+    return {"added": len(added), **current_feedback(state.store)}
 
 
 @router.get("/handoffs")

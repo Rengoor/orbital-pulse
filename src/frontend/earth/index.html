@@ -172,7 +172,7 @@
 
   /* ---------- Selected decision ---------- */
   function Detail(p) {
-    var r = p.record, note = React.useState('');
+    var r = p.record, note = React.useState(''), confirmed = React.useState('');
     if (!r) return h(V.Panel, { title: 'Selected decision' }, h('div', { className: 'empty' }, 'Select a record in the log to inspect it.'));
     var v = r.verdict, t = v.decision_trace || {}, m = r.execution_manifest || {}, q = t.data_quality || {};
     var changed = (t.gates || []).filter(function (g) { return g.changed; });
@@ -268,12 +268,60 @@
         h('div', null, h('h3', { className: 'vt-lbl' }, 'Ground review (simulated reviewer)'),
           h('input', { className: 'eb-note', type: 'text', value: note[0], placeholder: 'Note for the record', 'aria-label': 'Review note',
             onChange: function (e) { note[1](e.target.value); } }),
+          // Confirmed tier: what the control centre says the tier should have been.
+          // AGREE confirms the recorded tier by itself; DISAGREE needs this to become
+          // a lesson for the onboard advisor (GET /earth/llm-feedback). Never alters the record.
+          h('label', { className: 'muted', style: { display: 'block', marginTop: 'var(--space-2)', fontSize: 12 } }, 'If you disagree, the tier should have been: ',
+            h('select', { className: 'eb-note', style: { width: 'auto', marginLeft: 'var(--space-2)' }, value: confirmed[0], 'aria-label': 'Confirmed tier',
+              onChange: function (e) { confirmed[1](e.target.value); } },
+              h('option', { value: '' }, 'not stated'),
+              ['GREEN', 'YELLOW', 'RED', 'GREY'].map(function (t) { return h('option', { key: t, value: t }, V.TIERS[t].word + ' (' + t + ')'); }))),
           h('div', { className: 'btns', style: { marginTop: 'var(--space-2)' } },
             ['AGREE', 'DISAGREE', 'FOLLOW_UP'].map(function (o) {
               return h(V.Button, { key: o, variant: 'secondary', size: 'sm', icon: o === 'AGREE' ? 'check' : o === 'DISAGREE' ? 'flare' : 'antenna',
-                onClick: function () { p.onReview(r, o, note[0]); note[1](''); } }, o === 'FOLLOW_UP' ? 'Follow up' : o.charAt(0) + o.slice(1).toLowerCase());
+                onClick: function () { p.onReview(r, o, note[0], o === 'DISAGREE' ? confirmed[0] : ''); note[1](''); confirmed[1](''); } }, o === 'FOLLOW_UP' ? 'Follow up' : o.charAt(0) + o.slice(1).toLowerCase());
             })),
-          h('p', { className: 'muted', style: { marginTop: 'var(--space-2)', fontSize: 12 } }, 'A review is appended to its own signed log. It never changes the decision above.'))));
+          h('p', { className: 'muted', style: { marginTop: 'var(--space-2)', fontSize: 12 } }, 'A review is appended to its own signed log and fed back to the onboard advisor as a lesson. It never changes the decision above.'))));
+  }
+
+  /* ---------- Onboard advisor feedback (pipeline D) ----------
+     Reads GET /earth/llm-feedback. Every number here comes from the backend's signed
+     lesson ledger. The advisor is advisory: it can raise a tier, never lower one, and
+     never votes. Trust only decides whether its proposal reaches the Checker at all. */
+  var ADVISOR_STATE = {
+    untrusted: 'Untrusted: its proposals are withheld from the Checker until the ground corrects it back above the threshold.',
+    probation: 'Probation: its proposals reach the Checker, labelled probationary.',
+    trusted: 'Trusted: its proposals reach the Checker. Still advisory, still escalate-only.'
+  };
+  var OUTCOME_WORD = { correct: 'correct', over_call: 'more severe than confirmed', under_call: 'calmer than confirmed (missed risk)', abstained: 'no usable output' };
+  function AdvisorPanel(p) {
+    var f = p.feedback;
+    if (!f) return h(V.Panel, { title: 'Onboard advisor (local LLM)' }, h('div', { className: 'empty' }, 'Loading.'));
+    var s = f.summary, lessons = (f.lessons || []).slice().reverse();
+    var corrections = lessons.filter(function (l) { return l.kind === 'correction'; }).slice(0, 8);
+    return h(V.Panel, { title: 'Onboard advisor (local LLM)', meta: (f.enabled ? 'on · ' + (f.model || 'default model') : 'off') + ' · ' + s.scored + ' scored' },
+      h('div', { className: 'det' },
+        h('div', null,
+          h('dl', { className: 'kv' },
+            h('dt', null, 'trust'), h('dd', { className: s.state === 'untrusted' ? 'bad' : s.state === 'trusted' ? 'ok' : '' }, s.trust.toFixed(2) + ' · ' + s.state),
+            h('dt', null, 'accuracy'), h('dd', null, s.accuracy == null ? '-- (nothing scored yet)' : Math.round(s.accuracy * 100) + '% of ' + s.scored),
+            h('dt', null, 'correct'), h('dd', null, String(s.correct)),
+            h('dt', null, 'false alarms'), h('dd', null, String(s.over_call)),
+            h('dt', null, 'missed risk'), h('dd', { className: s.under_call ? 'bad' : '' }, String(s.under_call)),
+            h('dt', null, 'abstained'), h('dd', null, String(s.abstained)),
+            h('dt', null, 'NASA examples'), h('dd', null, String(s.examples)),
+            h('dt', null, 'ledger'), h('dd', { className: f.chain.valid ? 'ok' : 'bad' }, f.chain.valid ? 'signed chain verifies' : 'BROKEN at entry ' + f.chain.broken_at)),
+          h('p', { className: 'muted', style: { fontSize: 12 } }, ADVISOR_STATE[s.state] || ''),
+          h('p', { className: 'muted', style: { fontSize: 12 } }, 'How it learns: each ground review that confirms a tier becomes a scored lesson (reward when it was right, punishment when it was wrong, hardest for a calmer-than-true tier). The recent corrections are shown to the model at its next call. No model weights change on board.'),
+          h('div', { className: 'btns', style: { marginTop: 'var(--space-2)' } },
+            h(V.Button, { variant: 'secondary', size: 'sm', icon: 'card', onClick: p.onNasaExamples }, 'Load NASA worked examples')),
+          h('p', { className: 'muted', style: { marginTop: 'var(--space-1)', fontSize: 12 } }, 'Real Inspiration4 glucose draws (OSDR OSD-575), labelled by the laboratory reference range, not by a clinician. Shown to the model as examples; never scored.')),
+        h('div', null, h('h3', { className: 'vt-lbl' }, 'Recent corrections'),
+          corrections.length ? h('ul', { className: 'lst' }, corrections.map(function (l, i) {
+            return h('li', { key: i }, h(V.TierBadge, { tier: l.confirmed }),
+              h('span', null, 'advisor said ' + (l.advisor_said === 'NO_OUTPUT' ? 'nothing' : l.advisor_said) + ' · ' + (OUTCOME_WORD[l.outcome] || l.outcome) + ' · ' + (l.reward > 0 ? '+' : '') + l.reward),
+              h('span', { className: 'mono muted' }, clock(l.ts) + ' · ' + short(l.record_id, 8)));
+          })) : h('p', { className: 'muted' }, 'No scored lessons yet. Review a decision with Agree, or Disagree plus the tier it should have been.'))));
   }
 
   /* ---------- Chain and checkpoint ---------- */
@@ -428,7 +476,7 @@
     var checkpoint = React.useState(loadCheckpoint()), checkResult = React.useState(null);
     var delay = React.useState('1.3'), received = React.useState([]);
     var nasa = React.useState({}), checks = React.useState(null), panels = React.useState(null), loadedRef = React.useRef(false);
-    var handoffs = React.useState(null);
+    var handoffs = React.useState(null), advisor = React.useState(null);
 
     // Reference data changes rarely: load it once the link is up.
     function loadReference() {
@@ -439,6 +487,7 @@
       API.radiation(false).then(function (r) { nasa[1](function (p) { return Object.assign({}, p, { radiation: r }); }); }).catch(function () {});
       API.governanceChecks().then(checks[1]).catch(function () {});
       API.bloodPanels().then(panels[1]).catch(function () {});
+      loadAdvisor();
     }
 
     function refresh() {
@@ -474,9 +523,16 @@
         else result[1]({ ok: false, text: 'DIVERGED: recorded ' + r.verdict.tier + ' / ' + r.verdict.action + ', replay gives ' + n.verdict.tier + ' / ' + n.verdict.action + '.' });
       }).catch(fail);
     }
-    function review(r, outcome, note) {
-      API.review(r.id, outcome, note, 'ground_flight_surgeon').then(function () {
-        result[1]({ ok: true, text: 'Review recorded: ' + outcome + '.' }); refresh();
+    function review(r, outcome, note, confirmedTier) {
+      API.review(r.id, outcome, note, 'ground_flight_surgeon', confirmedTier).then(function () {
+        result[1]({ ok: true, text: 'Review recorded: ' + outcome + (confirmedTier ? ' (should have been ' + confirmedTier + ')' : '') + '. Fed back to the onboard advisor.' });
+        refresh(); loadAdvisor();
+      }).catch(fail);
+    }
+    function loadAdvisor() { API.llmFeedback().then(advisor[1]).catch(function () { advisor[1](null); }); }
+    function nasaExamples() {
+      API.llmNasaExamples().then(function (res) {
+        result[1]({ ok: true, text: 'Loaded ' + res.added + ' NASA worked example(s) into the advisor ledger.' }); loadAdvisor();
       }).catch(fail);
     }
     function verifyAll() {
@@ -537,6 +593,7 @@
       online ? h('div', { className: 'eb-main' },
         h(NasaPanel, { nasa: nasa[0] }),
         h(GovernancePanel, { checks: checks[0] })) : null,
+      online ? h(AdvisorPanel, { feedback: advisor[0], onNasaExamples: nasaExamples }) : null,
       online ? h(BloodPanel, { panels: panels[0] }) : null);
   }
   ReactDOM.createRoot(document.getElementById('root')).render(h(App));

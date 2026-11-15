@@ -36,6 +36,6 @@ Current as of 2026-11-14.
   classification, crew testing, or validation on flight data. The HUD's
   README cites NASA-STD-3001 Volume 2 per display rule and lists what is
   *not* met; it does not claim compliance.
-- **The blind scenarios are still unwritten** (`data/scenarios/blind_01.json`,
-  `blind_02.json`): they are reserved for an author who has not seen the
-  pipelines.
+- **No blind scenario was written.** Both scenario days (`data/scenarios/`)
+  were authored by people who had seen pipelines A and B, so the scenario
+  results are not an independent test of detection.

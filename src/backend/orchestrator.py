@@ -355,8 +355,12 @@ def decide(
     # Everything besides the readings that could change this verdict. A replay
     # that differs can be traced to the entry that differs. policy_path is a
     # machine-specific location, so the policy is identified by its hash.
-    config = {k: v for k, v in rules.items() if k not in ("limits", "policy_path")}
+    # llm_feedback (the advisor's correction ledger, backend/pipelines/d_llm/
+    # feedback.py) is identified separately below: it changes with every
+    # ground review and only the advisory pipeline ever reads it.
+    config = {k: v for k, v in rules.items() if k not in ("limits", "policy_path", "llm_feedback")}
     llm_enabled = os.environ.get("LLM_ENABLED", "0") == "1"
+    llm_feedback = (rules.get("llm_feedback") or {}) if llm_enabled else {}
     manifest = {
         "orchestrator_version": ORCHESTRATOR_VERSION,
         "checker_version": CHECKER_VERSION,
@@ -366,7 +370,17 @@ def decide(
         "limits_hash": _digest(rules.get("limits")),
         "baselines_hash": _baselines_digest(own_baselines),
         "pipelines": pipeline_status,
-        "llm": {"enabled": llm_enabled, "model": os.environ.get("LLM_MODEL") if llm_enabled else None},
+        "llm": {
+            "enabled": llm_enabled,
+            "model": os.environ.get("LLM_MODEL") if llm_enabled else None,
+            # Which feedback state the advisor was shown (trust, lesson counts,
+            # digest of the lessons in its prompt). Advisory only: see checker.py.
+            "feedback": {
+                "hash": llm_feedback.get("hash"),
+                "config_hash": llm_feedback.get("config_hash"),
+                **(llm_feedback.get("summary") or {}),
+            } if llm_feedback else None,
+        },
         "clock_source": clock_source,
         "random_seed": None,  # nothing in the decision path draws random numbers
         "signing": {"key_id": key_id(signing_key), "demo_key": is_demo_key(signing_key)},

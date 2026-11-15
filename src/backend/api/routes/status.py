@@ -3,9 +3,12 @@
 Owner: person A
 """
 
+import os
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.api.state import AppState, get_state
+from backend.pipelines.d_llm.feedback import current_feedback
 from backend.records.handoff import review_arrival
 
 router = APIRouter()
@@ -33,6 +36,28 @@ def status(astronaut_id: str, state: AppState = Depends(get_state)) -> dict:
         "ts": record["ts"],
         "autonomy": _autonomy(state, record),
         "ground_review": _ground_review(state, astronaut_id),
+        "advisor": _advisor(state, record),
+    }
+
+
+def _advisor(state: AppState, record: dict) -> dict:
+    """The onboard advisor (pipeline D) as the HUD shows it: on or off, what it
+    said for this record, and its current trust from the control centre's
+    corrections. It never carries the tier; the tier above is the Checker's."""
+    manifest = record.get("execution_manifest") or {}
+    llm = manifest.get("llm") or {}
+    enabled = os.environ.get("LLM_ENABLED", "0") == "1"
+    said = None
+    for p in record.get("proposals") or []:
+        if p.get("pipeline_id") == "d_llm":
+            said = p.get("tier")
+    now = current_feedback(state.store)["summary"] if enabled else None
+    return {
+        "enabled": enabled,
+        "said": said,                      # None: produced nothing, withheld, or off
+        "shown_at_decision": llm.get("feedback"),
+        "trust": now,                      # live trust, after the latest review
+        "role": "advisory: may raise a tier, never lower one; never a vote",
     }
 
 

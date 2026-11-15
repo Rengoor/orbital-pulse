@@ -4,6 +4,7 @@ Owner: person A
 """
 
 import logging
+import os
 from datetime import datetime, timezone
 from typing import Any
 
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from backend.api.state import AppState, get_state
 from backend.orchestrator import _READING_VALIDATOR, decide
 from backend.orchestrator import decide as _failsafe
+from backend.pipelines.d_llm.feedback import current_feedback
 from backend.records.handoff import assess
 
 logger = logging.getLogger(__name__)
@@ -65,6 +67,13 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
         now, clock_source = datetime.now(timezone.utc), "server"
     now = now.astimezone(timezone.utc).replace(tzinfo=None) if now.tzinfo else now
 
+    # The onboard advisor's feedback ledger (control-centre corrections and the
+    # trust they add up to) rides along in the rules, so decide() stays pure
+    # and the record's manifest can say which feedback state was in force.
+    rules = state.rules
+    if os.environ.get("LLM_ENABLED", "0") == "1":
+        rules = {**state.rules, "llm_feedback": current_feedback(state.store)}
+
     def build(prev_hash: str) -> dict:
         common = dict(
             now=now,
@@ -74,7 +83,7 @@ def checkin(body: CheckinRequest, state: AppState = Depends(get_state)) -> dict:
             signing_key=state.signing_key,
         )
         try:
-            return decide(readings=readings, baselines=state.baselines, rules=state.rules, **common)
+            return decide(readings=readings, baselines=state.baselines, rules=rules, **common)
         except Exception as exc:  # noqa: BLE001 - last line of defence
             # decide() already fails safe for anything it can catch. If it
             # still raised, record the fail-safe verdict rather than leave the

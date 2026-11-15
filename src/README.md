@@ -37,7 +37,10 @@ substitute.
 | `backend/` | Pipelines, Checker, signed records, downlink queue, Earth verifier and replay, API |
 | `frontend/` | Orbital Pulse UI, served by the backend at `/ui/`: helmet HUD (`hud/`), crew health monitor (`tablet/monitor.html`), Earth base (`earth/`), plus the token/component library |
 | `data/` | Schemas (the contract), real NASA ingestion, simulator, scenarios, fixtures |
-| `evidence/` | One-command reproducible results, red-team suite, usability notes, docs and slides |
+| `evidence/` | One-command reproducible results, red-team suite, usability notes and docs (limits, sources, hazard coverage, AI declaration) |
+| `validation/` | Real NASA measurements run through the unmodified decision system |
+
+The presentation is `Orbital Pulse NASA Space Apps 2026.pptx` at the repository root.
 
 ## Delay-aware autonomy
 

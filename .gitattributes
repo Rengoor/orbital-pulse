@@ -1,0 +1,8 @@
+# Files whose checksums are pinned by tests or manifests must check out
+# byte-for-byte on every platform, so line-ending conversion is disabled.
+src/frontend/js/vendor/**        -text
+src/validation/data/**           -text
+src/data/nasa/**/processed/**    -text
+*.pptx                           binary
+*.wasm                           binary
+*.task                           binary

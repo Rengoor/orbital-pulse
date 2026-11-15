@@ -1,0 +1,30 @@
+# Ground-truth feedback for the onboard advisor (pipeline D, the local LLM).
+#
+# Every value here is PROJECT-DEFINED. None has been tuned against a real
+# local model; see backend/pipelines/d_llm/README.md. The file is hashed into
+# each decision's execution manifest so a change of these numbers is visible
+# in the record.
+
+trust:
+  start: 0.5          # a fresh advisor is neither trusted nor distrusted
+  min: 0.0
+  max: 1.0
+  # Reward and punishment per scored lesson (added to trust, then clamped).
+  # Missing risk is punished three times harder than a false alarm: in this
+  # system a calmer-than-true tier is the dangerous direction.
+  reward:
+    correct:    +0.08   # advisor's tier == tier confirmed by the control centre
+    over_call:  -0.05   # advisor more severe than confirmed (false alarm)
+    under_call: -0.15   # advisor calmer than confirmed (missed risk)
+    abstained:  -0.02   # advisor produced nothing usable for a reviewed decision
+  # What the current trust means for the pipeline. The advisor is NEVER a
+  # vote: these states only decide whether its proposal is shown to the
+  # Checker at all (where it can raise a tier, never lower one).
+  states:
+    untrusted: 0.35     # trust below this: proposal withheld from the Checker
+    probation: 0.60     # trust below this: proposal passed, labelled probationary
+    # at or above probation: trusted (still advisory, still escalate-only)
+
+prompt:
+  max_corrections: 12  # most recent scored corrections shown to the model
+  max_examples: 12     # most recent unscored worked examples (NASA data) shown
